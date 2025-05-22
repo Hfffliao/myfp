@@ -34,7 +34,7 @@ public class InHandler {
 		User user = userService.getByusername(name);
 		if (user != null && user.getPassword().equals(word)) {
 			HttpSession session = request.getSession();
-			session.setAttribute("user", user);
+			session.setAttribute("user", user.getUserName());
 			System.out.print(true);
 			return "redirect:/suc";
 		} else {

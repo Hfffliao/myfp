@@ -222,7 +222,8 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
     <a href="#" class="logo">霖依智造</a>
     <i class="fas fa-bars menu-toggle" onclick="toggleMenu()"></i> <!-- 添加汉堡菜单 -->
     <div class="nav-links" id="navLinks">
-      <a href="#" class="nav-link" >liaoyi</a>
+      <a href="<%=request.getSession().getAttribute("user")==null?Code.host+"main.jsp":"#" %>"
+         class="nav-link" ><%=request.getSession().getAttribute("user")%></a>
       <a href="<%=Code.host %>pages/maint.jsp" class="nav-link">首页</a>
       <a href="#" class="nav-link">产品</a>
       <a href="<%=Code.host %>pages/fuwu.jsp" class="nav-link">服务</a>

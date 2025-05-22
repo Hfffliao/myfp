@@ -37,7 +37,7 @@ public class Register extends HttpServlet{
 	 * 处理 HTTP GET 请求，负责用户注册流程，包括验证码生成和验证。
 	 */
 	@PostMapping("/register")
-	public void doGet( HttpServletResponse response,
+	public void doPost( HttpServletResponse response,
 					  HttpServletRequest request) throws IOException, ServletException {
 		// 设置响应内容类型为 HTML，字符编码为 UTF-8
 		response.setContentType("text/html;charset=utf-8");
