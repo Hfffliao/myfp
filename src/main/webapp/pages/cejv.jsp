@@ -302,7 +302,7 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
             <a href="#" class="nav-link" >liaoyi</a>
             <a href="<%=Code.host %>pages/maint.jsp" class="nav-link">首页</a>
             <a href="#" class="nav-link">产品</a>
-            <a href="#" class="nav-link">服务</a>
+            <a href="<%=Code.host %>pages/fuwu.jsp" class="nav-link">服务</a>
             <a href="<%=Code.host %>pages/man.jsp" class="nav-link">关于</a>
             <a href="#" class="nav-link">联系</a>
         </div>

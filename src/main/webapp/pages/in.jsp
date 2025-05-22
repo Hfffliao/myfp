@@ -228,7 +228,7 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
     </section>
 
     <div class="card-container">
-        <form action="<%=Code.host %>demo3" method="post" class="card1">
+        <form action="<%=Code.host %>login" method="post" class="card1">
             用户名（邮箱地址）：<input type ="text" name="username" class="card-in"><br>
 
             密码：<input type ="password" name="password" class="card-in"><br>

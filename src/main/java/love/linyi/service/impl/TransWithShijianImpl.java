@@ -1,7 +1,9 @@
 package love.linyi.service.impl;
 
 import love.linyi.service.TransWithShijian;
+import org.springframework.stereotype.Service;
 
+@Service
 public class TransWithShijianImpl implements TransWithShijian {
    /* String start; String date; String stop;
     String starth; String datem; String stoph;

@@ -1,17 +1,17 @@
-package love.linyi.Servlet;
+package love.linyi.controller;
 
 import love.linyi.domin.User;
 import love.linyi.service.SendVerificationCode;
 import love.linyi.service.UserService;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.*;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -19,44 +19,33 @@ import java.io.PrintWriter;
  * Register 类用于处理用户注册请求，继承自 HttpServlet。
  * 该类负责生成验证码、验证用户输入的验证码以及处理用户注册逻辑。
  */
-@WebServlet("/register")
+@Controller
 public class Register extends HttpServlet{
 	/****/
 	// 用于发送验证码的服务类实例
+	@Autowired
 	private SendVerificationCode sendVerificationCode;
 	// 用于处理用户相关业务逻辑的服务类实例
+	@Autowired
 	private UserService userService;
 
 	/**
 	 * 初始化 Servlet 时调用，从 Spring 容器中获取所需的服务实例。
 	 */
-	@Override
-	public void init() throws ServletException {
-		super.init();
-		// 从 Spring 容器中获取 OutputFile 实例
-		WebApplicationContext ctx = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		// 从 Spring 容器中获取 SendVerificationCode 实例
-		sendVerificationCode = ctx.getBean(SendVerificationCode.class);
-		// 从 Spring 容器中获取 UserService 实例
-		userService = ctx.getBean(UserService.class);
-	}
 
 	/**
 	 * 处理 HTTP GET 请求，负责用户注册流程，包括验证码生成和验证。
-	 * @param req HttpServletRequest 对象，包含客户端请求信息
-	 * @param res HttpServletResponse 对象，用于向客户端发送响应
 	 */
-	public void doGet(HttpServletRequest req,HttpServletResponse res) throws IOException, ServletException {
+	@PostMapping("/register")
+	public void doGet( HttpServletResponse response,
+					  HttpServletRequest request) throws IOException, ServletException {
 		// 设置响应内容类型为 HTML，字符编码为 UTF-8
-		res.setContentType("text/html;charset=utf-8");
+		response.setContentType("text/html;charset=utf-8");
 		// 获取用于向客户端发送文本的 PrintWriter 对象
-		PrintWriter pw = res.getWriter();
-		// 从请求参数中获取用户名
-		String name = req.getParameter("username");
-		// 从请求参数中获取密码
-		String word = req.getParameter("password");
-		// 从请求参数中获取用户输入的验证码
-		String verification = req.getParameter("verification");
+		PrintWriter pw = response.getWriter();
+		String name=request.getParameter("username");
+		String word=request.getParameter("password");
+		 String verification=request.getParameter("verification");
 		// 打印获取到的用户名、密码和验证码
 		System.out.println(name);
 		System.out.println(word);
@@ -98,18 +87,18 @@ public class Register extends HttpServlet{
 			} catch (Exception e) {
 				pw.println("验证码发送失败");
 			}
-			req.setAttribute("myverification", verification);
-			req.setAttribute("username", name);
+			request.setAttribute("myverification", verification);
+			request.setAttribute("username", name);
 			// 转发请求到注册页面
-			req.getRequestDispatcher("/pages/register.jsp").forward(req, res);
+			request.getRequestDispatcher("/pages/register.jsp").forward(request, response);
 		} else {
 			// 如果用户输入了验证码，验证验证码是否正确
-			if (verification.equals(req.getParameter("myverification"))) {
+			if (verification.equals(request.getParameter("myverification"))) {
 				// 打印验证码正确信息到客户端和控制台
 				pw.println("验证码正确");
 				System.out.println("验证码正确");
 				// 验证两次输入的密码是否一致
-				if (word.equals(req.getParameter("repassword"))) {
+				if (word.equals(request.getParameter("repassword"))) {
 					// 打印密码两次一致信息到客户端
 					pw.println("密码两次一致");
 					// 调用服务类保存用户信息
@@ -122,15 +111,13 @@ public class Register extends HttpServlet{
 					// 打印跳转登录页面信息到客户端
 					pw.print("跳转登录页面");
 					// 转发请求到注册成功页面
-					req.getRequestDispatcher("/pages/registersuc.jsp").forward(req, res);
+					request.getRequestDispatcher("/pages/registersuc.jsp").forward(request, response);
 					// 关闭 PrintWriter 对象
 					pw.close();
 				}
 			}
 		}
 	}
-	public void doPost(HttpServletRequest req,HttpServletResponse res) throws IOException, ServletException {
-		doGet(req,res);
-	}
+
 
 }
