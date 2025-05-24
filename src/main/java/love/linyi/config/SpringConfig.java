@@ -7,6 +7,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @Configuration
 @ComponentScan({"love.linyi.service","love.linyi.dao","love.linyi.config","love.linyi.domin"})
 @PropertySource("classpath:love/linyi/config/jdbc.properties")
+@EnableAspectJAutoProxy
 @MapperScan("love.linyi.dao")
 @Import({JdbcConfig.class,MybatisConfig.class})
 public class SpringConfig {
