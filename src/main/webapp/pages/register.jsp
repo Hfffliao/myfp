@@ -136,6 +136,12 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
             background-color: #e8d4da;
             font-size: large;
         }
+        #area1 {
+            width: 25%;
+            height: 50px;
+            background-color: #e8d4da;
+            font-size: large;
+        }
 
         /* 响应式设计 */
         @media (max-width: 768px) {
@@ -202,24 +208,21 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
     </section>
 
     <div class="card-container">
-        <form action="<%=Code.host %>register" method="post" class="card1">
+        <form action="<%=Code.host %>register" method="get" class="card1">
             <h3> 用户名（邮箱地址，用于接收验证码）：</h3>
             <div style="display: flex;flex-direction: row;width: 100%;justify-content: center;gap: 1%;">
                 <input type ="email" name="username" value="<%=request.getAttribute("username")%>" class="card-in" style="display: block;">
-                <input type="submit" value="获取验证码" id="area" style="font-size: small;width: 20%;">
+                <input type="button" value="获取验证码" id="area" style="font-size: small;width: 20%;" onclick=startCountdown('area')>
             </div>
         </form>
         <form action="<%=Code.host %>register" method="post" class="card1">
             <input type ="hidden" name="username" value="<%=request.getAttribute("username")%>">
-            <input type ="hidden" name="myverification" value="<%=request.getAttribute("myverification")%>">
             <h3>  密码：</h3>
             <input type ="password" name="password" class="card-in" >
             <h3>  再次输入密码：</h3>
             <input type ="password" name="repassword" class="card-in" >
             验证码：<input type ="text" name="verification" class="card-in">
-            <input type="submit" value="注册" id="area">
-
-
+            <input type="submit" value="注册" id="area1">
         </form>
     </div>
 </main>
@@ -260,30 +263,85 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
     }
 </script>
 <script>
-    function disableSubmitButton() {
-        // 获取提交按钮
-        var submitButton = document.getElementById('area');
-        // 禁用按钮
-        submitButton.disabled = true;
-        // 设置初始倒计时时间
-        var countdown = 60;
-        // 更新按钮文本显示倒计时
-        submitButton.value = '提交 (' + countdown + 's)';
+    // 倒计时控制函数 - 核心解决方案
+    function startCountdown(buttonId) {
+        // 0. 获取按钮元素
+        const button = document.getElementById(buttonId);
+        if (!button) return;
 
-        // 每秒更新一次倒计时
-        var timer = setInterval(function() {
-            countdown--;
-            if (countdown > 0) {
-                submitButton.value = '提交 (' + countdown + 's)';
-            } else {
-                // 倒计时结束，启用按钮
-                submitButton.disabled = false;
-                submitButton.value = '提交';
-                // 清除定时器
-                clearInterval(timer);
-            }
-        }, 1000);
+        // 1. 获取当前时间并保存到 sessionStorage
+        const startTime = new Date().getTime();
+        sessionStorage.setItem(`${buttonId}StartTime`, startTime);
+
+        // 2. 保存按钮原始文本
+        const originalValue = button.value;
+        sessionStorage.setItem(`${buttonId}OriginalValue`, originalValue);
+
+        // 3. 立即更新按钮状态
+        button.disabled = true;
+        button.value = `${originalValue} (${60}s)`;
+
+        // 4. 提交表单获取验证码
+        document.querySelector('form[method="get"]').submit();
     }
+
+    // 页面加载时检查是否有倒计时需要恢复
+    window.addEventListener('DOMContentLoaded', () => {
+        // 0. 只检查"获取验证码"按钮
+        const buttonId = 'area';
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+
+        // 1. 尝试获取sessionStorage中的倒计时数据
+        const storedStartTime = sessionStorage.getItem(`${buttonId}StartTime`);
+        const storedOriginalValue = sessionStorage.getItem(`${buttonId}OriginalValue`);
+
+        // 2. 如果没有存储数据或已过期，则重置按钮状态
+        if (!storedStartTime || !storedOriginalValue) {
+            button.disabled = false;
+            button.value = "获取验证码";
+            return;
+        }
+
+        // 3. 计算剩余时间
+        const startTime = parseInt(storedStartTime);
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        let remaining = Math.max(0, 60 - elapsed);
+
+        // 4. 如果时间已过期
+        if (remaining <= 0) {
+            // 恢复按钮并清除存储
+            button.disabled = false;
+            button.value = storedOriginalValue;
+            sessionStorage.removeItem(`${buttonId}StartTime`);
+            sessionStorage.removeItem(`${buttonId}OriginalValue`);
+            return;
+        }
+
+        // 5. 更新按钮初始状态
+        button.disabled = true;
+        button.value = storedOriginalValue +remaining+`s`;
+
+        // 6. 启动倒计时计时器
+        const timer = setInterval(() => {
+            // 计算新的剩余时间
+            const currentElapsed = Math.floor((Date.now() - startTime) / 1000);
+            remaining = Math.max(0, 60 - currentElapsed);
+
+            if (remaining > 0) {
+                button.value = storedOriginalValue+remaining+`s`;
+            } else {
+                // 倒计时结束，恢复按钮状态
+                clearInterval(timer);
+                button.disabled = false;
+                button.value = storedOriginalValue;
+
+                // 清除存储的数据
+                sessionStorage.removeItem(`${buttonId}StartTime`);
+                sessionStorage.removeItem(`${buttonId}OriginalValue`);
+            }
+        }, 1000); // 每秒更新一次
+    });
 </script>
 </body>
 </html>
