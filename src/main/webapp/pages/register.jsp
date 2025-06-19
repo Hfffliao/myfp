@@ -8,99 +8,13 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
     <title>霖依</title>
     <!-- 引入字体图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="css/linyistyle.css">
     <style>
-        /* CSS变量定义 */
-        :root {
-            --primary-color: #177bdf;
-            --secondary-color: #34db95;
-            --accent-color: #e67e22;
-            --text-color: #4c4545;
-            --box-shadow: 1 4px/*方框下面的阴影长度*/ 6px rgba(245, 12, 12, 0.1);
-        }
-
-        /* 重置默认样式 */
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        body {
-            line-height: 1.6;
-            color: var(--text-color);
-            background: #f5f6fa;
-        }
-
-        /* 导航栏样式 */
-        .navbar {
-            background: linear-gradient( var(--primary-color),rgba(88, 88, 205, 0.5));
-            padding: 1rem 2rem;
-            box-shadow: var(--box-shadow);
-            position:relative;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            color: white;
-            font-size: 1.5rem;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .logo:hover{
-            transform: scale(1.05);
-
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        /* 主内容区 */
-        .hero {
-
-            background: linear-gradient(  rgba(88, 88, 205, 0.5), rgba(198, 18, 18, 0.5)),
-            url('https://source.unsplash.com/random/1920x1080') center/cover;
-            display:flex;
-            align-items:center;
-            justify-content: center;
-            text-align: center;
-            color: rgb(221, 208, 208);
-            margin-bottom: 0rem;
-        }
-
-        .hero-content h1 {
-            font-size: 3.5rem;
-            margin-bottom: 3rem;
-            text-shadow: 20px 20px 1px rgba(0, 0, 0, 0.5);
-        }
-        .hero-content h2 {
-
-            transition:tall 0.5s ;
-        }
-        .hero-content h2:hover{
-            transform: scale(1.15);
-            transform: translateY(-2px);
-
-        }
-
-        /* 卡片布局 */
         .card-container {
-            width:100%;
+            max-width:none;
             margin: 0rem ;
             font-size: large;
-            padding: 2rem;
+            padding: 3rem;
             display:flex;
             display: flex;
             /* 水平排列 */
@@ -114,7 +28,7 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
 
         }
         .card1{
-            width: 100%;
+            display:flex;
             display: flex;
             /* 水平排列 */
             flex-direction: column;
@@ -126,7 +40,7 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
         }
         .card-in{
             font-size: 20px;
-            width: 40%;
+            width: 300px;
             height: 40px;
             padding: 1px; /* 内边距，调整内容与边框的距离 */
         }
@@ -136,56 +50,8 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
             background-color: #e8d4da;
             font-size: large;
         }
-        #area1 {
-            width: 25%;
-            height: 50px;
-            background-color: #e8d4da;
-            font-size: large;
-        }
+        </style>
 
-        /* 响应式设计 */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-        }
-
-        /* 页脚样式 */
-        footer {
-            background: linear-gradient( rgba(198, 18, 18, 0.5), #e61414);
-            color: rgb(243, 236, 236);
-            padding: 3rem 2rem;
-            margin-top: 0rem;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .social-link {
-            color: white;
-            font-size: 1.5rem;
-            transition: opacity 0.3s ease;
-        }
-
-        .social-link:hover {
-            opacity: 0.8;
-        }
-    </style>
 </head>
 <body>
 
@@ -342,6 +208,18 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
             }
         }, 1000); // 每秒更新一次
     });
+    function toggleMenu() {
+        const navLinks = document.getElementById('navLinks');
+        navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    // 点击菜单外区域关闭菜单（可选）
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-container')) {
+            document.getElementById('navLinks').style.display = 'none';
+        }
+    });
 </script>
+
 </body>
 </html>

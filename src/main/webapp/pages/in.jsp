@@ -6,120 +6,11 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=0.6">
     <title>霖依</title>
+    <link rel="stylesheet" href="/pages/css/linyistyle.css">
+
     <!-- 引入字体图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* CSS变量定义 */
-        :root {
-            --primary-color: #177bdf;
-            --secondary-color: #34db95;
-            --accent-color: #e67e22;
-            --text-color: #4c4545;
-            --box-shadow: 1 4px/*方框下面的阴影长度*/ 6px rgba(245, 12, 12, 0.1);
-        }
-
-        /* 重置默认样式 */
-        *{
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
-        }
-
-        body {
-            line-height: 1.6;
-            color: var(--text-color);
-            background: #f5f6fa;
-        }
-
-        /* 导航栏样式 */
-        .navbar {
-            background: linear-gradient( var(--primary-color),rgba(88, 88, 205, 0.5));
-            padding: 1rem 2rem;
-            box-shadow: var(--box-shadow);
-            position:relative;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            color: white;
-            font-size: 1.5rem;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .logo:hover{
-            transform: scale(1.05);
-
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        /* 主内容区 */
-        /*
-   * .hero 类用于设置页面主视觉区域的样式。
-   * 这个区域通常作为页面内容的突出视觉介绍部分。
-   */
-        .hero {
-            /*
-             * 创建一个渐变叠加效果，叠加在一张来自 Unsplash 的随机背景图片上。
-             * 渐变从半透明的蓝色过渡到半透明的红色。
-             * 背景图片居中显示并覆盖整个区域。
-             */
-            background: linear-gradient(  rgba(88, 88, 205, 0.5), rgba(198, 18, 18, 0.5)),
-            url('https://source.unsplash.com/random/1920x1080') center/cover;
-
-            /*
-             * 将显示属性设置为 flex，启用弹性盒子布局。
-             * 这使得子元素的对齐和分布更加灵活。
-             */
-            display:flex;
-
-            /* 垂直居中 .hero 区域内的子元素。 */
-            align-items:center;
-
-            /* 水平居中 .hero 区域内的子元素。 */
-            justify-content: center;
-
-            /* 居中显示 .hero 区域内的文本内容。 */
-            text-align: center;
-
-            /* 设置 .hero 区域内文本的颜色。 */
-            color: rgb(221, 208, 208);
-
-            /*
-             * 设置 .hero 区域的底部外边距为 0。
-             * 对于值为 0 的情况，'rem' 单位是多余的，可以省略。
-             */
-            margin-bottom: 0rem;
-        }
-
-        .hero-content h1 {
-            font-size: 3.5rem;
-            margin-bottom: 3rem;
-            text-shadow: 20px 20px 1px rgba(0, 0, 0, 0.5);
-        }
-        .hero-content h2 {
-
-            transition:tall 0.5s ;
-        }
-        .hero-content h2:hover{
-            transform: scale(1.15);
-            transform: translateY(-2px);
-
-        }
 
         /* 卡片布局 */
         .card-container {
@@ -175,36 +66,7 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
         }
 
         /* 页脚样式 */
-        footer {
-            background: linear-gradient( rgba(198, 18, 18, 0.5), #e61414);
-            color: rgb(243, 236, 236);
-            padding: 3rem 2rem;
-            margin-top: 0rem;
-        }
 
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .social-link {
-            color: white;
-            font-size: 1.5rem;
-            transition: opacity 0.3s ease;
-        }
-
-        .social-link:hover {
-            opacity: 0.8;
-        }
     </style>
 </head>
 <body>

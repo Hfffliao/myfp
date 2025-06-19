@@ -5,6 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="/pages/css/linyistyle.css">
+
 </head>
 <body>
 <h1>注册成功</h1>

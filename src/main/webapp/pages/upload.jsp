@@ -114,7 +114,6 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
 
         /* 卡片布局 */
         .card-container {
-            max-width:none;
             margin: 0rem ;
             padding: 5rem;
             display:grid;
@@ -273,17 +272,17 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
         <div>
             <h3>注：上传的界面会在同级目录下</h3>
         </div>
-        <form class="inline-block-label1" action="<%=Code.host %>upload" method="post" enctype="multipart/form-data">
+        <form id="uploadForm" class="inline-block-label1" action="<%=Code.host %>upload" method="post" enctype="multipart/form-data">
 
             <input class="inline-block-label" type="file" id="file1" name="file" required><br>
-            <input  class="inline-block-label" type="submit" value="上传">
-
-        </form>
-        <div>
-
-        </div>
+            <div style="display: inline-flex; flex-direction: row;width: 100%;align-items: center">
+                <input id="uploadbt" class="inline-block-label"  type="button" value="上传" onclick="btonclick()">
+                <div id="progressContainer" style="width: 70%;height: 25px; background-color: #f3d5d5 ;color: antiquewhite; display: none;align-items: center">
+                    <div id="progressBar" style="width: 0%; height: 20px; background-color: #82aae5; text-align: center;  color: rgb(190, 68, 68);">0%</div>
+                </div>
+            </div>
+            </form>
     </div>
-
 </main>
 
 <footer>
@@ -305,6 +304,82 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
         </div>
     </div>
 </footer>
+<script>//进度条
+    const uploadForm = document.getElementById('uploadForm');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const uploadButton = document.getElementById('uploadbt');
+    let intervalId;
+
+    function btonclick() {
+        uploadButton.disabled = true;
+        const formData = new FormData(uploadForm);
+        const xhr = new XMLHttpRequest();
+        console.log("开始上传");
+        xhr.open('POST', '<%=Code.host %>upload', true);
+        xhr.timeout = 1000*60*60*24;
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                const responseText = xhr.responseText;
+                console.log('服务器返回信息:', responseText);
+                // 根据不同的返回信息进行处理
+                if (responseText.includes('login')) {
+                    alert('请先登录后再进行上传操作');
+                    // 可以在这里添加跳转到登录页面的逻辑
+                    window.location.href = '<%=Code.host %>main.jsp';
+                } else if (responseText.includes('file')) {
+                    alert('错误：请求不是文件上传请求');
+                    stopUpload();
+
+                } else if (responseText.includes('success')) {
+
+                } else if (responseText.includes('upload error')) {
+                    // 处理其他未知响应
+                    stopUpload();
+
+                    alert(responseText);
+                }
+            }
+        }
+        // 显示进度条
+        progressContainer.style.display = 'inline-flex';
+        xhr.send(formData);
+        console.log("show progress bar");
+        // 开始轮询获取进度
+        intervalId = setInterval(() => {
+            console.log("轮询进度");
+            const progressXhr = new XMLHttpRequest();
+            progressXhr.open('GET', '<%=Code.host %>upload-progress', true);
+            progressXhr.onreadystatechange = function() {
+                if (progressXhr.readyState === 4 && progressXhr.status === 200) {
+                    const progress = parseInt(progressXhr.responseText);
+                    progressBar.style.width = progress + '%';
+                    progressBar.textContent = progress + '%';
+
+                    if (progress >= 100 || progress < 0) {
+
+                        if (progress >= 100) {
+                            alert('文件上传成功');
+                        } else {
+                            alert('文件上传失败');
+                        }
+                        stopUpload();
+                    }
+                }
+            };
+            progressXhr.send();
+        }, 3000);
+    }
+    function stopUpload() {
+        // 停止上传
+        clearInterval(intervalId);
+        // 隐藏进度条
+        progressContainer.style.display = 'none';
+        progressBar.style.width = '0%';
+        progressBar.textContent = '0%';
+        uploadButton.disabled = false;
+    }
+</script>
 <script>
     async function copyToClipboard() {
         // 获取要复制的文本内容

@@ -4,14 +4,16 @@ import love.linyi.domin.User;
 import love.linyi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
-
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 @Controller
 public class InHandler {
@@ -47,8 +49,31 @@ public class InHandler {
 	 * 处理 GET 请求，这里留空，可根据需求添加逻辑
 	 * @return 视图名
 	 */
-	@GetMapping("/login")
-	public String doGet() {
-		return "loginPage"; // 可根据实际情况返回登录页面视图名
+	@GetMapping("/tencent4135514882438919469.txt")
+	public void doGet(HttpServletResponse response) throws IOException {
+		// 指定 txt 文件的路径
+		String filePath = "/siwei/tencent4135514882438919469.txt";
+		File file = new File(filePath);
+
+		// 设置响应头
+		response.setContentType("text/plain");
+		response.setContentLength((int) file.length());
+		response.setHeader("Content-Disposition", "attachment; filename=\"tencent4135514882438919469.txt\"");
+
+		// 读取文件内容并写入响应流
+		try (FileInputStream fis = new FileInputStream(file);
+			 OutputStream os = response.getOutputStream()) {
+			byte[] buffer = new byte[1024*2];
+			int bytesRead;
+			while ((bytesRead = fis.read(buffer)) != -1) {
+				os.write(buffer, 0, bytesRead);
+			}
+			os.flush();
+		}  catch (IOException e) {
+		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		response.getWriter().write("Error reading file");
+		System.err.println("Error reading file: " + e.getMessage());
+		e.printStackTrace();
+		}
 	}
 }
