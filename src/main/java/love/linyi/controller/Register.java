@@ -35,9 +35,6 @@ public class Register extends HttpServlet{
 	// 用于处理用户相关业务逻辑的服务类实例
 	@Autowired
 	private UserService userService;
-    @Autowired
-    private HttpSession httpSession;
-
 
 	private String getverification(){
 		int min = 0;
@@ -79,40 +76,36 @@ public class Register extends HttpServlet{
 		// 获取用于向客户端发送文本的 PrintWriter 对象
 		PrintWriter pw = response.getWriter();
 		String name = request.getParameter("username");
-		String word = request.getParameter("password");
 		String verification ;
 		// 打印获取到的用户名、密码和验证码
 		System.out.println(name);
-		System.out.println(word);
-		if (name == null) {
-			pw.println("请输入用户名（邮箱）");
-			System.out.println("请输入用户名");
+		if (name == null ||name.equals("")||name.equals("null")) {
+			pw.print("email error");
+			System.out.println("email error");
 			return;
 		}
 		User user = userService.getByusername(name);
 		if (user != null) {
-			pw.println("用户名已存在");
-			System.out.println("用户名已存在");
+			pw.print("user exist");
+			System.out.println("user exist");
 			return;
 		}
 		// 初始化验证码
 		verification = getverification();
 		// 打印生成的验证码
 		//System.out.println("生成验证码:" + verification);
-		// 调用服务类发送验证码给用户
+
 		try {
+			// 调用服务类发送验证码给用户
 			sendVerificationCode.sendVerificationCode(name, "霖依", "感谢使用霖依，您的验证码是：" + verification);
 			// 将生成的验证码存入请求属性，供后续页面使用
-
+			storeCaptcha(verification, request.getSession());
+			request.getSession().setAttribute("username", name);
+		    pw.print("send success");
 		} catch (Exception e) {
-			pw.println("验证码发送失败");
+			pw.print("send failed");
 		}
-		// 3. 生成验证码图片
 
-		storeCaptcha(verification, request.getSession());
-		request.setAttribute("username", name);
-		// 转发请求到注册页面
-		request.getRequestDispatcher("/pages/register.jsp").forward(request, response);
 
 	}
 	@PostMapping("/register")
@@ -121,7 +114,18 @@ public class Register extends HttpServlet{
 		response.setContentType("text/html;charset=utf-8");
 		// 获取用于向客户端发送文本的 PrintWriter 对象
 		PrintWriter pw = response.getWriter();
-		String name = request.getParameter("username");
+		Object count =request.getSession().getAttribute("count");
+		if (count==null){
+			request.getSession().setAttribute("count",1);
+		}
+		if (((int)count)>5){
+			pw.println("验证码错误次数过多，请重新获取");
+			request.getSession().removeAttribute("verification");
+			request.getSession().removeAttribute("verificationExpire");
+			count=0;
+			return;
+		}
+		String name =(String) request.getSession().getAttribute("username");
 		String word = request.getParameter("password");
 		String verification = (String) request.getSession().getAttribute("verification");
 		Long verificationExpire = (Long) request.getSession().getAttribute("verificationExpire");
@@ -157,6 +161,7 @@ public class Register extends HttpServlet{
 			// 打印验证码错误信息到控制台
 			System.out.println("verification error");
 			// 关闭 PrintWriter 对象
+
 			pw.close();
 		}
 	}

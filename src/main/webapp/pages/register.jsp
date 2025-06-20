@@ -8,35 +8,33 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
     <title>霖依</title>
     <!-- 引入字体图标 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="css/linyistyle.css">
+    <link rel="stylesheet" href="/pages/css/linyistyle.css">
     <style>
         .card-container {
             max-width:none;
             margin: 0rem ;
             font-size: large;
-            padding: 3rem;
+            padding: 5%;
             display:flex;
-            display: flex;
             /* 水平排列 */
             flex-direction: column;
             /* 允许换行 */
             flex-wrap: wrap;
             gap: 1rem;
             background:rgba(198, 18, 18, 0.5);
-            justify-content: center;
+            /*justify-content: flex-start;*/
             align-items: center;
 
         }
         .card1{
-            display:flex;
+            width: 70%;
             display: flex;
-            /* 水平排列 */
             flex-direction: column;
             /* 允许换行 */
             flex-wrap: wrap;
             gap: 1rem;
-            justify-content: center;
-            align-items: center;
+            /*justify-content: flex-start;*/
+            align-items: flex-start;
         }
         .card-in{
             font-size: 20px;
@@ -45,6 +43,12 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
             padding: 1px; /* 内边距，调整内容与边框的距离 */
         }
         #area {
+            width: 25%;
+            height: 50px;
+            background-color: #e8d4da;
+            font-size: large;
+        }
+        #area1 {
             width: 25%;
             height: 50px;
             background-color: #e8d4da;
@@ -72,22 +76,22 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
             <div class="hero1"> <h2>填写相关信息进行注册</h2></div>
         </div>
     </section>
-
     <div class="card-container">
-        <form action="<%=Code.host %>register" method="get" class="card1">
+        <div id="verificationform"  class="card1" >
             <h3> 用户名（邮箱地址，用于接收验证码）：</h3>
-            <div style="display: flex;flex-direction: row;width: 100%;justify-content: center;gap: 1%;">
-                <input type ="email" name="username" value="<%=request.getAttribute("username")%>" class="card-in" style="display: block;">
-                <input type="button" value="获取验证码" id="area" style="font-size: small;width: 20%;" onclick=startCountdown('area')>
-            </div>
-        </form>
-        <form action="<%=Code.host %>register" method="post" class="card1">
+            <input id="email" type ="email" name="username"  class="card-in" style="display: block;">
+        </div>
+        <form action="<%=Code.host %>register" method="post" class="card1" >
             <input type ="hidden" name="username" value="<%=request.getAttribute("username")%>">
             <h3>  密码：</h3>
             <input type ="password" name="password" class="card-in" >
             <h3>  再次输入密码：</h3>
             <input type ="password" name="repassword" class="card-in" >
-            验证码：<input type ="text" name="verification" class="card-in">
+            验证码：
+            <div class="card1" style="flex-direction: row;width: 100%">
+                <input type ="text" name="verification" class="card-in" value="验证码" style="width: 200px">
+                <input type="button" value="获取验证码" id="area" style="font-size: small;width: 20%;" onclick=startCountdown('area')>
+            </div>
             <input type="submit" value="注册" id="area1">
         </form>
     </div>
@@ -132,27 +136,70 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
     // 倒计时控制函数 - 核心解决方案
     function startCountdown(buttonId) {
         // 0. 获取按钮元素
+
+        const xmlhttp = new XMLHttpRequest();
         const button = document.getElementById(buttonId);
         if (!button) return;
-
-        // 1. 获取当前时间并保存到 sessionStorage
-        const startTime = new Date().getTime();
-        sessionStorage.setItem(`${buttonId}StartTime`, startTime);
-
-        // 2. 保存按钮原始文本
-        const originalValue = button.value;
-        sessionStorage.setItem(`${buttonId}OriginalValue`, originalValue);
-
+        const emailInput = document.getElementById('email');
+        const email = emailInput.value;
+        // 邮箱格式验证
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            alert('请输入有效的邮箱地址');
+            button.disabled = false;
+            return;
+        }
+        // 构建包含邮箱参数的请求 URL
+        const url = new URL("<%=Code.host %>register");
+        url.searchParams.append('username', email);
         // 3. 立即更新按钮状态
         button.disabled = true;
-        button.value = `${originalValue} (${60}s)`;
+        xmlhttp.open("GET",url.toString(),true);
+        xmlhttp.send();
 
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                // 处理服务器响应
+                const response = xmlhttp.responseText;
+                switch (response) {
+                    case "email error":
+                        alert("邮箱错误");
+                        button.disabled = false;
+                        break;
+                    case "user exist":
+                        alert(response);
+                        button.disabled = false;
+                        break;
+                    case "send success":
+                        alert(response);
+                        // 1. 获取当前时间并保存到 sessionStorage
+                        const startTime = new Date().getTime();
+                        sessionStorage.setItem(`${buttonId}StartTime`, startTime);
+                        // 2. 保存按钮原始文本
+                        const originalValue = button.value;
+                        sessionStorage.setItem(`${buttonId}OriginalValue`, originalValue);
+                        recoveryTimer();
+                        break;
+                    case "send failed":
+                        alert(response);
+                        button.disabled = false;
+                        break;
+                }
+            }
+        }
         // 4. 提交表单获取验证码
-        document.querySelector('form[method="get"]').submit();
+
     }
 
     // 页面加载时检查是否有倒计时需要恢复
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener( `DOMContentLoaded` ,() => {
+        recoveryTimer();
+    });
+    function cancelTimer(){
+        sessionStorage.removeItem(`${buttonId}StartTime`);
+        sessionStorage.removeItem(`${buttonId}OriginalValue`);
+    }
+    function recoveryTimer(){
         // 0. 只检查"获取验证码"按钮
         const buttonId = 'area';
         const button = document.getElementById(buttonId);
@@ -195,7 +242,7 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
             remaining = Math.max(0, 60 - currentElapsed);
 
             if (remaining > 0) {
-                button.value = storedOriginalValue+remaining+`s`;
+                button.value = remaining+`s`;
             } else {
                 // 倒计时结束，恢复按钮状态
                 clearInterval(timer);
@@ -207,18 +254,7 @@ pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
                 sessionStorage.removeItem(`${buttonId}OriginalValue`);
             }
         }, 1000); // 每秒更新一次
-    });
-    function toggleMenu() {
-        const navLinks = document.getElementById('navLinks');
-        navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
     }
-
-    // 点击菜单外区域关闭菜单（可选）
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.nav-container')) {
-            document.getElementById('navLinks').style.display = 'none';
-        }
-    });
 </script>
 
 </body>
