@@ -14,6 +14,7 @@ public interface ShiJianDao {
    // public void delete(Integer id);
   //  @Select("select id, time as otime, distance from shijian where id=#{id}")
  // public ShiJian getById(Integer id);
+
   @Select("select time as otime, distance from shijian")
   List<ShiJian> getAll();
     @Select("select time as otime, distance from shijian where time>#{min} and time<#{max}")

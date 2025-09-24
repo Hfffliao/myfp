@@ -6,10 +6,16 @@
          pageEncoding="UTF-8" import="love.linyi.controller.Code"%>
 <%@ page import="java.io.*" %>
 <html>
+<script>
+    // 定义全局变量存储上下文路径
+    const contextPath = "${pageContext.request.contextPath}";
+</script>
+<script src="${pageContext.request.contextPath}/src/main/webapp/static/pages/css/hangbege.js"></script>
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="/pages/css/linyistyle.css">
+    <link rel="stylesheet" href="/src/main/webapp/static/pages/css/linyistyle.css">
     <title>Windows命令执行</title>
+
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
 
@@ -79,22 +85,7 @@
     </style>
 </head>
 <body>
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="#" class="logo">霖依智造</a>
-        <i class="fas fa-bars menu-toggle" onclick="toggleMenu()"></i> <!-- 添加汉堡菜单 -->
-        <div class="nav-links" id="navLinks">
-            <a href="<%=request.getSession().getAttribute("user")==null?Code.host+"main.jsp":"#" %>"
-               class="nav-link" ><%=request.getSession().getAttribute("user")%></a>
-            <a href="<%=Code.host %>pages/maint.jsp" class="nav-link">首页</a>
-            <a href="#" class="nav-link">产品</a>
-            <a href="<%=Code.host %>pages/fuwu.jsp" class="nav-link">服务</a>
-            <a href="<%=Code.host %>pages/man.jsp" class="nav-link">关于</a>
-            <a href="#" class="nav-link">联系</a>
-        </div>
-    </div>
-</nav>
-
+<div id="header"></div>
 <main>
     <section class="hero">
         <div class="hero-content">
@@ -161,25 +152,6 @@
     </div>
 </main>
 
-<footer>
-    <div class="footer-content">
-        <div>
-            <h3>联系我们</h3>
-            <p>电话: (+86) 19807393661</p>
-
-            <p>邮箱： <a href="https://mail.qq.com/" id="copyContent" onclick="copyToClipboard()"> 3390351358@qq.com</a></p>
-            <p><a href="https://beian.miit.gov.cn">湘公网安备30174248163393967号</a></p>
-        </div>
-        <div>
-            <h3>关注我们</h3>
-            <div class="social-links">
-                <a href="#" class="social-link"><i class="fab fa-weibo"></i></a>
-                <a href="#" class="social-link"><i class="fab fa-weixin"></i></a>
-                <a href="#" class="social-link"><i class="fab fa-github"></i></a>
-            </div>
-        </div>
-    </div>
-</footer>
-
+<div id="footer"></div>
 </body>
 </html>

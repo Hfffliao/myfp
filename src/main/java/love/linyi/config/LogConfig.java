@@ -40,6 +40,6 @@ public class LogConfig {
         Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
         rootLogger.addAppender(consoleAppender);
         rootLogger.addAppender(fileAppender);
-        rootLogger.setLevel(Level.INFO);
+        rootLogger.setLevel(Level.ERROR);
     }
 }

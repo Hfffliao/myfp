@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<script>
+    // 定义全局变量存储上下文路径
+    function getContextPath() {
+        const pathName = window.location.pathname;
+        console.log('pathName:', pathName);
+        // 查找第二个 / 的索引
+        const Index = pathName.indexOf('p');
+        return pathName.substring(0,Index-1 );
+    }
+    const contextPath = getContextPath();
+    console.log('上下文路径:', contextPath);
+
+    // 动态创建 script 标签并设置 src 属性
+    const script = document.createElement('script');
+    script.src = contextPath + '/pages/css/hangbege.js';
+    document.head.appendChild(script);
+    // 动态创建 link 标签并设置 href 属性
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = contextPath + '/pages/css/linyistyle.css';
+    document.head.appendChild(link);
+</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <title>霖依</title>
+    <!-- 引入字体图标 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.2/css/all.min.css">
+    <style>
+
+        /* 卡片布局 */
+        .card-container {
+            max-width:none;
+            margin: 0rem ;
+            font-size: large;
+            padding: 3rem;
+            display:flex;
+            /* 水平排列 */
+            flex-direction: column;
+            /* 允许换行 */
+            flex-wrap: wrap;
+            gap: 1rem;
+            background:rgba(198, 18, 18, 0.5);
+            justify-content: center;
+            align-items: center;
+
+        }
+        .card1{
+            display:flex;
+            display: flex;
+            /* 水平排列 */
+            flex-direction: column;
+            /* 允许换行 */
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            align-items: center;
+        }
+        .card-in{
+            font-size: 20px;
+            width: 300px;
+            height: 40px;
+            padding: 1px; /* 内边距，调整内容与边框的距离 */
+        }
+        #area {
+            width: 25%;
+            height: 50px;
+            background-color: #e8d4da;
+            font-size: large;
+        }
+
+
+        /* 页脚样式 */
+
+    </style>
+</head>
+<body>
+
+<div id="header"></div>
+<main>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>登录home，享受专业的服务</h1>
+            <div class="hero1"> <h2>输入给定的用户名和密码进行登录</h2></div>
+        </div>
+    </section>
+
+    <div class="card-container">
+        <div  method="post" class="card1">
+            用户名（邮箱地址）：<input type ="text" name="username" class="card-in"><br>
+
+            密码：<input  type ="password" name="password" class="card-in"><br>
+            <input type="button"  value="登录" id="area" onclick="bt()">
+
+
+        </div>
+        <div>
+            <a id="register" >注册账号</a>
+            <a id="forgetpassword" >注册账号</a>
+        </div>
+    </div>
+</main>
+<script>
+  document.getElementById("register").href = contextPath + "/pages/register.html";
+  document.getElementById("forgetpassword").href = contextPath + "/pages/getpassword.html";
+  window.addEventListener('load',init)
+  function init() {
+    
+  }
+  function bt(){
+    fetch(endpointPath+"/login",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        // 修复点：把 JSON.stringify 放在 body 内
+        body:JSON.stringify({
+            username:document.querySelector("input[name='username']").value,
+            password:document.querySelector("input[name='password']").value
+        }),
+        credentials: "include" // 携带会话信息
+    }) // fetch 选项结束
+    .then(function(response){
+        const sessionId = response.headers.get('TK');
+        console.log("sessionId:"+sessionId);
+        if (sessionId) {
+            localStorage.setItem('sessionId', sessionId);
+        }
+        if(response.ok){
+            return response.json(); 
+        }  else {
+            alert('登录失败');
+            throw new Error(`登录失败，状态码: ${response.status}` );
+        } 
+    }).then(function(data){
+        
+        if(data.user){
+            const currentDate = new Date();
+            const expirationDate = new Date(currentDate.getTime() + 30* 60 * 1000);
+            localStorage.setItem('username',data.user);
+            localStorage.setItem('expirationDate', expirationDate.toISOString());
+            console.log('登录成功');
+
+
+            alert('登录成功');
+             window.location.href = contextPath + "/pages/main.html";
+        }else{
+            throw new Error('验证成功但是无用户信息');
+        }
+       
+    }).catch(function(error){
+        console.error('登录失败:', error);
+    })
+}
+</script>
+<div id="footer"></div>
+</body>
+</html>

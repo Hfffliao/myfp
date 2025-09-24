@@ -64,17 +64,17 @@ public class OutputFileImpl implements OutputFile {
                             if (fileName != null && !fileName.isEmpty()) {
                                 String filePath = uploadPath + File.separator + fileName;
                                 File storeFile = new File(filePath);
-                                item.write(storeFile);
+//                                item.write(storeFile);
                             }
                         }
                     }
                 }
-                System.out.println("File uploaded successfully: " + Code.host + "siwei/" + filename);
+                System.out.println("File uploaded successfully: " + request.getContextPath() + "siwei/" + filename);
 //                response.getWriter().write("File uploaded successfully: " + Code.host + "siwei/" + getFilename());
                 asyncContext.complete();
 
             } catch (Exception e) {
-                System.out.println("File upload failed: " + e.getMessage());
+                System.out.println("outputfilimpl File upload failed: " + e.getMessage());
                 throw new RuntimeException(e);
 
             }

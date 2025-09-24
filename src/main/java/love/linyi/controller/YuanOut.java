@@ -31,7 +31,7 @@ public class YuanOut {
         if (request.getSession().getAttribute("user") == null) {
             response.setContentType("text/html; charset=UTF-8");
             response.getWriter().write("请登录");
-            response.sendRedirect(Code.host + "main.jsp");
+            response.sendRedirect(request.getContextPath()  + "/main.html");
             return null;
         }
         // 设置跨域访问头
@@ -54,7 +54,7 @@ public class YuanOut {
             // 将数据存入模型
             modelAndView.addObject("dataList", ST);
             // 设置视图名称
-            modelAndView.setViewName("/pages/cejv.jsp");
+            modelAndView.setViewName(request.getContextPath() +"/pages/cejv.html");
         }
         return modelAndView;
     }

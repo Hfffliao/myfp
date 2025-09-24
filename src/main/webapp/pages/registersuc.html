@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<script></script><!--不加这个就会不加载js-->
+<script>
+    // 定义全局变量存储上下文路径
+    function getContextPath() {
+        const pathName = window.location.pathname;
+        console.log('pathName:', pathName);
+        // 查找第二个 / 的索引
+        const Index = pathName.indexOf('p');
+        return pathName.substring(0,Index-1 );
+    }
+    const contextPath = getContextPath();
+    console.log('上下文路径:', contextPath);
+
+    // 动态创建 script 标签并设置 src 属性
+    const script = document.createElement('script');
+    script.src = contextPath + '/pages/css/hangbege.js';
+    document.head.appendChild(script);
+    // 动态创建 link 标签并设置 href 属性
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = contextPath + '/pages/css/linyistyle.css';
+    document.head.appendChild(link);
+</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <title>霖依</title>
+    <!-- 引入字体图标 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+<div id="header"></div>
+<h1>注册成功</h1>
+<p>
+    <a >点击此处进入登录界面</a>
+</p>
+<script>
+    document.querySelector('a').href = contextPath + '/pages/in.html';
+</script>
+</body>
+</html>

@@ -14,6 +14,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Segoe UI', system-ui, sans-serif;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -25,16 +26,24 @@ body {
 /* 导航栏样式 */
 .navbar {
     background: linear-gradient( var(--primary-color),rgba(88, 88, 205, 0.5));
-    padding: 1rem 2rem;
-    box-shadow: var(--box-shadow);
-    position:relative;
-    top: 0;
-    z-index: 1000;
-}
 
+    height: 70px;
+    width:100% ;
+
+    padding: 10px  10px;
+    padding-right: 25px;
+    box-shadow: var(--box-shadow);
+    position:absolute;
+    z-index: 1000;
+    transition: all 2s ease;
+}
+    .navbar.fixed {
+        position: fixed; /* 固定定位 */
+        top: 0; /* 固定在视口顶部 */
+    }
 .nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 100%;
+    margin: 0 ;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -44,33 +53,71 @@ body {
     color: white;
     font-size: 1.5rem;
     text-decoration: none;
+    /*width: 10%;*/
     transition: all 0.3s ease;
 }
 
 .logo:hover{
-    transform: scale(1.05);
+    transform: scale(1.1);
 
 }
 
-.nav-links {
+.hamburger {
     display: flex;
-    gap: 2rem;
+    flex-direction: column;
+    cursor: pointer;
+}
+.nav-links {
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .nav-link {
+    height: 100%;
+    width: 12%;
     color: rgba(255, 255, 255, 0.9);
     text-decoration:none;
-    padding: 0.5rem 1rem;
+    /*padding: 2% 2%;*/
     border-radius: 6px;
     transition: all 0.3s ease;
+    /* 允许文字正常换行 */
+    white-space: normal;
+    /* 让长单词在必要时换行 */
+    overflow-wrap: break-word;
+    /* 强制在单词内换行，防止长单词溢出 */
+    word-break: break-all;
+
 }
 
 .nav-link:hover {
     background: rgba(147, 137, 137, 0.1);
     transform: translateY(-2px);
 }
+.userInfo{
+    display: none;
+    position: absolute;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+.userInfo_context{
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+}
+.userInfo_context:hover {
+    background: rgba(147, 137, 137, 0.1);
+    transform: translateY(-2px);
+}
 /* 主内容区 */
+
 .hero {
+    position:relative;
     min-height: 40vh;
     background: linear-gradient(  rgba(88, 88, 205, 0.5), rgba(198, 18, 18, 0.5)),
     url('https://source.unsplash.com/random/1920x1080') center/cover;
@@ -99,6 +146,7 @@ body {
 
 /* 页脚样式 */
 footer {
+    position:relative;
     background: linear-gradient( rgba(198, 18, 18, 0.5), #e61414);
     color: rgb(243, 236, 236);
     padding: 3rem 2rem;
@@ -114,6 +162,7 @@ footer {
 }
 
 .social-links {
+    position:relative;
     display: flex;
     gap: 1rem;
     margin-top: 1rem;
@@ -128,31 +177,31 @@ footer {
 .social-link:hover {
     opacity: 0.8;
 }
-    @media (max-width: 768px) {
-        /* 导航栏改为汉堡菜单 */
-        -links {
-            display: none; /* 默认隐藏导航链接 */
-            width: 100%;
-            flex-direction: column;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: var(--primary-color);
-            padding: 1rem;
-        }
+    /*@media (max-width: 768px) {*/
+    /*    !* 导航栏改为汉堡菜单 *!*/
+    /*    -links {*/
+    /*        display: none; !* 默认隐藏导航链接 *!*/
+    /*        width: 100%;*/
+    /*        flex-direction: column;*/
+    /*        position: absolute;*/
+    /*        top: 100%;*/
+    /*        left: 0;*/
+    /*        background: var(--primary-color);*/
+    /*        padding: 1rem;*/
+    /*    }*/
 
-        .nav-link {
-            width: 100%;
-            text-align: center;
-            padding: 1rem;
-        }
+    /*    .nav-link {*/
+    /*        width: 100%;*/
+    /*        text-align: center;*/
+    /*        padding: 1rem;*/
+    /*    }*/
 
-        /* 显示汉堡菜单图标 */
-        .menu-toggle {
-            display: block !important;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        /* 卡片容器减少内边距 */
-    }
+    /*    !* 显示汉堡菜单图标 *!*/
+    /*    .menu-toggle {*/
+    /*        display: block !important;*/
+    /*        color: white;*/
+    /*        font-size: 1.5rem;*/
+    /*        cursor: pointer;*/
+    /*    }*/
+    /*    !* 卡片容器减少内边距 *!*/
+    /*}*/

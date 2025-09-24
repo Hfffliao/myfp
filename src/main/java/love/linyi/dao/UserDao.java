@@ -15,7 +15,7 @@ public interface UserDao {
     //public void update(ShiJian shiJian);
     //  @Delete("delete from shijian where id=#{id}")
     // public void delete(Integer id);
-      @Select("select   username as userName, password from user where username=#{username}")
+      @Select("select   username as userName, password,id from user where username=#{username}")
      public User getByusername(@Param("username") String username );
     @Select("select username as userName, password from user")
     List<User> getAll();

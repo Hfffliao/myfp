@@ -31,7 +31,7 @@ public class UpLoadHtml {
        // 检查用户是否登录
         if (request.getSession().getAttribute("user") == null) {
             response.setContentType("text/html; charset=UTF-8");
-            response.getWriter().write("please login");
+            response.getWriter().print("please login");
             System.out.println("please login");
             return;
         }

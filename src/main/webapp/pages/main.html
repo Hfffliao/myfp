@@ -1,0 +1,98 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<script>
+    // 定义全局变量存储上下文路径
+    function getContextPath() {
+        const pathName = window.location.pathname;
+        console.log('pathName:', pathName);
+        // 查找第二个 / 的索引
+        const Index = pathName.indexOf('p');
+        return pathName.substring(0,Index-1 );
+    }
+    const contextPath = getContextPath();
+    console.log('上下文路径:', contextPath);
+
+    // 动态创建 script 标签并设置 src 属性
+    const script = document.createElement('script');
+    script.src = contextPath + '/pages/css/hangbege.js';
+    document.head.appendChild(script);
+    // 动态创建 link 标签并设置 href 属性
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = contextPath + '/pages/css/linyistyle.css';
+    document.head.appendChild(link);
+</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <title>霖依</title>
+    <!-- 引入字体图标 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* 卡片布局 */
+        .card-container {
+            max-width:none;
+            margin: 0rem ;
+            padding: 5rem;
+            display:grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            background:rgba(198, 18, 18, 0.5);
+
+        }
+
+        .card {
+            background: rgb(191, 207, 221);
+            color: rgb(29, 24, 24);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-20px);
+            box-shadow: 50px 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0.5; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 1s ease forwards;
+        }
+    </style>
+</head>
+<div id="header"></div>
+<main>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>欢迎来到home</h1>
+            <div class="hero1"> <h2>霖依创造</h2></div>
+
+        </div>
+    </section>
+
+    <div class="card-container">
+        <article class="card">
+            <h2>创新设计</h2>
+            <p>采用最新设计理念，打造卓越用户体验</p>
+        </article>
+        <article class="card">
+            <h2>尖端技术</h2>
+            <p>运用前沿技术，保障系统稳定高效</p>
+        </article>
+        <article class="card">
+            <h2>优质服务</h2>
+            <p>7×24小时专业团队技术支持</p>
+        </article>
+    </div>
+</main>
+<div id="footer"></div>
+</body>
+</html>

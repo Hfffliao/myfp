@@ -1,33 +1,34 @@
 package love.linyi.controller;
-
 import love.linyi.domin.User;
 import love.linyi.service.SendVerificationCode;
 import love.linyi.service.UserService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.function.EntityResponse;
+import org.springframework.web.servlet.function.ServerResponse;
 
-import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Register 类用于处理用户注册请求，继承自 HttpServlet。
  * 该类负责生成验证码、验证用户输入的验证码以及处理用户注册逻辑。
  */
-@Controller
-public class Register extends HttpServlet{
+@RestController
+@ResponseBody
+public class Register{
 	/****/
 	// 用于发送验证码的服务类实例
 	@Autowired
@@ -109,21 +110,24 @@ public class Register extends HttpServlet{
 
 	}
 	@PostMapping("/register")
-	public void doPost( HttpServletResponse response, HttpServletRequest request) throws IOException, ServletException {
-		// 设置响应内容类型为 HTML，字符编码为 UTF-8
-		response.setContentType("text/html;charset=utf-8");
-		// 获取用于向客户端发送文本的 PrintWriter 对象
-		PrintWriter pw = response.getWriter();
+	public ResponseEntity<Map<String,String>> doPost(HttpServletResponse response, HttpServletRequest request) throws IOException, ServletException {
+		Map<String,String> result = new HashMap<>();
 		Object count =request.getSession().getAttribute("count");
+		//count用于防止别人反复输入验证码
 		if (count==null){
-			request.getSession().setAttribute("count",1);
+			request.getSession().setAttribute("count",0);
+			count=0;
 		}
+		count=(int)count+1;
+		request.getSession().setAttribute("count",count);
+		System.out.println(count);
 		if (((int)count)>5){
-			pw.println("验证码错误次数过多，请重新获取");
 			request.getSession().removeAttribute("verification");
 			request.getSession().removeAttribute("verificationExpire");
 			count=0;
-			return;
+			request.getSession().setAttribute("count",count);
+			result.put("status","验证码输入错误次数过多");
+			return ResponseEntity.ok(result);
 		}
 		String name =(String) request.getSession().getAttribute("username");
 		String word = request.getParameter("password");
@@ -147,22 +151,21 @@ public class Register extends HttpServlet{
 				// 转发请求到注册成功页面
 				request.getSession().removeAttribute("verification");
 				request.getSession().removeAttribute("verificationExpire");
-				request.getRequestDispatcher("/pages/registersuc.jsp").forward(request, response);
-				// 关闭 PrintWriter 对象
-				pw.close();
+				result.put("status","success");
+				return ResponseEntity.ok(result);				// 关闭 PrintWriter 对象
+
 			}
 			else {
 				System.out.println("two word error");
-				pw.println("两次密码不一致或者密码为空");
+				result.put("status","两次密码输入不一致");
+				return ResponseEntity.ok(result);
 			}
 		}else {
-			// 验证失败，返回错误信息
-			pw.println("验证码错误或已过期");
 			// 打印验证码错误信息到控制台
 			System.out.println("verification error");
-			// 关闭 PrintWriter 对象
-
-			pw.close();
+			// 验证失败，返回错误信息
+			result.put("status","验证码输入错误");
+			return ResponseEntity.ok(result);
 		}
 	}
 

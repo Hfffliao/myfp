@@ -22,16 +22,15 @@ public class SucSer {
 	 * @return ModelAndView 对象
 	 */
 	@GetMapping
-	public ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		ModelAndView modelAndView = new ModelAndView();
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
 		if (request.getSession().getAttribute("user") != null) {
 			response.setContentType("text/html;charset=utf-8");
-			modelAndView.setViewName("redirect:" + Code.host + "pages/maint.jsp");
+
 		} else {
 			response.setContentType("text/html; charset=UTF-8");
 			response.getWriter().write("请登录");
-			modelAndView.setViewName("redirect:" + Code.host + "main.jsp");
 		}
-		return modelAndView;
+
 	}
 }

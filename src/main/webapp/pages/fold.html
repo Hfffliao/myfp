@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <title>霖依</title>
+    <!-- 引入字体图标 -->
+    <script>
+        // 定义全局变量存储上下文路径
+        function getContextPath() {
+            const pathName = window.location.pathname;
+            //   console.log('pathName:', pathName);
+            // 查找第二个 / 的索引
+            const Index = pathName.indexOf('p');
+            return pathName.substring(0, Index - 1);
+        }
+        const contextPath = getContextPath();
+        //  console.log('上下文路径:', contextPath);
+
+        // 动态加载脚本的函数
+        function loadScript(src, onLoad, onError) {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = onLoad;
+            script.onerror = onError;
+            document.head.appendChild(script);
+        }
+
+        // 动态加载样式表的函数
+        function loadStylesheet(href, onLoad, onError) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            link.onload = onLoad;
+            link.onerror = onError;
+            document.head.appendChild(link);
+        }
+
+        // 加载 hangbege.js
+        loadScript(
+            contextPath + '/pages/css/hangbege.js',
+            () => {
+                // console.log('hangbege.js 加载成功');
+            },
+            () => console.error('hangbege.js 加载失败')
+        );
+
+        // 加载 linyistyle.css
+        loadStylesheet(
+            contextPath + '/pages/css/linyistyle.css',
+            () => { },//console.log('linyistyle.css 加载成功'),
+            () => console.error('linyistyle.css 加载失败')
+        );
+    </script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        /* CSS变量定义 */
+
+        /* 卡片布局 */
+        .card-container {
+            max-width: none;
+            margin: 0rem;
+            padding: 5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            background: rgba(198, 18, 18, 0.5);
+
+        }
+
+
+        .file-system-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .toolbar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .file-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 0px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
+        }
+
+        .file-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .file-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .folder {
+            color: #ffd700;
+        }
+
+        .file {
+            color: #6c757d;
+        }
+
+        .file-name {
+            flex-grow: 1;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+        }
+
+        .delete-btn:hover {
+            background-color: #bb2d3b;
+        }
+
+        .new-folder-input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex-grow: 1;
+        }
+
+        .rename-btn {
+            background-color: #1259dd;
+            margin-left: 10px;
+        }
+
+        .rename-btn:hover {
+            background-color: #218838;
+        }
+
+        .rename-input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .fileshow {
+            width: 100%;
+            height: 800px;
+            z-index: 1000;
+            position: fixed;
+            /* 固定定位 */
+            top: 100px;
+            display: none;
+            padding: 10px 20px 10px 20px;
+        }
+        .moreoperation{
+            position: fixed;
+            z-index: 1000;
+            display: none;
+            width: 50%;
+            height: 50%;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+              /* 居中定位 */
+              top: 50%;         /* 顶部距离视口50% */
+            left: 50%;        /* 左侧距离视口50% */
+            transform: translate(-50%, -50%); /* 向左上方偏移自身宽高的50%，实现居中 */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header"></div>
+    <main>
+        <!-- 文件展示窗口 -->
+        <div id="fileshow" class="fileshow">
+            <button id="closefileshow" onclick="closefileshow()">关闭</button>
+            <button id="downloadlink">下载</button>
+            <!-- //文件展示项目 -->
+            <div id="fileshowcontent" style="width: 100%;height: 500px;">
+            </div>
+        </div>
+        <!-- 更多操作按钮的选项 -->
+        <div id="moreoperation" class="moreoperation">
+            <button onclick="opensealfile()">封印文件</button>
+             <!-- 添加关闭按钮 -->
+             <button onclick="closeMoreOperation()" style="float: right; background: #dc3545; margin-bottom: 10px;">×</button>
+            <div style="margin: 15px 0;">
+                <label for="sealTime" style="margin-right: 8px;">解封时间:</label>
+                <input type="datetime-local" id="sealTime" name="sealTime" required>
+                <button onclick="sealfile()">确定封印</button>
+            </div>
+        </div>
+
+        <section class="hero">
+            <div class="hero-content">
+                <h1>文件系统</h1>
+                <h2><span id="message">在此处添加，删除，移动，上传或是预览您的文件</span></h2>
+            </div>
+        </section>
+        <div class="card-container " style="min-height: 500px;">
+            <div class="file-system-container">
+                <div class="toolbar" id="toolbar">
+                    <button onclick="createNewFolder()">新建文件夹</button>
+                    <!-- 新增上传文件夹按钮 -->
+                    <button onclick="document.getElementById('folder-input').click()">上传文件夹</button>
+                    <!-- 新增上传文件按钮 -->
+                    <button onclick="document.getElementById('file-input').click()">上传文件</button>
+                    <!-- 隐藏的文件输入元素 -->
+                    <input type="file" id="file-input" style="display: none;" onchange="handleFolderUpload(this)"
+                        multiple>
+                    <!-- 隐藏的文件夹输入元素 -->
+                    <input type="file" id="folder-input" style="display: none;" onchange="handleFolderUpload(this)"
+                        webkitdirectory directory>
+                </div>
+                <div id="new-folder-form" style="display: none;">
+                    <input type="text" class="new-folder-input" id="new-folder-name" placeholder="输入文件夹名称">
+                    <button onclick="saveNewFolder()">保存</button>
+                    <button onclick="cancelNewFolder()">取消</button>
+                </div>
+                <div id="path-display">当前路径: /</div>
+                <ul class="file-list" id="file-list">
+                    <!-- 文件和文件夹将通过 JavaScript 动态添加 -->
+                </ul>
+            </div>
+        </div>
+    </main>
+    <div id="footer"></div>
+</body>
+
+
+
+<script>
+    function closefileshow() {
+        document.getElementById('fileshow').style.display = 'none';
+    }
+
+    // 新增：关闭 moreoperation 面板的函数
+    function closeMoreOperation() {
+        document.getElementById('moreoperation').style.display = 'none';
+    }
+
+    ///////创建文件夹
+    function createNewFolder() {
+        // 隐藏其他表单
+        const otherForm = document.getElementById('toolbar');
+        otherForm.style.display = 'none';
+        // 显示新建文件夹表单
+        const newFolderForm = document.getElementById('new-folder-form');
+        newFolderForm.style.display = 'block';
+    }
+    // 保存新建文件夹
+    async function saveNewFolder() {
+
+        //获取新建文件夹表单
+        const folderName = document.getElementById('new-folder-name').value.trim();
+        if (folderName) {
+            try {
+                const pathParam = currentPath.join('/');
+                const response = await fetch('/create-folder', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        path: pathParam,
+                        name: folderName
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('创建文件夹失败');
+                }
+
+                await initFileList();
+            } catch (error) {
+                console.error('创建文件夹出错:', error);
+            }
+        }
+        cancelNewFolder();
+    }
+    //关闭新建文件夹  
+    function cancelNewFolder() {
+        document.getElementById('new-folder-form').style.display = 'none';
+        document.getElementById('toolbar').style.display = 'block';
+    }
+
+    ///////// 删除文件或文件夹
+    async function deleteItem(name,type,id) {
+        try {
+            let joincurrentPath = currentPath.join('/');
+            //如果joincurrentPath不为空，且不以/结尾，添加/来构造合法url
+            console.log(joincurrentPath);
+            if (joincurrentPath.length > 0) {
+                joincurrentPath += '/';
+            }
+            // 对路径和文件名进行 URL 编码
+            const encodedPath = encodeURIComponent(joincurrentPath);
+            const encodedName = encodeURIComponent(name);
+            const encodedid = encodeURIComponent(id);
+
+            let url = `${endpointPath}/file`;
+            url+=`?filepn=${encodedPath}${encodedName}&fileid=${encodedid}&type=${type}`
+            const response = await fetch(url, {
+                method: 'DELETE',
+                credentials: "include"
+            });
+            console.log('id='+id+';type='+type);
+            if (!response.ok) {
+                throw new Error('删除文件/文件夹失败');
+            }
+            await getFilePathSystemAndInit();
+        } catch (error) {
+            await getFilePathSystemAndInit();
+            console.error('删除文件/文件夹出错:', error);
+        }
+    }
+    ///////// 处理文件上传
+    async function handleFileUpload(input) {
+        const files = Array.from(input.files);
+        const formData = new FormData();
+        let tatolsize = 0;//记录总大小
+
+
+        files.forEach(file => {
+            tatolsize += file.size;
+        });
+
+        //添加大小
+        formData.append('tatolsize', tatolsize);
+        // 将文件添加到 FormData
+        files.forEach(file => {
+            formData.append('files', file, file.name);
+        });
+        //添加相对路径
+        formData.append('relativePath', currentPath.join('/'));
+        try {
+            const sessionId = localStorage.getItem('sessionId');
+            let requestUrl = endpointPath + '/folder';
+            requestUrl += `;jsessionid=${sessionId}`;
+            const response = await fetch(requestUrl, {
+                method: 'POST',
+                body: formData,
+                credentials: "include"
+                // 监听上传进度
+            });
+
+            if (!response.ok) {
+                throw new Error('上传失败');
+            }
+
+            const data = await response.json();
+            console.log('上传成功', data);
+            await initFileList();
+        } catch (error) {
+            console.error('上传错误', error);
+        } finally {
+            input.value = ''; // 清空输入框
+        }
+    }
+    /////////处理上传文件夹
+    function handleFolderUpload(input) {
+        const files = Array.from(input.files);
+        const formData = new FormData();
+        let tatolsize = 0;//记录总大小
+        // 构建文件夹结构和添加文件到 FormData
+        let filestructure = [];
+        // 辅助函数，根据路径在filestructure查找或创建文件夹
+        function findOrCreateFolder(folderArray, pathParts) {
+            let current = folderArray;
+            for (let i = 0; i < pathParts.length; i++) {
+                const part = pathParts[i];
+                let folder = current.find(item => item.name === part && item.type === 'folder');
+                if (!folder) {
+                    folder = { name: part, type: 'folder', children: [] };
+                    current.push(folder);
+                }
+                current = folder.children;
+            }
+            return current;
+        }
+        //主函数，便利文件构造文件结构，计算总大小，将文件添加到formdata
+        files.forEach(file => {
+            const relativePath = file.webkitRelativePath;
+            if (relativePath) {
+                const pathParts = relativePath.split('/');
+                const filename = pathParts.pop(); // 移除并返回最后一个元素作为文件名
+                const parentFolder = findOrCreateFolder(filestructure, pathParts);
+                // 添加文件到父文件夹
+                parentFolder.push({ name: filename, type: 'file' });
+            } else {
+                // 处理根目录下的文件
+                filestructure.push({ name: file.name, type: 'file' });
+            }
+            tatolsize += file.size;
+            formData.append('files', file, file.name);
+        });
+        //添加大小
+        formData.append('tatolsize', tatolsize);
+
+        //添加相对路径
+        formData.append('relativePath', currentPath.join('/'));
+        //添加文件夹结构
+        formData.append('filestructure', JSON.stringify(filestructure));
+        console.log(tatolsize);
+        console.log(JSON.stringify(filestructure));
+        // 发送数据到后端
+        const sessionId = localStorage.getItem('sessionId');
+        let requestUrl = endpointPath + '/folder';
+        requestUrl += `;jsessionid=${sessionId}`;
+        fetch(requestUrl, {
+            method: 'POST',
+            body: formData,
+            credentials: "include"
+
+        })
+            .then(response => {
+                if (response.status == 401) {
+                    alert('please login');
+                }
+                if (!response.ok) {
+                    throw new Error('上传失败');
+                }
+
+                return response.json();
+            })
+            .then(data => {
+                alert('upload success');
+                getFilePathSystemAndInit();
+            })
+            .catch(error => {
+                console.error('上传错误', error);
+            })
+            .finally(() => {
+                input.value = ''; // 清空输入框
+            });
+    }
+    //验证空间够吗
+    async function checkSpace(tatolsize) {
+        const sessionId = localStorage.getItem('sessionId');
+        let requestUrl = endpointPath + '/folder_check';
+        requestUrl += `;jsessionid=${sessionId}`;
+        try {
+            const response = await fetch(requestUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    tatolsize: tatolsize
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('上传失败');
+            }
+            return response.json();
+        } catch (error) {
+            console.error('上传错误', error);
+        }
+    }
+    //////////// 开始重命名
+    function startRename(index){
+        // 获取当前路径下的文件系统数据
+        let currentFileSystem = fileSystem;
+        currentPath.forEach(pathPart => {
+            const folder = currentFileSystem.find(item => item.name === pathPart && item.type === 'folder');
+            if (folder) {
+                currentFileSystem = folder.children;
+            }
+        });
+
+        const item = currentFileSystem[index];
+        const listItem = document.querySelectorAll('.file-item')[index + (currentPath.length > 0 ? 1 : 0)];
+        const nameElement = listItem.querySelector('.file-name');
+        const oldName = item.name;
+
+        const input = document.createElement('input');
+        input.className = 'rename-input';
+        input.value = oldName;
+        listItem.replaceChild(input, nameElement);
+
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'rename-btn';
+        saveBtn.textContent = '保存';
+        saveBtn.onclick = () => saveRename(index, input.value, listItem, oldName);
+        listItem.replaceChild(saveBtn, listItem.querySelector('.rename-btn'));
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'delete-btn';
+        cancelBtn.textContent = '取消';
+        cancelBtn.onclick = () => cancelRename(index, listItem, oldName);
+        listItem.appendChild(cancelBtn);
+    }
+    // 保存重命名
+    function saveRename(index, newName, listItem, oldName) {
+        if (newName.trim()) {
+            // 获取当前路径下的文件系统数据
+            let currentFileSystem = fileSystem;
+            currentPath.forEach(pathPart => {
+                const folder = currentFileSystem.find(item => item.name === pathPart && item.type === 'folder');
+                if (folder) {
+                    currentFileSystem = folder.children;
+                }
+            });
+
+            currentFileSystem[index].name = newName;
+            initFileList();
+        } else {
+            cancelRename(index, listItem, oldName);
+        }
+    }
+    // 取消重命名
+    function cancelRename(index, listItem, oldName) {
+        const nameElement = document.createElement('span');
+        nameElement.className = 'file-name';
+        nameElement.textContent = oldName;
+        listItem.replaceChild(nameElement, listItem.querySelector('.rename-input'));
+
+        const renameBtn = document.createElement('button');
+        renameBtn.className = 'rename-btn';
+        renameBtn.textContent = '重命名';
+        renameBtn.onclick = () => startRename(index);
+        listItem.replaceChild(renameBtn, listItem.querySelector('.rename-btn'));
+
+        listItem.removeChild(listItem.querySelector('.delete-btn:last-child'));
+    }
+    ////////// 单击文件项
+    async function clickFileItem(name) {
+        try {
+            let joincurrentPath = currentPath.join('/');
+            //如果joincurrentPath不为空，且不以/结尾，添加/来构造合法url
+            console.log(joincurrentPath);
+            if (joincurrentPath.length > 0) {
+                joincurrentPath += '/';
+            }
+            // 对路径和文件名进行 URL 编码
+            const encodedPath = encodeURIComponent(joincurrentPath);
+            const encodedName = encodeURIComponent(name);
+            let url = `${endpointPath}/file`;
+            //添加查询参数
+            url += `?filepn=${encodedPath}${encodedName}`;
+            console.log(url);
+            // 发送请求
+            const response = await fetch(url, {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                // 创建一个自定义错误对象，包含 response 属性
+                const customError = new Error(`HTTP error! status: ${response.status}`);
+                customError.response = response;
+                throw customError;
+            }
+
+            // 获取响应的 Blob 对象
+            const blob = await response.blob();
+
+            // 创建下载链接
+            const urlObject = window.URL.createObjectURL(blob);
+            // 从响应头中获取文件名
+            const contentDisposition = response.headers.get('Content-Disposition');
+            console.log(contentDisposition);
+            let filenameMatch;
+            if (contentDisposition) {
+                filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+            }
+            console.log(filenameMatch);
+            //配置下载按钮
+            let link = document.getElementById('downloadlink');
+            link.textContent = '下载';
+            link.onclick = () => {
+                //配置下载链接
+                const a = document.createElement('a');
+                a.href = urlObject;
+                if (filenameMatch) {
+                    a.download = filenameMatch[1];
+                }
+                a.click();
+               window.URL.revokeObjectURL(urlObject);
+            }
+            //获取文件类型
+            let filetype = filenameMatch[1].substring(filenameMatch[1].lastIndexOf('.') + 1);
+            //如果是可显示的则显示
+            if (
+            //    filetype == 'doc'  || filetype == 'docx' || filetype == 'xls' || filetype == 'xlsx' ||
+            // filetype == 'ppt' || filetype == 'pptx' || filetype == 'pdf'||
+            filetype == 'txt'||filetype=='jpg'||filetype=='png') {
+
+                let show = document.getElementById('fileshow');
+                let showcontent = document.getElementById('fileshowcontent');
+                showcontent.innerHTML = '';
+                if (filetype === 'txt') {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const textarea = document.createElement('textarea');
+                        textarea.value = e.target.result;
+                        textarea.style.width = '100%';
+                        textarea.style.height = '100%';
+                        textarea.style.resize = 'none';
+                        showcontent.appendChild(textarea);
+                    };
+                    reader.readAsText(blob);
+                    show.style.display = 'block';
+                }
+                if(filetype=='jpg'||filetype=='png'){
+                    const img = document.createElement('img');
+                    img.src = urlObject;
+                    img.style.width = '70%';
+                    showcontent.appendChild(img);
+                    show.style.display = 'block';
+                }
+                //可能有用的表示方法
+                // const iframe = document.createElement('iframe');
+                // iframe.style.width = '100%';
+                // iframe.style.height = '100%';
+                // iframe.style.border = 'none';
+
+                // if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(filetype)) {
+                //     // 使用 Microsoft Office Online 预览 Office 文件
+                //     const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(urlObject)}`;
+                //     iframe.src = officeUrl;
+                // } else if (filetype === 'pdf') {
+                //     // 直接预览 PDF 文件
+                //     iframe.src = urlObject;
+                // } else if (['jpg', 'png'].includes(filetype)) {
+                //     // 显示图片
+                //     iframe.src = `data:image/${filetype};base64,${await blobToBase64(blob)}`;
+                // } else if (filetype === 'txt') {
+                //     // 显示文本文件
+                //     const reader = new FileReader();
+                //     reader.onload = function(e) {
+                //         const textContent = e.target.result;
+                //         iframe.srcdoc = `
+                //             <!DOCTYPE html>
+                //             <html>
+                //             <head>
+                //                 <meta charset="UTF-8">
+                //             </head>
+                //             <body>
+                //                 <pre style="white-space: pre-wrap; padding: 10px;">${textContent}</pre>
+                //             </body>
+                //             </html>
+                //         `;
+                //     };
+                //     reader.readAsText(blob);
+                // }
+                // showcontent.appendChild(iframe);
+                // show.style.display = 'block';
+
+            } else {
+                // 触发点击事件进行下载
+                link.click();
+            }
+            console.log(filetype);
+        } catch (error) {
+            console.error('下载错误', error);
+            errorhandle(error);          // 可以在这里添加用户提示，如显示错误信息弹窗
+        }
+    }
+    ////更多操作按钮
+    function moreOperation(name,type){
+        if(type=='file'){
+            //文件操作
+            let moreoperation = document.getElementById('moreoperation');
+            moreoperation.style.display = 'block';
+            currentFile=name;
+        }
+        if(type=='folder'){
+            //文件夹操作
+        }
+    }
+    ////封印文件
+    function sealfile() {
+        const sealTime = document.getElementById('sealTime').value;
+        if (!sealTime) {
+            alert('请选择封印时间');
+            return;
+        }
+        // 后续处理逻辑（如提交到后端）
+        fetch(`${endpointPath}/sealFile`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+                filepath: currentPath.join('/'),
+                filename: currentFile,
+                sealTime: sealTime
+            })
+           
+        }).then(response=>{
+            if(response.ok){
+                console.log('封印文件成功');
+            }
+        }) 
+        .catch(error=>{
+                console.error('封印文件失败', error);
+        })
+        console.log(currentPath.join('/'));
+        console.log(currentFile);
+        console.log(sealTime);
+        console.log('封印时间:', sealTime);
+        alert(`文件已封印，时间: ${sealTime}`);
+        document.getElementById('moreoperation').style.display = 'none';
+    }
+
+    // 模拟文件系统数据，添加 children 属性来表示子文件和文件夹
+    let fileSystem = [
+        {
+            id: '1',
+            name: '文档',
+            type: 'folder',
+            whose: '3390351358@qq.com',
+            path: '/文档',
+            children: [
+                { name: '报告.docx', type: 'file' }
+            ]
+        },
+        {
+            name: '图片',
+            type: 'folder',
+            children: []
+        }
+    ];
+let currentFile;
+
+    // 当前所在的文件夹路径，初始为根目录
+    let currentPath = [];
+
+    // 初始化文件列表
+    async function initFileList() {
+        const fileList = document.getElementById('file-list');
+        fileList.innerHTML = '';
+
+        try {
+            // 发送请求获取文件列表
+
+
+            // 根据当前路径获取对应的文件系统数据
+            let currentFileSystem = fileSystem;
+            for (const pathPart of currentPath) {
+                const folder = currentFileSystem.find(item =>
+                    item.name === pathPart && item.type === 'folder'
+                );
+                if (folder) {
+                    currentFileSystem = folder.children;
+                } else {
+                    break;
+                }
+            }
+
+            // 如果不是根目录，添加返回上一级的按钮
+            if (currentPath.length > 0) {
+                const backItem = document.createElement('li');
+                backItem.className = 'file-item';
+
+                const icon = document.createElement('span');
+                icon.className = 'file-icon folder';
+                icon.innerHTML = '📁';
+                backItem.appendChild(icon);
+
+                const name = document.createElement('span');
+                name.className = 'file-name';
+                name.textContent = '..';
+                backItem.onclick = goBack;
+                backItem.appendChild(name);
+
+                fileList.appendChild(backItem);
+            }
+            // 遍历文件系统数据，创建文件项
+            currentFileSystem.forEach((item, index) => {
+                //一个文件栏位
+                const listItem = document.createElement('li');
+                listItem.className = 'file-item';
+                //文件栏位主体包括icon&name
+                const filebody = document.createElement('div');
+                filebody.style = "display:inline-block;width: 80% ; white-space: normal;overflow-wrap: break-word;word-break: break-all;"
+                listItem.appendChild(filebody);
+
+                const icon = document.createElement('span');
+                icon.className = `file-icon ${item.type}`;
+                icon.innerHTML = item.type === 'folder' ? '📁' : '📄';
+                filebody.appendChild(icon);
+
+
+                const name = document.createElement('span');
+                name.className = 'file-name';
+                name.textContent = item.name;
+                if (item.type === 'folder') {
+                    filebody.onclick = () => enterFolder(item.name);
+                }
+                if (item.type === 'file') {
+                    filebody.onclick = () => clickFileItem(item.name);
+                }
+                filebody.appendChild(name);
+                //文件操作按钮
+                const renameBtn = document.createElement('button');
+                renameBtn.className = 'rename-btn';
+                renameBtn.textContent = '重命名';
+                renameBtn.onclick = () => startRename(item.id);
+                listItem.appendChild(renameBtn);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.textContent = '删除';
+                deleteBtn.onclick = () => deleteItem(item.name,item.type,item.id);
+                listItem.appendChild(deleteBtn);
+
+                const moreBtn = document.createElement('button');
+                moreBtn.className = 'more-btn';
+                moreBtn.textContent = '更多';
+                moreBtn.onclick = () => moreOperation(item.name,item.type);
+                listItem.appendChild(moreBtn);
+                fileList.appendChild(listItem);
+            });
+
+            // 更新当前路径显示
+            const pathDisplay = document.getElementById('path-display');
+            pathDisplay.textContent = `当前路径: /${currentPath.join('/')}`;
+        } catch (error) {
+            console.error('初始化文件列表出错:', error);
+        }
+    }
+
+    ////// 进入文件夹
+    async function enterFolder(folderName) {
+        currentPath.push(folderName);
+        await initFileList();
+    }
+
+    ////// 返回上一级
+    async function goBack() {
+        currentPath.pop();
+        await initFileList();
+    }
+    //////获取文件路径系统
+    async function getFilePathSystem() {
+        // 发送数据到后端
+        const sessionId = localStorage.getItem('sessionId');
+        let requestUrl = endpointPath + '/folder';
+        requestUrl += `;jsessionid=${sessionId}`;
+        fileSystem = await fetch(requestUrl, {
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        }).then(res => res.json());
+    }
+    //////获取并初始化文件列表
+    function getFilePathSystemAndInit() {
+        getFilePathSystem()
+            .then(data => {
+                // 初始化界面
+                initFileList();
+            })
+            .catch(error => {
+                console.error('获取文件路径出错:', error);
+            });
+    }
+    window.onload = function () {
+        getFilePathSystemAndInit();
+    };
+    console.log('javascript执行完了');
+</script>
+
+</html>

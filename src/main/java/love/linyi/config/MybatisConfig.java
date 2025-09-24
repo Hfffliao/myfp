@@ -19,4 +19,5 @@ public class MybatisConfig {
         ms.setBasePackage("love.linyi.dao");
         return ms;
     }
+
 }

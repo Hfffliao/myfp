@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=0.6">
+  <title>霖依</title>
+  <!-- 引入字体图标 -->
+  <script>
+    // 定义全局变量存储上下文路径
+    function getContextPath() {
+      const pathName = window.location.pathname;
+      console.log('pathName:', pathName);
+      // 查找第二个 / 的索引
+      const Index = pathName.indexOf('p');
+      return pathName.substring(0,Index-1 );
+    }
+    const contextPath = getContextPath();
+    console.log('上下文路径:', contextPath);
+
+    // 动态加载脚本的函数
+    function loadScript(src, onLoad, onError) {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = onLoad;
+      script.onerror = onError;
+      document.head.appendChild(script);
+    }
+
+    // 动态加载样式表的函数
+    function loadStylesheet(href, onLoad, onError) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      link.onload = onLoad;
+      link.onerror = onError;
+      document.head.appendChild(link);
+    }
+
+    // 加载 hangbege.js
+    loadScript(
+            contextPath + '/pages/css/hangbege.js',
+            () => console.log('hangbege.js 加载成功'),
+            () => console.error('hangbege.js 加载失败')
+    );
+
+    // 加载 linyistyle.css
+    loadStylesheet(
+            contextPath + '/pages/css/linyistyle.css',
+            () => console.log('linyistyle.css 加载成功'),
+            () => console.error('linyistyle.css 加载失败')
+    );
+  </script>
+  <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.2/css/all.min.css">
+  <style>
+    /* CSS变量定义 */
+
+    /* 卡片布局 */
+    .card-container {
+      max-width:none;
+      margin: 0rem ;
+      padding: 5rem;
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      background:rgba(198, 18, 18, 0.5);
+
+    }
+
+    .card {
+      background: rgb(191, 207, 221);
+      color: rgb(29, 24, 24);
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: var(--box-shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-20px);
+      box-shadow: 50px 8px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 动画效果 */
+    @keyframes fadeIn {
+      from { opacity: 0.5; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      animation: fadeIn 1s ease forwards;
+    }
+  </style>
+</head>
+<body>
+<div id="header"></div>
+<main>
+  <section class="hero">
+    <div class="hero-content">
+      <h1>服务</h1>
+      <h1><span id="message">fuwu</span></h1>
+    </div>
+  </section>
+
+  <div class="card-container">
+    <article class="card">
+      <h2>我的世界服务器</h2><a href=""><h3>控制服务器</h3></a>
+    </article>
+    <article class="card">
+        <h2>鹅舍测距仪数据</h2><a id="groom" ><h3>查看数据</h3></a>
+    </article>
+    <article class="card">
+      <h2>网络摄像头</h2><a id="camera"><h3>有网就能看</h3></a>
+    </article>
+    <article class="card">
+      <h2>我的云文件系统</h2><a id="fold"><h3>实现文件系统功能，同一账号实现多设备同步</h3></a>
+    </article>
+    <article class="card">
+        <a href=""><h3>正在开发中。。。</h3></a>
+    </article>
+  </div>
+</main>
+
+<div id="footer"></div>
+<script>
+  document.getElementById('groom').href = contextPath + '/pages/cejv.html';
+  document.getElementById('camera').href = contextPath + '/pages/camera.html';
+  document.getElementById('fold').href = contextPath + '/pages/fold.html';
+</script>
+</body>
+</html>

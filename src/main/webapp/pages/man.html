@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<script>
+    // 定义全局变量存储上下文路径
+    function getContextPath() {
+        const pathName = window.location.pathname;
+        console.log('pathName:', pathName);
+        // 查找第二个 / 的索引
+        const Index = pathName.indexOf('p');
+        return pathName.substring(0,Index-1 );
+    }
+    const contextPath = getContextPath();
+    console.log('上下文路径:', contextPath);
+
+    // 动态创建 script 标签并设置 src 属性
+    const script = document.createElement('script');
+    script.src = contextPath + '/pages/css/hangbege.js';
+    document.head.appendChild(script);
+    // 动态创建 link 标签并设置 href 属性
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = contextPath + '/pages/css/linyistyle.css';
+    document.head.appendChild(link);
+</script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.6">
+    <title>霖依</title>
+    <!-- 引入字体图标 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.2/css/all.min.css">
+    <style>
+
+        /* 卡片布局 */
+        .card-container {
+            max-width:none;
+            margin: 0rem ;
+            padding: 5rem;
+            display:grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            background:rgba(198, 18, 18, 0.5);
+
+        }
+
+        .card {
+            background: rgb(191, 207, 221);
+            color: rgb(29, 24, 24);
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-20px);
+            box-shadow: 50px 8px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from { opacity: 0.5; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            animation: fadeIn 1s ease forwards;
+        }
+
+        /*!* 响应式设计 *!*/
+        /*@media (max-width: 768px) {*/
+        /*    .nav-links {*/
+        /*        display: none;*/
+        /*    }*/
+
+        /*    .hero-content h1 {*/
+        /*        font-size: 2.5rem;*/
+        /*    }*/
+        /*}*/
+
+        /*!* 页脚样式 *!*/
+
+    </style>
+</head>
+<body>
+<div id="header"></div>
+</div>
+<main>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>赞助者信息</h1>
+            <div class="hero1"> <h2>霖依创造</h2></div>
+
+        </div>
+    </section>
+
+    <div class="card-container">
+        <arti class="card">
+            <h2>满师傅</h2>
+            <img src="man.jpg" alt="示例图片">
+        </arti>
+        <article class="card">
+
+        </article>
+        <article class="card">
+
+        </article>
+    </div>
+</main>
+
+<div id="footer"></div>
+<script></script>
+</body>
+</html>
