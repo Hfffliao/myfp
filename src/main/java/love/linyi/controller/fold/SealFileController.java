@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,7 +25,9 @@ public class SealFileController {
     public ResponseEntity<String> sealFile(@RequestBody SealFileRequset sealFileRequset,
                                            HttpSession session) {
         String username = (String) session.getAttribute("user");
-        String path = Code.root + "/" + username + "/" + sealFileRequset.getFilepath() + "/" + sealFileRequset.getFilename();
+        String sealFilePath = sealFileRequset.getFilepath();//这个函数处理\和$的时候要特殊处理，看源码
+        sealFilePath = sealFilePath.replaceAll("/", File.separator);
+        String path = Code.root + File.separator + username + File.separator + sealFilePath + File.separator + sealFileRequset.getFilename();
         File file = new File(path);
         LocalDateTime sealTime = sealFileRequset.getSealTime();
         LocalDateTime now = LocalDateTime.now();

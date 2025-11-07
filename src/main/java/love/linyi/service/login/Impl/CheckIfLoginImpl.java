@@ -3,7 +3,7 @@ package love.linyi.service.login.Impl;
 import love.linyi.service.login.CheckIfLogin;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 @Service
 public class CheckIfLoginImpl implements CheckIfLogin {
     @Override

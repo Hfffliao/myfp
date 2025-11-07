@@ -1,5 +1,9 @@
-const endpointPath = "http://linyi.love";
-const Coderoot='C:/uploads';
+//const endpointPath = "http://linyi.love";
+// const endpointPath = "http://localhost:25571";
+//const endpointPath = "http://localhost:8080";
+const endpointPath = "https://linyi.love";
+//const Coderoot='C:/uploads';
+//const Coderoot='C:/uploads';
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
     // DOM 已经加载完成，直接执行初始化逻辑
     initPage();
@@ -238,19 +242,19 @@ function errorhandle(error){
                 const statusCode = error.response.status;
                 switch (statusCode) {
                     case 401:
-                        errorMessage = '未授权，请先登录';
+                        errorMessage = '401：未授权，请先登录';
                         break;
                     case 403:
-                        errorMessage = '禁止访问，您没有权限下载该文件';
+                        errorMessage = '403：禁止访问，您没有权限';
                         break;
                     case 404:
-                        errorMessage = '文件未找到，请检查文件路径';
+                        errorMessage = '404：文件未找到，请检查文件路径';
                         break;
                     case 500:
-                        errorMessage = '服务器内部错误，请联系管理员';
+                        errorMessage = '500：服务器内部错误，请联系管理员';
                         break;
                     default:
-                        errorMessage = `文件下载出错，状态码: ${statusCode}`;
+                        errorMessage = `出错，状态码: ${statusCode}`;
                         break;
                 }
             }

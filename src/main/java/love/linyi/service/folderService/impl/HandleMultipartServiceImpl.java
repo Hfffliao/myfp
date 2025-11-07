@@ -12,11 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+//调用UserFolderService类存文件信息到数据库
+//在本类存储文件到本地，除了存文件到本地的函数，其它地方用的路径分割符都是"/"（windows）
 @Service
 public class HandleMultipartServiceImpl implements HandleMultipartService {
     @Autowired
@@ -34,7 +36,7 @@ public class HandleMultipartServiceImpl implements HandleMultipartService {
             relativePath="/"+relativePath;
         }
 
-        rootDir = Code.root+"/" + username;
+        rootDir = Code.root+File.separator + username;
         //建立一个UserFolder的list，用于存储文件信息
         List<UserFolder> userFolderList =  new ArrayList<>();
         // 检查参数是否为空
@@ -67,9 +69,9 @@ public class HandleMultipartServiceImpl implements HandleMultipartService {
         }
         try {
             for (MultipartFile multipartFile : files) {
-                if (multipartFile.isEmpty()) {
-                    continue; // 使用 continue 跳过当前空文件，继续处理下一个文件
-                }
+//                if (multipartFile.isEmpty()) {
+//                    continue; // 使用 continue 跳过当前空文件，继续处理下一个文件
+//                }
                 if (multipartFile != null) {
                     String fileName = multipartFile.getOriginalFilename();
                     String filePath = filePathMap.get(fileName);
@@ -142,7 +144,13 @@ public class HandleMultipartServiceImpl implements HandleMultipartService {
   }
     private void saveFileToFileSystem(MultipartFile file, String filePath, String fileName,String username) throws Exception {
         // 构建完整的文件存储路径
-        String fullPath = rootDir + (filePath != null ? filePath : "") + "/" + fileName;
+        // 处理路径中的斜杠在不同系统兼容性问题
+        if(filePath == null || filePath.isEmpty()){
+            filePath = "";
+        }
+        String[] pathSegments = filePath.split("/");
+        filePath= String.join(File.separator, pathSegments);
+        String fullPath = rootDir + filePath + File.separator + fileName;
         File destFile = new File(fullPath);
 
         try {

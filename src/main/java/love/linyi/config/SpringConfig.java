@@ -1,10 +1,11 @@
 package love.linyi.config;
 
-import love.linyi.service.camera.tcp.VideoStreamWebSocketHandler;
+//import love.linyi.netapi.websocket.VideoStreamWebSocketHandler;
+import love.linyi.netapi.websocket.VideoStreamWebSocketHandler;
+import love.linyi.netapi.websocket.WebSocketToEsp8266;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -18,10 +19,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 
 @Configuration
-@ComponentScan({"love.linyi.service","love.linyi.dao","love.linyi.config","love.linyi.domin"})
+@ComponentScan({"love.linyi.service","love.linyi.dao","love.linyi.config","love.linyi.domin","love.linyi.netapi"})
 @PropertySource("classpath:love/linyi/config/jdbc.properties")
 @EnableAspectJAutoProxy
 @MapperScan("love.linyi.dao")
@@ -34,6 +36,8 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 public class SpringConfig implements WebMvcConfigurer, WebSocketConfigurer{
     @Autowired
     private VideoStreamWebSocketHandler videoStreamWebSocketHandler;
+    @Autowired
+    private WebSocketToEsp8266 webSocketToEsp8266;
     @Bean
     public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -61,7 +65,10 @@ public class SpringConfig implements WebMvcConfigurer, WebSocketConfigurer{
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(videoStreamWebSocketHandler, "/video-ws")
+        registry.addHandler(videoStreamWebSocketHandler, "/car-user")
+                .setAllowedOrigins("*")
+                .addInterceptors(new HttpSessionHandshakeInterceptor());;
+        registry.addHandler(webSocketToEsp8266, "/car")
                 .setAllowedOrigins("*");
     }
 }

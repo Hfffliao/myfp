@@ -1,12 +1,11 @@
 package love.linyi.config.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebFilter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,20 +30,22 @@ public class AuthFilter implements Filter {
         String registerUrl = httpRequest.getContextPath() + "/register";
         String logoutUrl = httpRequest.getContextPath() + "/logout";
         String main=httpRequest.getContextPath() + "/pages/main.html";
-        String video=httpRequest.getContextPath() + "/video-ws";
+
         String currentUrl = httpRequest.getRequestURI();
         // 判断是否为静态资源路径，假设静态资源存于 /static 路径
         if(currentUrl.equals(httpRequest.getContextPath()+"/")){
             httpResponse.sendRedirect(main);
             return;
         }
-        System.out.println("isStaticResource");
+        System.out.println("开始判断是否登录");
         boolean isStaticResource = currentUrl.startsWith(httpRequest.getContextPath() + "/pages");
         boolean isImageResource = currentUrl.startsWith(httpRequest.getContextPath() + "/image");
         boolean isfaviconResource = currentUrl.equals(httpRequest.getContextPath() + "/favicon.ico");
-        boolean isvideoResource = currentUrl.equals(httpRequest.getContextPath() + "/video-ws");
+        boolean isvideoResource = currentUrl.startsWith(httpRequest.getContextPath() + "/video-stream");
+        boolean iscarUser = currentUrl.equals(httpRequest.getContextPath() + "/car-user");
+        boolean iscar = currentUrl.equals(httpRequest.getContextPath() + "/car");
         // 若请求的是登录页面或登录请求，直接放行
-        if (currentUrl.equals(loginUrl) || currentUrl.equals(registerUrl)||currentUrl.equals(logoutUrl)|| isStaticResource||isImageResource||isfaviconResource||isvideoResource) {
+        if (currentUrl.equals(loginUrl) || currentUrl.equals(registerUrl)||currentUrl.equals(logoutUrl)|| isStaticResource||isImageResource||isfaviconResource||isvideoResource||iscarUser||iscar) {
             System.out.println("放行");
             chain.doFilter(request, response);
             return;

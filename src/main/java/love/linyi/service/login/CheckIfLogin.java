@@ -1,6 +1,6 @@
 package love.linyi.service.login;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 public interface CheckIfLogin {
     boolean checkIfLogin(HttpSession session);

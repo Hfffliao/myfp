@@ -1,4 +1,4 @@
-package springstudy;
+package springCodeStudy;
 
 import org.springframework.stereotype.Component;
 

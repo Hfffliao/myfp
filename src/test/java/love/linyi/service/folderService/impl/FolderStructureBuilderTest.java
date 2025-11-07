@@ -7,11 +7,7 @@ import love.linyi.domin.UserFolder;
 import love.linyi.service.UserFolderService;
 import love.linyi.service.impl.UserFolderServiceImpl;
 import org.junit.jupiter.api.Test;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
