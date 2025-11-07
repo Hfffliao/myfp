@@ -1,0 +1,15 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "msedge",
+            "request": "launch",
+            "name": "Open camera copy 3 - 副本.html",
+            "file": "c:\\Users\\HMCL\\javaeeeclipse-jee-2021-06-R-win32-x86_64\\workspase\\springmvc\\springmvc\\src\\main\\webapp\\pages\\camera copy 3 - 副本.html"
+        }
+    ]
+}

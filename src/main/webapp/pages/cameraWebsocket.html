@@ -1,0 +1,276 @@
+<!-- 这个网页负责用websocket连接到服务器，接收视频流并在网页上显示。
+无自定义的udp协议解析器,只能解析完整帧的流。 -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ESP32视频流</title>
+    <meta charset="UTF-8">
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        #status { padding: 10px; margin: 10px; border-radius: 5px; }
+        .connected { background-color: #d4edda; color: #155724; }
+        .disconnected { background-color: #f8d7da; color: #721c24; }
+        #videoData { width: 80%; height: 400px; margin: 20px auto; 
+                    border: 1px solid #ccc; padding: 10px; overflow: auto; 
+                    text-align: left; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>ESP32实时视频流监控</h1>
+    <div id="status" class="disconnected">未连接到服务器</div>
+    <!-- <div id="videoData">等待视频数据...</div> -->
+    <img id="videoDat" src="" alt="视频数据">
+    
+    <script>
+            // 在文件顶部添加全局开关
+        const LOG_ENABLED = false; // 设为false即可关闭所有日志
+
+        // 替换所有console.log为条件输出
+        function log(...args) {
+            if (LOG_ENABLED) {
+                console.log(...args);
+            }
+        }
+        $(document).ready(function() {
+            let lastFrameTime = 0;
+            const frameInterval = 0;
+            // 获取WebSocket URL
+           // const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = 'ws://' + '175.178.254.104'+':'+'/video-ws';
+            // 创建WebSocket连接
+            const websocket = new WebSocket(wsUrl);
+            websocket.binaryType = 'arraybuffer';
+            let frameBuffer = []; 
+            
+            websocket.onopen = function(event) {
+                $('#status').text('已连接到服务器').removeClass('disconnected').addClass('connected');
+                log('WebSocket连接已建立');
+            };
+            const imgElement = document.getElementById('videoDat');
+
+            //图像处理函数
+            let combined=new Uint8Array(0);
+             let totalLength=0;
+             let board=1024*10;
+            websocket.onmessage = function(event) {
+                
+                // combined=new Uint8Array(combined.length+event.data.length);
+                // combined.set(new Uint8Array(event.data),combined.length);
+                frameBuffer.push(combined);
+                frameBuffer.push(new Uint8Array(event.data));
+                let offset = 0;
+                // 1. 将新接收的数据添加到缓冲区
+                totalLength = frameBuffer.reduce((sum, arr) => sum + arr.length, 0);
+                combined=new Uint8Array(totalLength);
+                for (const arr of frameBuffer) {
+                    combined.set(arr, offset);
+                    offset += arr.length;
+                }
+                frameBuffer = [];
+                let booleanMain=true;//用于判断processFrame是否正常退出
+                while(true){
+                    if (isFrameComplete()) {
+                        // 处理完整帧数据
+                        log("combined.length:"+combined.length);
+                        booleanMain=processFrame(combined);
+                        if(!booleanMain){
+                            booleanMain=!booleanMain;
+                            break;
+                        }
+                    }else{                      
+                        log("且是combined.length:"+combined.length);
+                        break;
+                    }
+                }
+                //判断缓冲区是否要处理
+                function isFrameComplete(){
+                    if(combined.length < board){
+                        log("conbined小于一帧");
+                        return false;
+                    }else if(combined.length > 1024*1024){//conbined太大了，处理不过来的
+                        log("combined大于20kb");
+                        combined=new Uint8Array(0);
+                        return false;
+                    }else{
+                        return true;
+                    }
+                }
+                //处理并渲染图像
+                function processFrame(){
+                    const now = Date.now();
+                    if (now - lastFrameTime < frameInterval) return;
+                    lastFrameTime = now;
+                    let startIndex=0;
+                    let lengthStartBytes=0;
+                    let imagelength=0;
+                    let bytes =new Uint8Array(4);
+                    //找到startindex；
+                    let j=0;
+                    for(let i=0;i<combined.length;i++){
+                        j=0;
+                        while(combined[i+j] == 119+j){
+                            j++;
+                        }
+                        if(j==8){
+                            log("找到图像第一个标志位");
+                            startIndex=i+12;
+                            lengthStartBytes=i+8;
+                            //log("j:"+j)
+                            break;
+                        }
+                    }
+                    
+                    if(j!=8){//表示一轮下来没有找到图像第一个标志位
+                        console.error("i!=8，一轮下来没有找到图像第一个标志位")
+                        return false;
+                    }
+                    //获取表示图像长度的四个字节
+                    for(let i=0;i<4;i++){
+                        bytes[i]=combined[lengthStartBytes+i];
+                    }
+                    imagelength=bytesToUInt32BE(bytes);
+                     if(imagelength<0||startIndex+imagelength+12+1>combined.length){
+                            console.error("imagelength错误:"+imagelength);
+                            board=imagelength+startIndex+12+1;
+                            return false;
+                        }
+                    bytes =new Uint8Array(4);
+                    log("imagelength:"+imagelength);
+                    log("startIndex:"+startIndex);
+                    log("lengthStartBytes:"+lengthStartBytes);
+                    let image=new Uint8Array(imagelength);
+                    displayImage(combined.subarray(startIndex,startIndex+imagelength),'image/jpeg');
+                    // 6. 移除已处理的帧数据，保留剩余缓冲区内容
+                    //获取下一帧的长度，开始位置
+                    combined = combined.subarray(startIndex + imagelength);
+              
+                    if(combined.length<12){
+                        console.error("截取下一帧图像后combined.length<12，无法获取大小");
+                        board=1024*10;
+                        return false;
+                    }
+                    for(let i=0;i<combined.length;i++){
+                        j=0;
+                        while(combined[i+j] == 119+j){
+                            j++;
+                        }
+                        if(j==8){
+                            log("找到下一帧图形的标志位");
+                            startIndex=i+12;
+                            lengthStartBytes=i+8;
+                            log("startIndex:"+startIndex+"iiiiiiii:"+i);
+                            if(i!=0){
+                                log("i!=0，下一帧图像第一个字节不是标志");
+                            }
+                            break;
+                        }
+                    }
+                    if(j!=8){//表示一轮下来没有找到图像第一个标志位
+                        console.error("i!=8，一轮下来没有找到下一帧图像第一个标志位");
+                        board=1024*10;
+                        return false;
+                    }
+                    //获取表示图像长度的四个字节
+                    for(let i=0;i<4;i++){
+                        bytes[i]=combined[lengthStartBytes+i];
+                    }
+                    imagelength=bytesToUInt32BE(bytes);
+                    if(imagelength<0){
+                            console.error("imagelength错误:"+imagelength);
+                            combined=new Uint8Array(0);
+                            board=1024*10;
+                            return false;
+                    }
+                    bytes =new Uint8Array(4);
+                    //获取board
+                    board=imagelength+startIndex+12+1;//加12是为了包含获得下一帧的信息
+                    //加1是因为board是长度，而startIndex是下标
+
+                   ///////////////    //显示图像
+                    function displayImage(uint8Array, mimeType = 'image/jpeg') {
+                        try{
+                            if(uint8Array.length == 0){
+                            console.error("图像uint8Array.length == 0");
+                            }
+                            ////检查 jpeg图像尾标志位
+                            if(uint8Array[uint8Array.length-2]!=255||uint8Array[uint8Array.length-1]!=217){
+                                console.error("图像uint8Array[uint8Array.length-2]!=255||uint8Array[uint8Array.length-1]!=217");
+                                log("imagelength:"+imagelength);
+                               log("startIndex:"+startIndex);
+                                log("lengthStartBytes:"+lengthStartBytes); 
+                                log("uint8Array.length:"+uint8Array.length);
+                                log("combined.length:"+combined.length);
+                                let index=uint8Array.length-1;
+                                //查找jpeg图像尾标志位
+                                while(index>uint8Array.length/2){//图像小于长度的一半就不查找了
+                                    if(uint8Array[index-1]!=255||uint8Array[index]!=217){
+                                        index--;
+                                    }else{
+                                        break;
+                                    }
+                                }
+                                if(index==uint8Array.length/2){
+                                    console.error("找不到jpeg图像尾标志位");
+                                    return false;
+                                }else{
+                                    log("找到jpeg图像尾标志位index:"+index);
+                                }
+                                // 移除无效数据
+                                uint8Array = uint8Array.subarray(0, index+1);
+                                
+                            //   // 调试 将循环日志放入可折叠组
+                            //     console.groupCollapsed(`字节数组 (长度: ${uint8Array.length})`);
+                            //     for(let i=0; i<uint8Array.length; i++){
+                            //         console.log(`[${i}]: ${uint8Array[i]}`);
+                            //     }
+                            //     console.groupEnd();
+                                
+                            }
+                            ////检查 jpeg图像头标志位
+                            if(uint8Array[0]!=255||uint8Array[1]!=216){
+                            console.error("图像uint8Array[0]!=255||uint8Array[1]!=216");
+                            }
+
+                            // 创建 Blob 对象
+                            const blob = new Blob([uint8Array], { type: mimeType });                   
+                            // 生成临时 URL
+                            const url = URL.createObjectURL(blob);                    
+                            // 创建 <img> 元素并显示        
+                            imgElement.src=url;
+                        }catch(error){
+                            console.error("显示图像错误:"+error);
+                        }
+                            
+                    }
+            
+                }
+                function bytesToUInt32BE(bytes) {
+                return (bytes[0] << 24) | 
+                        (bytes[1] << 16) | 
+                        (bytes[2] << 8) | 
+                        (bytes[3]) >>> 0;
+                }
+             
+            };
+            
+            websocket.onclose = function(event) {
+                $('#status').text('连接已断开').removeClass('connected').addClass('disconnected');
+                log('WebSocket连接已关闭');
+                
+                // 尝试重新连接
+                setTimeout(function() {
+                    log('尝试重新连接...');
+                    location.reload();
+                }, 5000);
+            };
+            
+            websocket.onerror = function(error) {
+                console.error('WebSocket错误: ', error);
+                $('#status').text('连接错误').removeClass('connected').addClass('disconnected');
+            };
+        });
+    </script>
+</body>
+</html>

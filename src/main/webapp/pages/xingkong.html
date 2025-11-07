@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>仰望星空</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        .message-container {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .message {
+            position: absolute;
+            background: rgba(30, 30, 60, 0.8);
+            border: 1px solid rgba(100, 149, 237, 0.5);
+            border-radius: 10px;
+            padding: 15px;
+            max-width: 220px;
+            box-shadow: 0 0 15px rgba(100, 149, 237, 0.5);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.5s ease-out, float 6s ease-in-out infinite;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .message::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid rgba(30, 30, 60, 0.8);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 15px;
+            border-radius: 20px;
+            z-index: 3;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starfield"></canvas>
+    <div class="counter"><span id="count" hidden="true">0</span></div>
+    <div class="message-container" id="messageContainer"></div>
+
+    <script>
+        // 50条关心语句
+        const messages = [
+            "今天过得怎么样？累不累？",
+            "记得按时吃饭，别饿着了。",
+            "天气变化大，注意增减衣服。",
+            "学习任务再多也要记得休息。",
+            "想你了小兔子，希望你今天开心。",
+            "多久没喝水啦？记得喝水哦。",
+            "别给自己太大压力，你已经很棒了。",
+            "晚上早点休息哦。",
+            "有什么烦心事，不管我帮不帮的了，我都愿意倾听。",
+            "今天有遇到什么开心的事吗？",
+            "记得微笑，你笑起来最好看。",
+            "无论发生什么，我都在你身边。",
+            "你值得所有的美好和幸福。",
+            "其他都是次要的，身体和开心最重要。",
+            "想给你一个温暖的拥抱。",
+            "你是我生命中最美的风景。",
+            "今天有没有好好照顾自己？",
+            "你的快乐就是我的快乐。",
+            "无论多远，我的心都和你在一起。",
+            "累了就歇歇，别硬撑。",
+            "你是我每天起床的动力（回你微信要开锁）。",
+            "希望今天的阳光能温暖你。",
+            "你是我最珍贵的宝贝。",
+            "记得对自己好一点。",
+            "想和你分享生活中的点点滴滴。",
+            "你的笑容是我最大的幸福。",
+            "无论多忙，都要记得想我，听到没！。",
+            "你是我心中最特别的存在。",
+            "有你在，我的世界才完整。",
+            "今天有没有什么小惊喜？",
+            "你的一切都让我牵挂。",
+            "希望你被世界温柔相待。",
+            "你是我坚持下去的理由。略略略",
+            "想和你一起看遍世间美景。",
+            "我们的幸福就是我的追求。",
+            "无论何时，我都在这里等你。",
+            "你让我的生活充满色彩。",
+            "希望你每天都比昨天更快乐。",
+            "想和你一起慢慢变老。",
+            "你的存在让我的世界更美好。",
+            "希望你被爱包围，被幸福环绕。",
+            "你是我生命中最美的意外。",
+            "想和你分享所有的喜怒哀乐。",
+            "你是我心中永远的快乐源泉。",
+            "希望你的每一天都充满希望。",
+            "你是我最珍惜的人。",
+            "想和你创造更多美好回忆。",
+            "你是我此生最美的遇见。",
+            "来自最爱你的人",
+            "小姑娘"
+        ];
+        
+        // 星河背景
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        function createStars() {
+            stars = [];
+            const starCount = 200;
+            
+            for (let i = 0; i < starCount; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speed: Math.random() * 0.5 + 0.1,
+                    brightness: Math.random() * 0.5 + 0.5,
+                    //下面的颜色暂时没用到
+                    red: Math.random()*255,
+                    green: Math.random()*255,
+                    blue: Math.random()*255,
+                    shoneSpeed:500+Math.random()*500,
+                    nextdrawbrightnessTime:0
+                });
+            }
+        }
+        
+        function drawStars() {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.brightness})`;
+                ctx.fill();
+                
+                // 移动星星
+                star.x -= star.speed;
+                if (star.x < 0) {
+                    star.x = canvas.width;
+                    star.y = Math.random() * canvas.height;
+                }
+                // 星星闪烁
+                if (Date.now() > star.nextdrawbrightnessTime){
+                    star.brightness = Math.random()*0.5+0.5;
+                    star.nextdrawbrightnessTime = Date.now()+star.shoneSpeed;
+                }
+            });
+            
+            requestAnimationFrame(drawStars);
+        }
+        
+        // 初始化星河
+        resizeCanvas();
+        createStars();
+        drawStars();
+        
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            createStars();
+        });
+        
+        // 生成关心语句
+        const messageContainer = document.getElementById('messageContainer');
+        const countDisplay = document.getElementById('count');
+        let messageCount = 0;
+        let usedMessages = [];
+        
+        function getRandomPosition() {
+            const padding = 50;
+            const maxX = window.innerWidth - 250; // 减去消息框的大致宽度
+            const maxY = window.innerHeight - 150; // 减去消息框的大致高度
+            
+            return {
+                x: Math.floor(Math.random() * maxX) + padding,
+                y: Math.floor(Math.random() * maxY) + padding
+            };
+        }
+        
+        function getRandomMessage() {
+            if (usedMessages.length >= messages.length) {
+                usedMessages = []; // 如果所有消息都已使用，重置
+            }
+            
+            let availableMessages = messages.filter(msg => !usedMessages.includes(msg));
+            const randomIndex = Math.floor(Math.random() * availableMessages.length);
+            const selectedMessage = availableMessages[randomIndex];
+            usedMessages.push(selectedMessage);
+            
+            return selectedMessage;
+        }
+        
+        function createMessage() {
+            const position = getRandomPosition();
+            const message = document.createElement('div');
+            message.className = 'message';
+            if (messageCount >= 50){
+                switch (messageCount) {
+                    case 49:
+
+                        message.textContent = "你是我此生最美的遇见。";
+                        break;
+                    case 50:
+                        message.textContent = "来自最爱你的人";
+                        break;
+                    case 51:
+                        message.textContent = "小姑娘";
+                        break;
+                }
+                message.style.left = `${window.innerWidth/2}px`;
+                message.style.top = `${window.innerHeight/2}px`;
+                message.style.fontSize = "20px";
+                console.log(window.innerHeight);
+                
+            }else{ 
+               
+                message.textContent = getRandomMessage();
+                message.style.left = `${position.x}px`;
+                message.style.top = `${position.y}px`;
+            }
+           
+            
+            
+           
+            
+            // 随机旋转角度
+            const rotation = (Math.random() * 10) - 5;
+            message.style.transform = `rotate(${rotation}deg)`;
+            message.style.color = `rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
+            // message.style.border= `1px solid rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255}, 0.5)`;
+            // message.style.boxShadow = `0 0 15px rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255}, 0.5)`;
+            // message.style.backgroundColor = `rgba(${Math.random()*255},${Math.random()*255},${Math.random()*255}, 0.8)`;
+            
+            messageContainer.appendChild(message);
+            messageCount++;
+            countDisplay.textContent = messageCount;
+            
+            // 5秒后淡出并移除消息
+            setTimeout(() => {
+                message.style.opacity = 0;
+                message.style.transition = 'opacity 1s';
+                setTimeout(() => {
+                    if (message.parentNode) {
+                        message.parentNode.removeChild(message);
+                    }
+                }, 1000);
+            }, 4000);
+        }
+        
+        // 每0.5秒生成一条消息，共50条
+        const messageInterval = setInterval(() => {
+            if (messageCount < 52) {
+                if (messageCount >= 50) {
+                    createMessage();
+                }
+            } else {
+                clearInterval(messageInterval);
+            }
+        }, 7000);
+        const mainMessageInterval = setInterval(() => {
+            if (messageCount < 50) {
+                createMessage();
+            } else {
+                clearInterval(mainMessageInterval);
+            }
+        }, 1000);
+        
+        // 初始生成几条消息
+        for (let i = 0; i < 3; i++) {
+            setTimeout(() => createMessage(), i * 200);
+        }
+    </script>
+</body>
+</html>
