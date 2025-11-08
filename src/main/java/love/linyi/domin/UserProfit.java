@@ -7,7 +7,18 @@ public class UserProfit {
     private int totalSize;
     private int usedSize;
     private int remainingSize;
-public UserProfit(){}
+    public UserProfit(){}
+
+    @Override
+    public String toString() {
+        return "UserProfit{" +
+                "id=" + id +
+                ", totalSize=" + totalSize +
+                ", usedSize=" + usedSize +
+                ", remainingSize=" + remainingSize +
+                '}';
+    }
+
     public UserProfit(int id, int remainingSize, int totalSize, int usedSize) {
         this.id = id;
         this.remainingSize = remainingSize;

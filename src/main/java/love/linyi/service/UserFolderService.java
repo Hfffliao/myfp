@@ -6,6 +6,6 @@ import love.linyi.domin.UserProfit;
 import java.util.List;
 
 public interface UserFolderService {
-    public int save(List<UserFolder> userFolderList);
-    public List<UserFolder> getUserFolderList(int id);
+    int save(List<UserFolder> userFolderList);
+    List<UserFolder> getUserFolderList(int id);
 }

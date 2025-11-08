@@ -1,7 +1,9 @@
 package love.linyi.controller.fold;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import love.linyi.domin.UserFolder;
+import love.linyi.domin.UserProfit;
 import love.linyi.service.UserFolderService;
+import love.linyi.service.UserProfitService;
 import love.linyi.service.folderService.FolderStructureBuilderService;
 import love.linyi.service.folderService.HandleMultipartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,18 @@ public class FolderController {
    public HandleMultipartService handleMultipartService;
     @Autowired
     public UserFolderService userFolderService;
+    @Autowired
+    public UserProfitService userProfitService;
     @GetMapping("/folder/if")
-    public ResponseEntity<Map<String, Object>> ifUpload(  @RequestParam("tatolsize") long totalSize ){
+    public ResponseEntity<Map<String, Object>> ifUpload(  @RequestParam("tatolsize") long totalSize
+    ,HttpSession session){
         Map<String, Object> response = new HashMap<>();
-
+        UserProfit userProfit =userProfitService.getuserprofit((int)session.getAttribute("id"));
+        if(userProfit.getRemainingSize()>totalSize){
+            response.put("ifupload",true);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("ifupload",false);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -60,10 +70,5 @@ public class FolderController {
         return ResponseEntity.ok()
                 .header("Content-Type", "application/json;charset=UTF-8")
                 .body(json);
-    }
-    @GetMapping("/folder/delete")
-    public String deletefolder(@RequestParam("path") String path) throws JsonProcessingException {
-        System.out.println("deletefolder");
-        return "deletefolder";
     }
 }
