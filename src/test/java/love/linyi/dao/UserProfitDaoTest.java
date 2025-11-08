@@ -16,6 +16,7 @@ public class UserProfitDaoTest extends BaseDaoTest {
     
     @BeforeEach
     public void setUp() {
+        UserProfit userProfit = new UserProfit(7,60,30,20);
 
     }
     
@@ -31,6 +32,45 @@ public class UserProfitDaoTest extends BaseDaoTest {
         assertNotNull(userProfit, "应该能查询到存在的用户收益记录");
 
         assertNotNull(userProfit.getId());
+    }
+    @Test
+    public void testAddUserProfit_WithValidUserId() {
+        // 数据
+
+
+        // When - 执行查询
+        UserProfit userProfit = new UserProfit(7,60,30,20,7);
+        int result = userProfitDao.addUserProfit(userProfit);
+        System.out.println(result);
+        // Then - 验证结果
+        assertEquals(1, result, "添加用户权益记录应该返回1");
+
+
+    }
+    @Test
+    public void testDeleteUserProfit_WithValidUserId() {
+        // 数据
+        int existingUserId = 3;
+
+        // When - 执行查询
+        int result = userProfitDao.deleteUserProfit(existingUserId);
+        System.out.println(result);
+        // Then - 验证结果
+        assertEquals(1, result, "添加用户权益记录应该返回1");
+
+
+    }
+    @Test
+    public void testUpdateUserProfit_WithValidUserId() {
+        // 数据
+        UserProfit userProfit = new UserProfit(7,60,30,3);
+
+
+        // When - 执行查询
+        int result = userProfitDao.updateUserProfit(userProfit);
+        System.out.println(result);
+        // Then - 验证结果
+        assertEquals(1, result, "添加用户权益记录应该返回1");
     }
     
 

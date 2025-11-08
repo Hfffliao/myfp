@@ -4,9 +4,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 import javax.sql.DataSource;
 @Configuration
 @PropertySource("classpath:love/linyi/config/jdbc.properties")
+@EnableTransactionManagement // 启用事务管理
 public class JdbcConfig {
     @Value("${jdbc.driver}")
    private String driver;
@@ -55,4 +61,12 @@ public class JdbcConfig {
 //        transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
 //        return transactionManager;
 //    }
+@Bean
+public PlatformTransactionManager transactionManager(DataSource dataSource) {
+    return new DataSourceTransactionManager(dataSource);
+}
+    @Bean
+    public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
+    }
 }

@@ -7,7 +7,9 @@ public class UserProfit {
     private int totalSize;
     private int usedSize;
     private int remainingSize;
+    private int user_id;
     public UserProfit(){}
+
 
     @Override
     public String toString() {
@@ -16,14 +18,31 @@ public class UserProfit {
                 ", totalSize=" + totalSize +
                 ", usedSize=" + usedSize +
                 ", remainingSize=" + remainingSize +
+                ", user_id=" + user_id +
                 '}';
     }
 
-    public UserProfit(int id, int remainingSize, int totalSize, int usedSize) {
+    public int getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(int user_id) {
+        this.user_id = user_id;
+    }
+//    全参构造函数，用于查询用户利润信息
+    public UserProfit(int id, int remainingSize, int totalSize, int usedSize, int user_id) {
         this.id = id;
         this.remainingSize = remainingSize;
         this.totalSize = totalSize;
         this.usedSize = usedSize;
+        this.user_id = user_id;
+    }
+//    无id构造函数，用于存储用户利润信息
+    public UserProfit( int remainingSize, int totalSize, int usedSize, int user_id) {
+        this.remainingSize = remainingSize;
+        this.totalSize = totalSize;
+        this.usedSize = usedSize;
+        this.user_id = user_id;
     }
 
     public int getId() {

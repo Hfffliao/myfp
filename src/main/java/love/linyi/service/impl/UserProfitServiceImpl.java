@@ -5,7 +5,9 @@ import love.linyi.dao.UserProfitDao;
 import love.linyi.domin.UserProfit;
 import love.linyi.service.UserProfitService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserProfitServiceImpl implements UserProfitService {
     @Autowired
     UserProfitDao userProfitDao;
