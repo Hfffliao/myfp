@@ -32,7 +32,7 @@ public class AuthFilter implements Filter {
         String main=httpRequest.getContextPath() + "/pages/main.html";
 
         String currentUrl = httpRequest.getRequestURI();
-        // 判断是否为静态资源路径，假设静态资源存于 /static 路径
+
         if(currentUrl.equals(httpRequest.getContextPath()+"/")){
             httpResponse.sendRedirect(main);
             return;
@@ -44,8 +44,17 @@ public class AuthFilter implements Filter {
         boolean isvideoResource = currentUrl.startsWith(httpRequest.getContextPath() + "/video-stream");
         boolean iscarUser = currentUrl.equals(httpRequest.getContextPath() + "/car-user");
         boolean iscar = currentUrl.equals(httpRequest.getContextPath() + "/car");
+
+        //访问接口文档
+        boolean isswagger = currentUrl.startsWith(httpRequest.getContextPath() + "/swagger-ui");
+
+        boolean isv3 = currentUrl.startsWith(httpRequest.getContextPath() + "/v3");
+
         // 若请求的是登录页面或登录请求，直接放行
-        if (currentUrl.equals(loginUrl) || currentUrl.equals(registerUrl)||currentUrl.equals(logoutUrl)|| isStaticResource||isImageResource||isfaviconResource||isvideoResource||iscarUser||iscar) {
+        if (currentUrl.equals(loginUrl) || currentUrl.equals(registerUrl)
+                ||currentUrl.equals(logoutUrl)|| isStaticResource||isImageResource
+                ||isfaviconResource||isvideoResource||iscarUser||iscar
+                ||isswagger||isv3) {
             System.out.println("放行");
             chain.doFilter(request, response);
             return;

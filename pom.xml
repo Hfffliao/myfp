@@ -253,6 +253,8 @@
       <artifactId>jetty-alpn-java-server</artifactId>
       <version>12.0.27</version> <!-- 与Jetty版本保持一致 -->
     </dependency>
+<!--    支持自动生成接口文档-->
+
   </dependencies>
 
   <build>

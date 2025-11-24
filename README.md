@@ -1,70 +1,40 @@
 # myfp
-这是一个我存放我感兴趣的springboot项目的仓库，现在不完善，但会慢慢完善的
 
-提交记录
-commit e808077c39841a4a344332168f7794a82ef6820d
-Author: liaoyi <3390351358@qq.com>
-Date:   Thu Sep 25 01:28:05 2025 +0800
+## 简介
 
-    添加了在线文件系统，视频流中转服务器
+这是一个我存放我感兴趣的spring项目的仓库，现在不完善，但会慢慢完善的
+**目前有一个项目，内有三个功能模块和一些辅助模块**：
 
-commit fbe38fef87a11721fbfe394196b4eae1d28784e9
-Author: liaoyi <3390351358@qq.com>
-Date:   Fri Jun 20 14:22:53 2025 +0800
+#### 1.技术栈
 
-    改成全由springmvc管理的（优化了验证码发送的多种情况）
+Spring SpringMVC MySQL MyBatis
 
-commit a1a066437db3d7913ffa577296e727eb35ea663d
-Author: liaoyi <3390351358@qq.com>
-Date:   Fri Jun 20 00:40:13 2025 +0800
+#### 2.功能模块
 
-    改成全由springmvc管理的（使用异步请求上传文件显示进度提取出css）
+1.一个是线上文件夹模块，类似云盘，实现用户文件及文件夹上传，下载，删除，更改，查询等功能，每个用户的文件是私有的，只能通过登录账号操作；
 
-commit cebad868dc1146d14ac5cec51f4c0d8968080954
-Author: liaoyi <3390351358@qq.com>
-Date:   Tue Jun 17 21:05:54 2025 +0800
+2.一个是用户模块，实现用户的注册、登录、查询、以及用户权益管理等功能；
 
-    改成全由springmvc管理的（将服务暂时移入秘境，并加入了前端防过度发验证码逻辑）
+3.最后一个是物联网小车的服务端管理模块，负责中转及校验小车拍摄的视频，客户端发送的小车操控信号，视频延迟得到大幅度优化，客户端采用用网页形式，在浏览器中运行，有较好的跨平台能力
 
-commit 1edb21c182334c944b060529813fa31ecd97ce1b
-Author: liaoyi <3390351358@qq.com>
-Date:   Sat May 24 15:18:37 2025 +0800
+#### 3.辅助模块
 
-    改成全由springmvc管理的（加了日志和异常处理）
+1.日志
 
-commit c8e5a5f27f724d82849f07d12761ed5db2152c17
-Author: liaoyi <3390351358@qq.com>
-Date:   Thu May 22 23:40:53 2025 +0800
+2.测试
 
-    改成全由springmvc管理的（加了账号显示）
+3.接口文档
 
-commit b693e317ba044a1a4b718a856d731d121ff4e198
-Author: liaoyi <3390351358@qq.com>
-Date:   Thu May 22 20:14:04 2025 +0800
+#### 4.其他
 
-    改成全由springmvc管理的
+使用git进行版本管理，用maven管理依赖
 
-commit 45bec1e235a1c4a3b4821bedccf704991603c165
-Author: liaoyi <3390351358@qq.com>
-Date:   Thu May 22 16:29:57 2025 +0800
+## 快速开始
 
-    shiyan
+windows
 
-commit 82286619b196367a711b45f19ef3a2f2f7ee6eaa
-Author: liaoyi <3390351358@qq.com>
-Date:   Thu May 22 16:20:02 2025 +0800
+1.打开命令提示符，进入一个空目录，运行`git clone https://github.com/Hfffliao/myfp.git ` 克隆完整的仓库到电脑本地；成功的话会在这个目录下生成myfp文件夹。
 
-    初始化项目，添加基本 Spring MVC 结构
+2.进入myfp项目的目录，使用`mvn clean` 清空编译完成的文件，然后使用`mvn package` 编译myfp项目；编译完成之后在myfp目录中能找到"\target\springmvc-1.0-SNAPSHOT.war"文件。
 
-commit f010157db65747b6694f5e489720f8ff0e615c28
-Author: liaoyi <3390351358@qq.com>
-Date:   Thu May 22 16:07:15 2025 +0800
-
-    shiyan
-
-commit 8e962c3631a5aea8ae6771d6ba4e031a484caf0b
-Author: liaoyi <3390351358@qq.com>
-Date:   Thu May 22 15:45:08 2025 +0800
-
-    linyi-1.0
-
+3.把springmvc-1.0-SNAPSHOT.war文件复制到tomcat的webapps目录下，改名为ROOT.war并启动tomcat（使用jetty也是类似的）

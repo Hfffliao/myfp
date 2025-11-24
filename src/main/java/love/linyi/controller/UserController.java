@@ -1,4 +1,5 @@
 package love.linyi.controller;
+
 import love.linyi.domin.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +10,9 @@ import java.util.List;
 
 @Controller
 //@RequestMapping("/user")
+//@Tag(name = "用户控制接口示例", description = "对用户的增删查改")
 public class UserController {
+    //@Operation(summary = "注册用户", description = "注册注册")
     @RequestMapping(value = "/user/{id}",method= RequestMethod.POST)
     public String save(@PathVariable int id){
         System.out.println("user save"+id);

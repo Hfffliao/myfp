@@ -42,23 +42,7 @@ class FolderControllerTest {
     void setUp() {
     }
 
-//    @Test
-//    void testGetFolder_UserNotLoggedIn() throws JsonProcessingException {
-//        // Arrange
-//
-//        when(checkIfLogin.checkIfLogin(session)).thenReturn(false);
-//
-//         //Act
-//        ResponseEntity<String> result = folderController.getfolder(session);
-//
-//        // Assert
-//        Map<String, Object> expectedResponse = new HashMap<>();
-//        String expected = String.valueOf(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(expectedResponse));
-//        assertEquals(expected, result);
-//        verify(checkIfLogin).checkIfLogin(session);
-//        verifyNoInteractions(userFolderService);
-//        verifyNoInteractions(folderStructureBuilder);
-//    }
+
     @Test
     void testifUpload_sizeTobig() {
         // Arrange

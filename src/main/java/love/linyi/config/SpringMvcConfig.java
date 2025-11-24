@@ -24,7 +24,16 @@ public class SpringMvcConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/main.html")
                 .addResourceLocations("/main.html");
 
-        // 部署环境映射，假设 HTML 文件在类路径下的 META-INF/resources/pages 目录
+        // SpringDoc UI资源
+        registry.addResourceHandler("/swagger-ui/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/springdoc-openapi-ui/")
+                .resourceChain(false);
+
+
+        // 添加 OpenAPI JSON 描述映射
+        registry.addResourceHandler("/v3/api-docs/**")
+                .addResourceLocations("classpath:/META-INF/resources/v3/api-docs/");
+
     }
 //    @Bean(name = "multipartResolver")
 //    public CommonsMultipartResolver multipartResolver() {

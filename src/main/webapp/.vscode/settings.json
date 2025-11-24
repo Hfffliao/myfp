@@ -1,9 +1,0 @@
-{
-    "idf.espIdfPathWin": "d:\\esp-idf\\esp\\v5.5.1\\esp-idf",
-    "idf.toolsPathWin": "d:\\esp-idf\\.esptool",
-    "idf.pythonInstallPath": "d:\\esp-idf\\.esptool\\tools\\idf-python\\3.11.2\\python.exe",
-    "idf.openOcdConfigs": [
-        "interface/ftdi/esp32_devkitj_v1.cfg",
-        "target/esp32.cfg"
-    ]
-}
