@@ -1,6 +1,7 @@
 package love.linyi.controller.fold;
 import love.linyi.controller.Code;
 import love.linyi.service.folderService.Deletefile;
+import love.linyi.service.security.FilePath;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -17,12 +18,16 @@ import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 @Controller
 @RequestMapping("/file")
 public class FileController {
     @Autowired
     Deletefile deletefile;
+    @Autowired
+    FilePath filePathImpl;
+
     /**
      * 返回本地文件
      *
@@ -84,9 +89,14 @@ public class FileController {
         String name = (String) (session.getAttribute("user")==null? "":session.getAttribute("user"));
         //获取用户id并检查是否为空
         int id = (int) (session.getAttribute("id")==null? 0:session.getAttribute("id"));
-        System.out.println(id+";"+name);
+        //System.out.println(id+";"+name);
         // 替换为实际的本地文件路径
-        File file = new File(Code.root+"/"+name+"/"+filepn);
+        Path path=filePathImpl.formalFilePath(Path.of(Code.root,name),filepn);
+        if(path==null){
+            return ResponseEntity.badRequest().build();
+        }
+        //System.out.println(path);
+        File file = new File(path.toString());
         Resource resource = new FileSystemResource(file);
 
         if (!resource.exists()) {
