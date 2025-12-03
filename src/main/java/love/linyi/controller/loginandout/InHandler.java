@@ -2,6 +2,8 @@ package love.linyi.controller.loginandout;
 
 import love.linyi.domin.User;
 import love.linyi.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ public class InHandler {
     @Autowired
     private UserService userService;
 
+    private static final Logger logger = LoggerFactory.getLogger(InHandler.class);
     /**
      * 处理用户登录的 POST 请求。
      * 从请求体中获取用户名和密码，调用 UserService 验证用户信息。
@@ -37,6 +40,11 @@ public class InHandler {
      */
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> doPost(@RequestBody Map<String, Object> requestBody, HttpServletRequest request) {
+        if(logger.isDebugEnabled()){
+            logger.debug("requestIP: {}", request.getRemoteAddr());
+            logger.debug("RequestURI: {}", request.getRequestURI());
+            logger.debug("requestBody: {}", requestBody);
+        }
         // 用于存储响应信息的 Map
         Map<String, Object> response = new HashMap<>();
         try {

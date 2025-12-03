@@ -1,6 +1,5 @@
 package love.linyi.controller.camera.http3;
 import jakarta.servlet.http.HttpServletRequest;
-import love.linyi.netapi.jetty.JettyInitializer;
 import love.linyi.netapi.udp.UdpRecvAndH3SendService;
 import love.linyi.service.camera.http3.StreamManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,8 @@ public class VideoStreamController {
     @Autowired
     private StreamManager streamManager;
 
-    @Autowired
-    JettyInitializer jettyInitializer;
+//    @Autowired
+//    JettyInitializer jettyInitializer;
     int streamCount = 0;
     @GetMapping(value = "/video-stream/{streamId}")//, produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public DeferredResult<Void> streamVideo(
@@ -31,7 +30,7 @@ public class VideoStreamController {
         if(streamId.equals("0")){
 
             if(streamCount > 1){
-                jettyInitializer.removeHttp2Connector();
+               // jettyInitializer.removeHttp2Connector();
                 //System.out.println("removeHttp2Connector");
             }
             return null;
@@ -44,7 +43,7 @@ public class VideoStreamController {
         response.setHeader("Transfer-Encoding", "chunked");
         OutputStream outputStream = response.getOutputStream();
         if(streamId.equals("128")){
-            jettyInitializer.addHttp2Connector();
+           // jettyInitializer.addHttp2Connector();
             System.out.println("addHttp2Connector");
             streamCount=0;
         }

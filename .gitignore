@@ -7,6 +7,9 @@ target/
 
 # 忽略日志文件
 *.log
+*.log.*
 
 # 忽略临时文件
 *.tmp
+
+dependency-reduced-pom.xml

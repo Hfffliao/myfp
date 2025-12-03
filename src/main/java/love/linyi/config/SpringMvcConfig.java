@@ -35,12 +35,4 @@ public class SpringMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/META-INF/resources/v3/api-docs/");
 
     }
-//    @Bean(name = "multipartResolver")
-//    public CommonsMultipartResolver multipartResolver() {
-//        CommonsMultipartResolver resolver = new CommonsMultipartResolver();
-//        // 最大上传文件大小 100MB
-//        resolver.setMaxUploadSize(104857600);
-//        resolver.setDefaultEncoding("UTF-8");
-//        return resolver;
-//    }
 }

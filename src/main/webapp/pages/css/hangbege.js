@@ -1,11 +1,13 @@
 //const endpointPath = "http://linyi.love";
 // const endpointPath = "http://localhost:25571";
 //const endpointPath = "http://localhost:8080";
-const endpointPath = "https://linyi.love";
+const endpointPath = "https://linyi.love:8443";
 //const Coderoot='C:/uploads';
 //const Coderoot='C:/uploads';
+
 if (document.readyState === 'interactive' || document.readyState === 'complete') {
     // DOM 已经加载完成，直接执行初始化逻辑
+
     initPage();
 } else {
     // 监听 DOMContentLoaded 事件
@@ -214,7 +216,7 @@ function initnavbar() {
     // 初始化 logo 图片的 src 属性
     const logoImg = document.querySelector('.logo img');
     if (logoImg) {
-        logoImg.src = `${contextPath}/image/01.png`;
+        logoImg.src = `${contextPath}/pages/image/01.png`;
     }
 
     // 初始化各个导航链接的 href 属性
@@ -261,3 +263,4 @@ function errorhandle(error){
             // 显示错误信息弹窗
             alert(errorMessage);
 }
+

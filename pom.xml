@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.linyi.love</groupId>
+  <groupId>linyi.love</groupId>
   <artifactId>springmvc</artifactId>
-  <packaging>war</packaging>
+  <packaging>${packaging.type}</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>springmvc Maven Webapp</name>
   <url>http://maven.apache.org</url>
@@ -20,11 +20,178 @@
       <url>https://maven.aliyun.com/nexus/content/groups/public/</url>
     </repository>
   </repositories>
+
+  <profiles>
+    <!-- Jetty嵌入式部署 -->
+    <profile>
+      <id>jetty-embedded</id>
+      <properties>
+        <packaging.type>jar</packaging.type>
+        <jettyVersion>12.0.30</jettyVersion>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>jakarta.servlet</groupId>
+          <artifactId>jakarta.servlet-api</artifactId>
+          <version>6.0.0</version>
+<!--                <scope>provided</scope>-->
+          <scope>compile</scope>
+        </dependency>
+        <dependency>
+          <groupId>jakarta.platform</groupId>
+          <artifactId>jakarta.jakartaee-api</artifactId>
+          <version>10.0.0</version>
+          <scope>compile</scope>
+<!--                <scope>provided</scope>-->
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-server</artifactId>
+          <version>12.0.27</version> <!-- Jetty 12支持Servlet 6.0 -->
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.jetty.ee10</groupId>
+          <artifactId>jetty-ee10-webapp</artifactId>
+          <version>12.0.27</version>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.jetty.ee10</groupId>
+          <artifactId>jetty-ee10-annotations</artifactId>
+          <version>12.0.27</version>
+        </dependency>
+        <!-- Jetty 12 HTTP/3核心依赖 -->
+        <dependency>
+          <groupId>org.eclipse.jetty.http3</groupId>
+          <artifactId>jetty-http3-server</artifactId>
+          <version>12.0.27</version> <!-- 建议使用Jetty 12最新稳定版 -->
+        </dependency>
+        <!-- QUIC传输层依赖（HTTP/3基于QUIC） -->
+        <dependency>
+          <groupId>org.eclipse.jetty.quic</groupId>
+          <artifactId>jetty-quic-server</artifactId>
+          <version>12.0.27</version>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.jetty.http2</groupId>
+          <artifactId>jetty-http2-server</artifactId>
+          <version>12.0.27</version> <!-- 版本需与项目中Jetty其他组件一致 -->
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-alpn-server</artifactId>
+          <version>12.0.27</version> <!-- 版本需与项目中Jetty其他组件一致 -->
+        </dependency>
+        <!-- {{ 新增ALPN处理器实现依赖 - 开始 }} -->
+        <dependency>
+          <groupId>org.eclipse.jetty</groupId>
+          <artifactId>jetty-alpn-java-server</artifactId>
+          <version>12.0.27</version> <!-- 与Jetty版本保持一致 -->
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+          <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
+          <version>12.0.27</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+<!--          构建过程直接执行主类-->
+<!--          <plugin>-->
+<!--            <groupId>org.codehaus.mojo</groupId>-->
+<!--            <artifactId>exec-maven-plugin</artifactId>-->
+<!--            <executions>-->
+<!--              <execution><goals><goal>java</goal></goals></execution>-->
+<!--            </executions>-->
+<!--            <configuration>-->
+<!--              <mainClass>JettyStarter</mainClass>-->
+<!--            </configuration>-->
+<!--          </plugin>-->
+
+
+<!--          指定主类-->
+<!--          <plugin>-->
+<!--            <groupId>org.apache.maven.plugins</groupId>-->
+<!--            <artifactId>maven-jar-plugin</artifactId>-->
+<!--            <version>3.3.0</version>-->
+<!--            <configuration>-->
+<!--              <archive>-->
+<!--                <manifest>-->
+<!--                  <mainClass>JettyStarter</mainClass>-->
+<!--                </manifest>-->
+<!--              </archive>-->
+<!--            </configuration>-->
+<!--          </plugin>-->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>3.3.0</version>
+            <executions>
+              <execution>
+                <id>add-jetty-source</id>
+                <phase>generate-sources</phase>
+                <goals><goal>add-source</goal></goals>
+                <configuration>
+                  <sources>
+                    <source>src/main/jetty</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.4.1</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals><goal>shade</goal></goals>
+                <configuration>
+                  <transformers>
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                      <mainClass>JettyStarter</mainClass>
+                    </transformer>
+                    <!-- 关键：合并 META-INF/services 文件 -->
+                    <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+
+                  </transformers>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- Tomcat WAR部署 -->
+    <profile>
+      <id>tomcat-war</id>
+      <properties>
+        <packaging.type>war</packaging.type>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>jakarta.servlet</groupId>
+          <artifactId>jakarta.servlet-api</artifactId>
+          <version>6.0.0</version>
+          <scope>provided</scope>
+<!--          <scope>compile</scope>-->
+        </dependency>
+        <dependency>
+          <groupId>jakarta.platform</groupId>
+          <artifactId>jakarta.jakartaee-api</artifactId>
+          <version>10.0.0</version>
+<!--          <scope>compile</scope>-->
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
+        <artifactId>slf4j-log4j12</artifactId>
         <version>2.0.17</version>
       </dependency>
     </dependencies>
@@ -32,7 +199,7 @@
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
+      <artifactId>slf4j-log4j12</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mybatis</groupId>
@@ -148,29 +315,19 @@
       <version>2.8.0</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
-      <version>6.0.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <!-- Jakarta EE JDBC API -->
-    <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
-      <version>2.1.1</version>
-    </dependency>
 
-<!--    <dependency>-->
-<!--      <groupId>taglibs</groupId>-->
-<!--      <artifactId>standard</artifactId>-->
-<!--      <version>1.1.2</version>-->
-<!--    </dependency>-->
+
     <dependency>
       <groupId>com.sun.mail</groupId>
       <artifactId>jakarta.mail</artifactId>
       <version>2.0.1</version>
     </dependency>
+<!--    <dependency>-->
+<!--      <groupId>taglibs</groupId>-->
+<!--      <artifactId>standard</artifactId>-->
+<!--      <version>1.1.2</version>-->
+<!--    </dependency>-->
+
     <dependency>
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjweaver</artifactId>
@@ -198,65 +355,14 @@
       <artifactId>hibernate-core</artifactId>
       <version>6.4.1.Final</version>
     </dependency>
-    <dependency>
-      <groupId>jakarta.persistence</groupId>
-      <artifactId>jakarta.persistence-api</artifactId>
-      <version>3.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.platform</groupId>
-      <artifactId>jakarta.jakartaee-api</artifactId>
-      <version>10.0.0</version>
-      <scope>provided</scope>
-    </dependency>
     <!-- Jetty 12 依赖 ；适配servlet6 -->
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <version>12.0.27</version> <!-- Jetty 12支持Servlet 6.0 -->
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.ee10</groupId>
-      <artifactId>jetty-ee10-webapp</artifactId>
-      <version>12.0.27</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.ee10</groupId>
-      <artifactId>jetty-ee10-annotations</artifactId>
-      <version>12.0.27</version>
-    </dependency>
-    <!-- Jetty 12 HTTP/3核心依赖 -->
-    <dependency>
-      <groupId>org.eclipse.jetty.http3</groupId>
-      <artifactId>jetty-http3-server</artifactId>
-      <version>12.0.27</version> <!-- 建议使用Jetty 12最新稳定版 -->
-    </dependency>
-    <!-- QUIC传输层依赖（HTTP/3基于QUIC） -->
-    <dependency>
-    <groupId>org.eclipse.jetty.quic</groupId>
-    <artifactId>jetty-quic-server</artifactId>
-    <version>12.0.27</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty.http2</groupId>
-      <artifactId>jetty-http2-server</artifactId>
-      <version>12.0.27</version> <!-- 版本需与项目中Jetty其他组件一致 -->
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-alpn-server</artifactId>
-      <version>12.0.27</version> <!-- 版本需与项目中Jetty其他组件一致 -->
-    </dependency>
-    <!-- {{ 新增ALPN处理器实现依赖 - 开始 }} -->
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-alpn-java-server</artifactId>
-      <version>12.0.27</version> <!-- 与Jetty版本保持一致 -->
-    </dependency>
 <!--    支持自动生成接口文档-->
 
   </dependencies>
-
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
   <build>
     <plugins>
       <plugin>
@@ -270,8 +376,5 @@
       </plugin>
     </plugins>
   </build>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties>
+
 </project>

@@ -95,7 +95,7 @@ public class UdpRecvAndH3SendService {
 
                 if(!isRunning){
                     Thread.sleep(1000);
-                    System.out.println("controller 1000ms未获取连接");
+                    //System.out.println("controller 1000ms未获取连接");
                 }
             }
         } catch (Exception e) {
