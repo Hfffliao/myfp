@@ -1,7 +1,7 @@
 # 忽略 IDE 相关文件
 .idea/
 *.iml
-
+.idea
 # 忽略编译生成的文件
 target/
 
