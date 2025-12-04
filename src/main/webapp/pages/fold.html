@@ -189,10 +189,49 @@
             left: 50%;        /* 左侧距离视口50% */
             transform: translate(-50%, -50%); /* 向左上方偏移自身宽高的50%，实现居中 */
         }
+        .isDelete{
+            width: 50vw;
+            height: 20vh;
+            position: fixed;
+            left: 25vw;
+            top: 40vh;
+            border-radius: 4px;
+            z-index: 1000;
+            background-color: aliceblue;
+            display: none;
+
+        }
+        .isDelete-content{
+            display: inline-flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+        .isDeleteBt-content{
+            display: inline-flex;
+            flex-direction: row;
+            justify-content:center;
+            align-items: center;
+            width: 100%;
+            gap: 10%;
+
+        }
+        .isDelete-context{
+            padding: 5% 15%;
+        }
     </style>
 </head>
 
 <body>
+<div class="isDelete" id="isDelete">
+    <div class="isDelete-content">
+        <div id="isDelete-context" class="isDelete-context"></div>
+        <div class="isDeleteBt-content"><button class="delete-btn" id="delete_bt">删除</button><button id="no_delete_bt">不删除</button></div>
+    </div>
+</div>
+
     <div id="header"></div>
     <main>
         <!-- 文件展示窗口 -->
@@ -308,9 +347,28 @@
         document.getElementById('toolbar').style.display = 'block';
     }
 
+    /////////选择是否删除文件或文件夹
+    function isDeletef(name,type,id){
+        const isd = document.getElementById("isDelete");
+        const isd_context =document.getElementById("isDelete-context");
+        const delete_bt=document.getElementById("delete_bt");
+        const no_delete_bt=document.getElementById("no_delete_bt");
+        delete_bt.onclick=function (){
+            deleteItem(name,type,id);
+            isd.style.display='none'
+        }
+        no_delete_bt.onclick=function (){
+            isd.style.display='none'
+        }
+        isd_context.textContent=`确定删除${name}吗？`
+        isd.style.display='block';
+
+    }
     ///////// 删除文件或文件夹
     async function deleteItem(name,type,id) {
         try {
+
+
             let joincurrentPath = currentPath.join('/');
             //如果joincurrentPath不为空，且不以/结尾，添加/来构造合法url
             console.log(joincurrentPath);
@@ -829,7 +887,7 @@ let currentFile;
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-btn';
                 deleteBtn.textContent = '删除';
-                deleteBtn.onclick = () => deleteItem(item.name,item.type,item.id);
+                deleteBtn.onclick = () => isDeletef(item.name,item.type,item.id);
                 listItem.appendChild(deleteBtn);
 
                 const moreBtn = document.createElement('button');

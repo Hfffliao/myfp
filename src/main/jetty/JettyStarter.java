@@ -97,9 +97,18 @@ public class JettyStarter {
         DispatcherServlet dispatcherServlet=new DispatcherServlet(webApplicationContextcontext);
         ServletHolder servletHolder = context.addServlet(ResourceServlet.class, "/pages/*");
         // 添加 ResourceServlet 以从特定位置提供静态内容。
+        //添加dispatcherServlet并配置
         ServletHolder dispatcherServletHolder = context.addServlet(dispatcherServlet, "/");
+        MultipartConfigElement multipartConfig = new MultipartConfigElement(
+                System.getProperty("java.io.tmpdir"),
+                524288000,        // 500MB
+                524288000,        // 500MB
+                1000000           // 1MB 阈值
+        );
+        dispatcherServletHolder.getRegistration().setMultipartConfig(multipartConfig);
         dispatcherServletHolder.setInitOrder(1);
 
+        configureFilters(context, applicationContext);
 // 使用初始化参数配置 ResourceServlet。
         servletHolder.setInitParameter("baseResource", "C:\\Users\\HMCL\\javaeeeclipse-jee-2021-06-R-win32-x86_64\\workspase\\springmvc\\springmvc\\src\\main\\webapp\\pages");
         servletHolder.setInitParameter("pathInfoOnly", "true");
@@ -110,41 +119,6 @@ public class JettyStarter {
         server.setHandler(context);
         server.start();
         server.join();
-    }
-    private static ServletContextHandler createServletContextHandler(
-            WebApplicationContext rootContext,
-            WebApplicationContext servletContext) {
-
-     //   ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        ServletContextHandler contextHandler = new ServletContextHandler("/");
-        ServletHolder servletHolder= contextHandler.addServlet(DispatcherServlet.class,"/*");
-
-
-        // 添加上下文属性，便于在 Servlet 和 Filter 中访问
-        contextHandler.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, rootContext);
-
-        // 添加 ContextLoaderListener 用于根上下文
-       // contextHandler.addEventListener(new ContextLoaderListener(rootContext));
-
-        // 创建并配置 DispatcherServlet
-
-
-        servletHolder.setInitOrder(1);
-        // 禁用默认 XML 配置加载
-        servletHolder.setInitParameter("contextConfigLocation", "");
-
-        // 配置文件上传 (对应 customizeRegistration 方法)
-        MultipartConfigElement multipartConfig = new MultipartConfigElement(
-                System.getProperty("java.io.tmpdir"),
-                524288000,        // 500MB
-                524288000,        // 500MB
-                1000000           // 1MB 阈值
-        );
-        servletHolder.getRegistration().setMultipartConfig(multipartConfig);
-        // 配置过滤器 (对应 getServletFilters 方法)
-        //configureFilters(contextHandler, rootContext);
-
-        return contextHandler;
     }
     private static void configureFilters(ServletContextHandler contextHandler, WebApplicationContext context) {
         // CORS 过滤器

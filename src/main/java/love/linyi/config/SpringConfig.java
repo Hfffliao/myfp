@@ -65,7 +65,7 @@ public class SpringConfig implements WebMvcConfigurer, WebSocketConfigurer{
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(videoStreamWebSocketHandler, "/car-user")
+        registry.addHandler(videoStreamWebSocketHandler, "/car/user")
                 .setAllowedOrigins("*")
                 .addInterceptors(new HttpSessionHandshakeInterceptor());;
         registry.addHandler(webSocketToEsp8266, "/car")

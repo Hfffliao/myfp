@@ -587,7 +587,7 @@
             await fetch('https://linyi.love:25572/videostop',)
         }
 
-        const wsUrl_control = 'wss://' + 'linyi.love' + ':8443/car/user';
+        const wsUrl_control = 'wss://' + 'linyi.love' + ':/car/user';
 
         const websocket_ctrl = new WebSocket(wsUrl_control);
         websocket_ctrl.binaryType = 'arraybuffer';

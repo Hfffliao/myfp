@@ -30,13 +30,13 @@
         <jettyVersion>12.0.30</jettyVersion>
       </properties>
       <dependencies>
-        <dependency>
-          <groupId>jakarta.servlet</groupId>
-          <artifactId>jakarta.servlet-api</artifactId>
-          <version>6.0.0</version>
-<!--                <scope>provided</scope>-->
-          <scope>compile</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--          <groupId>jakarta.servlet</groupId>-->
+<!--          <artifactId>jakarta.servlet-api</artifactId>-->
+<!--          <version>6.0.0</version>-->
+<!--&lt;!&ndash;                <scope>provided</scope>&ndash;&gt;-->
+<!--          <scope>compile</scope>-->
+<!--        </dependency>-->
         <dependency>
           <groupId>jakarta.platform</groupId>
           <artifactId>jakarta.jakartaee-api</artifactId>
@@ -170,13 +170,13 @@
         <packaging.type>war</packaging.type>
       </properties>
       <dependencies>
-        <dependency>
-          <groupId>jakarta.servlet</groupId>
-          <artifactId>jakarta.servlet-api</artifactId>
-          <version>6.0.0</version>
-          <scope>provided</scope>
-<!--          <scope>compile</scope>-->
-        </dependency>
+<!--        <dependency>-->
+<!--          <groupId>jakarta.servlet</groupId>-->
+<!--          <artifactId>jakarta.servlet-api</artifactId>-->
+<!--          <version>6.0.0</version>-->
+<!--          <scope>provided</scope>-->
+<!--&lt;!&ndash;          <scope>compile</scope>&ndash;&gt;-->
+<!--        </dependency>-->
         <dependency>
           <groupId>jakarta.platform</groupId>
           <artifactId>jakarta.jakartaee-api</artifactId>
@@ -370,6 +370,9 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version> <!-- 明确指定版本 -->
         <configuration>
+          <compilerArgs>
+            <arg>-parameters</arg>
+          </compilerArgs>
           <source>17</source>
           <target>17</target>
         </configuration>

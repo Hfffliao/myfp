@@ -12,7 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +81,7 @@ public class HandleMultipartServiceImpl implements HandleMultipartService {
                 if (multipartFile != null) {
                     String fileName = multipartFile.getOriginalFilename();
                     String filePath = filePathMap.get(fileName);
+                    //保存文件到文件系统
                     saveFileToFileSystem(multipartFile, filePath, fileName,username);
 
                 }
@@ -161,8 +168,13 @@ public class HandleMultipartServiceImpl implements HandleMultipartService {
                     return;
                 }
             }
-            // 将文件保存到文件系统
-            file.transferTo(destFile);
+            Path targetPath=destFile.toPath();
+
+            //file.transferTo(destFile);
+            // 底层文件复制//等效于transferTo
+            try (InputStream inputStream = file.getInputStream()) {
+                Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            }
             System.out.println("文件已保存到: " + fullPath);
         } catch (Exception e) {
             System.err.println("保存文件 " + fullPath + " 时出错: " + e.getMessage());

@@ -1,7 +1,9 @@
 //const endpointPath = "http://linyi.love";
+const endpointPath = "https://linyi.love";
+// const endpointPath = "https://linyi.love:8080";//不存在
 // const endpointPath = "http://localhost:25571";
-//const endpointPath = "http://localhost:8080";
-const endpointPath = "https://linyi.love:8443";
+// const endpointPath = "http://localhost:8080";
+// const endpointPath = "https://linyi.love:8443";
 //const Coderoot='C:/uploads';
 //const Coderoot='C:/uploads';
 
