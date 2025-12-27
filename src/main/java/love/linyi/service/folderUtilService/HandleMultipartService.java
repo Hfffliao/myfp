@@ -1,4 +1,4 @@
-package love.linyi.service.folderService;
+package love.linyi.service.folderUtilService;
 
 import org.springframework.web.multipart.MultipartFile;
 

@@ -3,11 +3,9 @@ package love.linyi.dao;
 import love.linyi.domin.ShiJian;
 import love.linyi.domin.UserFolder;
 import love.linyi.domin.UserProfit;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
+import java.nio.file.Path;
 import java.util.List;
 public interface UserFolderDao {
     @Insert("<script>" +
@@ -27,7 +25,7 @@ public interface UserFolderDao {
     // public ShiJian getById(Integer id);
     @Select("select * from folder where user_id=#{id}")
     List<UserFolder> getAll(@Param("id")int id);
-    @Select("select time as otime, distance from shijian where time>#{min} and time<#{max}")
-    List<UserFolder> getArae(@Param("max") String max, @Param("min") String min);
+    @Update("update folder set path=#{newPath} where path=#{Path} and user_id=#{id}")
+    void updateFileName(@Param("Path") String Path, @Param("id") int id);
 
 }

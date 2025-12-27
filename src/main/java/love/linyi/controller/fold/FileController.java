@@ -1,17 +1,17 @@
 package love.linyi.controller.fold;
 import love.linyi.controller.Code;
-import love.linyi.service.folderService.Deletefile;
+import love.linyi.domin.UserFolder;
+import love.linyi.service.UserFolderService;
+import love.linyi.service.folderUtilService.Deletefile;
 import love.linyi.service.security.FilePath;
+import love.linyi.common.context.UserContext;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -27,6 +27,8 @@ public class FileController {
     Deletefile deletefile;
     @Autowired
     FilePath filePathImpl;
+    @Autowired
+    UserFolderService userFolderService;
 
     /**
      * 返回本地文件
@@ -132,6 +134,33 @@ public class FileController {
                 //响应流是二进制流
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
+    }
+
+    @PatchMapping
+    //重命名文件或文件夹,需要文件id和新文件名
+    public ResponseEntity<String> updateName(@RequestParam("id") int fileId
+            ,@RequestParam("newfilename") String newfilename
+                                             ) {
+        String username = UserContext.getUsername();
+        //获取文件model
+//        UserFolder userFolder = userFolderService.getUserFolderbyId(fileId);
+//        //检查文件是否存在
+//        if (userFolder == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//
+//        //规范化输入路径
+//        Path SystargetPath = filePathImpl.formalFilePath(Path.of(Code.root, username), path);
+//        //把输入转化为/dd/dd形式
+//        String dbtargetPath = filePathImpl.formalFilePathToDB(path);
+//        if (SystargetPath == null) {//处理之后不合理的路径都会返回null
+            return ResponseEntity.badRequest().body("路径无效");
+//        }
+//        if (dbtargetPath == null) {//处理之后不合理的路径都会返回null
+//            return ResponseEntity.badRequest().body("路径无效");
+//        }
+//        userFolderService.updateFileName(dbtargetPath);
+//        return ResponseEntity.ok("重命名成功");
     }
 
 }

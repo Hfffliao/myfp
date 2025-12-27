@@ -1,9 +1,9 @@
-package love.linyi.service.folderService.impl;
+package love.linyi.service.folderUtilService.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import love.linyi.domin.UserFolder;
-import love.linyi.service.folderService.FolderStructureBuilderService;
+import love.linyi.service.folderUtilService.FolderStructureBuilderService;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

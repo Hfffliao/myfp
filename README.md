@@ -67,6 +67,8 @@ windows
 
 1.账号密码等在 "src\main\resources\love\linyi\config\jdbc.properties"里面配置
 
+2.注意建表的时候要先建立user表，因为其他表有的有外键是user表的字段
+
 ###### 2.库和表
 
 1.库名是jiankong，  
@@ -119,4 +121,6 @@ CREATE TABLE `shijian` (
 
 ## 模块详解
 
-#### 1.
+#### 1.folder表字段
+`path`：是以“/”开头，用“/”做分隔符，以路径名结尾；
+因为在逻辑上这个path字段是绝对路径，用户看到的也是绝对路径，用“/”做分隔符，并且在不涉及操作系统文件夹的地方，都用“/”做分隔符，方便路径处理；

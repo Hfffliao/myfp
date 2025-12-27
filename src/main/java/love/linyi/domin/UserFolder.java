@@ -7,13 +7,16 @@ public class UserFolder {
     private String type;
     private int userId;
 
-    public int getUserId() {
-        return userId;
-    }
 
-    public void setUserId(int userId) {
+
+    public UserFolder(int id, String name, String path, String type, int userId) {
+        this.id = id;
+        this.name = name;
+        this.path = path;
+        this.type = type;
         this.userId = userId;
     }
+
 
 
 
@@ -24,6 +27,13 @@ public class UserFolder {
         this.name = name;
         this.path = path;
         this.type = type;
+    }
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public int getId() {

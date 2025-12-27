@@ -4,7 +4,7 @@ import love.linyi.exception.BusinessException;
 import love.linyi.exception.SystemException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
+//这个是返回给用户的
 @RestControllerAdvice
 public class ProjectExceptionAdvice {
     @ExceptionHandler(SystemException.class)

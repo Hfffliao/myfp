@@ -8,6 +8,7 @@ target/
 # 忽略日志文件
 *.log
 *.log.*
+logs/
 
 # 忽略临时文件
 *.tmp

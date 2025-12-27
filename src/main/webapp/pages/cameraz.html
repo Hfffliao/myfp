@@ -5,8 +5,110 @@
     <meta charset="UTF-8">
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> -->
     <title>Robot-l1Console</title>
+    
     <script>//这部分需要hangbege.js的都要有
+  
+
+     function startrec() {
+            const imgElement = document.getElementById('videoDat');
+            window.imgelement=imgElement;
+            const blob = new Blob([workerCode], { type: 'application/javascript' });
+            const workerUrl = URL.createObjectURL(blob);
+            // 使用内联Worker
+            const videoWorker = new Worker(workerUrl);
+            window.videoWork = videoWorker; // 显式全局
+            //const videoWorker = new Worker('worker.js');
+
+            // 接收Worker处理结果
+            videoWorker.onmessage = function (e) {
+                const imageData = e.data;
+                // console.log("最终处理结果："+e.data);            //console.error("2线程处理好照片交给主线程显示："+Date.now());
+                displayImage(imageData, 'image/jpeg');
+                // console.log("显示完毕："+Date.now());
+            };
+
+
+
+
+            //
+            //接收视频数据
+            //
+            /////////////////////////////////////////////////////////////////////////////////
+            // 创建流URL映射对象
+            let streamURLs;
+
+            // 动态生成URL
+            streamURLs = `https://linyi.love:4444/webtransport`;
+
+            beforeStartStreaming(streamURLs);
+            async function beforeStartStreaming(streamURLs) {
+                startStreaming(streamURLs);
+            }
+
+            async function startStreaming(url) {
+                try {
+                    // 使用 AbortController
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 1000 * 600); // 10分钟超时
+                    //webtransport
+                    const transport = new WebTransport(url);
+                    // The connection can be used once ready fulfills
+                    await transport.ready;
+
+                    const reader = transport.datagrams.readable.getReader();
+                    //const stream = await transport.createBidirectionalStream();
+                    // stream.readable is a WebTransportReceiveStream
+                    //const readable = stream.readable;
+                    // stream.writable is a WebTransportSendStream
+                    //const writable = stream.writable;
+                    //const reader = readable.getReader();
+                    const writer = transport.datagrams.writable.getWriter();
+                    // const data1 = new Uint8Array([65, 66, 67]);
+                    // const data2 = new Uint8Array([68, 69, 70]);
+                    clearTimeout(timeoutId);
+                    console.log("开始连接:" + url);
+                    //检查响应状态
+                    // if (!response.ok) {
+                    //     throw new Error(`HTTP错误! 状态码: ${response.status}`);
+                    // }
+
+                    // console.log("开始接收视频流");
+                    // transportButton.addEventListener('click', function () {
+                    //     writer.write(data1);
+                    //     writer.write(data2);
+                    // })
+
+                    while (true) {
+                        try {
+                            //console.log("我又来了");
+                            const { done, value } = await reader.read();
+
+                            if (done) {
+                                console.log("视频流结束");
+                                break;
+                            }
+                            if (value.byteLength == 0) {
+                                console.log("value.byteLength==0");
+                                continue;
+                            }
+                            // 处理接收到的视频数据
+
+                            //console.log(`接收到 ${value.byteLength} 字节数据`);
+                            addmessage(value);
+                        } catch (error) {
+                            console.error("读取数据错误:", error);
+                            break;
+                        }
+                    }
+                } catch (error) {
+                    console.log(`连接错误: ${error.message}`);
+                }
+            }
+            ////////////////////////////////////////////
+        }
+ 
     // 定义全局变量存储上下文路径//
+
     function getContextPath() {
         const pathName = window.location.pathname;
         console.log('pathName:', pathName);
@@ -459,7 +561,7 @@
 
         }
 
-        @media screen and (max-width: 12000px) and (orientation: portrait) {
+        @media screen  and (orientation: portrait) {
             body {
                 height: 100vw;
                 width: 100vh;
@@ -493,9 +595,9 @@
             <div class="control-panel">
                 <div class="slider-container">
                     <div class="slider-label">左控制</div>
-
-                    <input type="range" min="-5" max="5" value="0" class="vertical-slider" id="leftSlider"
-                        orient="vertical">
+<!-- -->
+                    <input type="range" min="-5" max="5" value="0"  id="leftSlider"class="vertical-slider"
+                       orient="vertical"  >
 
                 </div>
 
@@ -509,6 +611,16 @@
                     <img id="videoDat" src="" alt="等待视频数据">
 
                     <div class="controls">
+
+                         <div class="control-group">
+                           <button id="lvdaiButton" onclick="sendMessageToWebSocket(1)">履带开关</button>
+
+                        </div>
+                         <div class="control-group">
+                           <button id="videoButton" onclick="sendMessageToWebSocket(2)">相机开关</button>
+
+                        </div>
+                         
                         <div class="control-group">
                             <button id="startvideo" onclick="startvideo()">开始观察</button>
 
@@ -524,6 +636,7 @@
                             <button id="rightstopButton" onclick="sendMessageToWebSocket(6)">紧急制动</button>
 
                         </div>
+
                     </div>
 
                     <div class="horizontal-slider-container">
@@ -786,104 +899,8 @@
 
 
 
-        function startrec() {
-            const imgElement = document.getElementById('videoDat');
-            window.imgelement=imgElement;
-            const blob = new Blob([workerCode], { type: 'application/javascript' });
-            const workerUrl = URL.createObjectURL(blob);
-            // 使用内联Worker
-            const videoWorker = new Worker(workerUrl);
-            window.videoWork = videoWorker; // 显式全局
-            //const videoWorker = new Worker('worker.js');
 
-            // 接收Worker处理结果
-            videoWorker.onmessage = function (e) {
-                const imageData = e.data;
-                // console.log("最终处理结果："+e.data);            //console.error("2线程处理好照片交给主线程显示："+Date.now());
-                displayImage(imageData, 'image/jpeg');
-                // console.log("显示完毕："+Date.now());
-            };
-
-
-
-
-            //
-            //接收视频数据
-            //
-            /////////////////////////////////////////////////////////////////////////////////
-            // 创建流URL映射对象
-            let streamURLs;
-
-            // 动态生成URL
-            streamURLs = `https://linyi.love:4444/webtransport`;
-
-            beforeStartStreaming(streamURLs);
-            async function beforeStartStreaming(streamURLs) {
-                startStreaming(streamURLs);
-            }
-
-            async function startStreaming(url) {
-                try {
-                    // 使用 AbortController
-                    const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 1000 * 600); // 10分钟超时
-                    //webtransport
-                    const transport = new WebTransport(url);
-                    // The connection can be used once ready fulfills
-                    await transport.ready;
-
-                    const reader = transport.datagrams.readable.getReader();
-                    //const stream = await transport.createBidirectionalStream();
-                    // stream.readable is a WebTransportReceiveStream
-                    //const readable = stream.readable;
-                    // stream.writable is a WebTransportSendStream
-                    //const writable = stream.writable;
-                    //const reader = readable.getReader();
-                    const writer = transport.datagrams.writable.getWriter();
-                    // const data1 = new Uint8Array([65, 66, 67]);
-                    // const data2 = new Uint8Array([68, 69, 70]);
-                    clearTimeout(timeoutId);
-                    console.log("开始连接:" + url);
-                    //检查响应状态
-                    // if (!response.ok) {
-                    //     throw new Error(`HTTP错误! 状态码: ${response.status}`);
-                    // }
-
-                    // console.log("开始接收视频流");
-                    // transportButton.addEventListener('click', function () {
-                    //     writer.write(data1);
-                    //     writer.write(data2);
-                    // })
-
-                    while (true) {
-                        try {
-                            //console.log("我又来了");
-                            const { done, value } = await reader.read();
-
-                            if (done) {
-                                console.log("视频流结束");
-                                break;
-                            }
-                            if (value.byteLength == 0) {
-                                console.log("value.byteLength==0");
-                                continue;
-                            }
-                            // 处理接收到的视频数据
-
-                            //console.log(`接收到 ${value.byteLength} 字节数据`);
-                            addmessage(value);
-                        } catch (error) {
-                            console.error("读取数据错误:", error);
-                            break;
-                        }
-                    }
-                } catch (error) {
-                    console.log(`连接错误: ${error.message}`);
-                }
-            }
-            ////////////////////////////////////////////
-        }
-    </script>
+         </script>
 </body>
 
 </html>

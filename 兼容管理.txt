@@ -1,1 +1,1 @@
-兼容链一（1.1.0的spring 1.0.1的remotecar 1.0.0的station 1.0.0的goserver 1.0.0的node压测）
+兼容链一（1.1.0的myfp 1.0.1的remotecar 1.0.0的station 1.0.0的goserver 1.0.0的node压测）

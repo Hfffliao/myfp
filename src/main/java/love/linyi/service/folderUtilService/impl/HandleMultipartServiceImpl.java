@@ -1,4 +1,4 @@
-package love.linyi.service.folderService.impl;
+package love.linyi.service.folderUtilService.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,18 +6,15 @@ import love.linyi.controller.Code;
 import love.linyi.domin.UserFolder;
 import love.linyi.exception.BusinessException;
 import love.linyi.service.UserFolderService;
-import love.linyi.service.folderService.HandleMultipartService;
+import love.linyi.service.folderUtilService.HandleMultipartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,11 +1,7 @@
 
-package love.linyi.service.folderService.impl;
+package love.linyi.service.folderUtilService.impl;
 
-import love.linyi.config.*;
-import love.linyi.dao.UserFolderDao;
 import love.linyi.domin.UserFolder;
-import love.linyi.service.UserFolderService;
-import love.linyi.service.impl.UserFolderServiceImpl;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

@@ -1,7 +1,7 @@
-package love.linyi.service.folderService.impl;
+package love.linyi.service.folderUtilService.impl;
 
 import love.linyi.dao.UserFolderDao;
-import love.linyi.service.folderService.Deletefile;
+import love.linyi.service.folderUtilService.Deletefile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

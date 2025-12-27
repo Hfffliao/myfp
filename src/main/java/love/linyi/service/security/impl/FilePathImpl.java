@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 @Component
 public class FilePathImpl implements FilePath {
     @Override
+    //把用户提供的路径和基础的路径拼接，并检查是否在基础路径下，如果不在，输出null
     public Path formalFilePath(Path baseDir, String userInput) {
         try {
            // System.out.println(baseDir);
@@ -31,5 +32,16 @@ public class FilePathImpl implements FilePath {
         } catch (Exception e) {
             return null; // 非法路径
         }
+    }
+    @Override
+    //把路径转化为数据库中存储的格式
+    public String formalFilePathToDB(String path) {
+        Path p = Path.of(path);
+        String pathStr = p.toString();
+        // 判断第一个字符是否为反斜杠，如果不是则添加一个
+        if (!pathStr.startsWith("\\")) {
+            pathStr = "\\" + pathStr;
+        }
+        return pathStr.replace("\\", "/");
     }
 }

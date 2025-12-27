@@ -3,7 +3,7 @@ package love.linyi.controller.fold;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import love.linyi.controller.Code;
-import love.linyi.service.folderService.Deletefile;
+import love.linyi.service.folderUtilService.Deletefile;
 import love.linyi.service.security.FilePath;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

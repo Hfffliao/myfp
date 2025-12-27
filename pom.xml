@@ -7,6 +7,11 @@
   <version>1.0-SNAPSHOT</version>
   <name>springmvc Maven Webapp</name>
   <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <packaging.type>jar</packaging.type>  <!-- 添加默认值 -->
+</properties>
   <repositories>
     <!-- 添加Maven中央仓库 -->
 <!--    <repository>-->
@@ -260,6 +265,13 @@
       <version>5.13.2</version>
       <scope>test</scope>
     </dependency>
+    <!-- 参数化测试支持 -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <version>5.10.0</version>
+      <scope>test</scope>
+    </dependency>
     <!-- Hamcrest 依赖 -->
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -359,10 +371,7 @@
 <!--    支持自动生成接口文档-->
 
   </dependencies>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-  </properties>
+
   <build>
     <plugins>
       <plugin>

@@ -1,4 +1,4 @@
-package love.linyi.service.folderService;
+package love.linyi.service.folderUtilService;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import love.linyi.domin.UserFolder;

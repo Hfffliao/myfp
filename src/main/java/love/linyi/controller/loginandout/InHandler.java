@@ -53,7 +53,7 @@ public class InHandler {
             String word = (String) requestBody.get("password");
 
             // 检查用户名和密码是否为空
-            if (name == null || word == null) {
+            if (name == null || word == null || name.isEmpty() || word.isEmpty()) {
                 // 若为空，设置登录失败标志和错误信息
                 response.put("login", false);
                 response.put("message", "用户名和密码不能为空");
@@ -96,28 +96,4 @@ public class InHandler {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
-//    private String getClientIp(HttpServletRequest request) {
-//        String ip = request.getHeader("X-Forwarded-For");
-//        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-//            ip = request.getHeader("Proxy-Client-IP");
-//        }
-//        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-//            ip = request.getHeader("WL-Proxy-Client-IP");
-//        }
-//        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-//            ip = request.getHeader("HTTP_CLIENT_IP");
-//        }
-//        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-//            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-//        }
-//        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-//            ip = request.getRemoteAddr();
-//        }
-//        // 如果经过多个代理，取第一个 IP
-//        if (ip != null && ip.contains(",")) {
-//            ip = ip.split(",")[0].trim();
-//        }
-//        return ip;
-//    }
-
 }

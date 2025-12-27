@@ -6,6 +6,8 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import love.linyi.common.context.UserContext;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +44,7 @@ public class AuthFilter implements Filter {
         boolean isImageResource = currentUrl.startsWith(httpRequest.getContextPath() + "/image");
         boolean isfaviconResource = currentUrl.equals(httpRequest.getContextPath() + "/favicon.ico");
         boolean isvideoResource = currentUrl.startsWith(httpRequest.getContextPath() + "/video-stream");
-        boolean iscarUser = currentUrl.equals(httpRequest.getContextPath() + "/car-user");
+        boolean iscarUser = currentUrl.equals(httpRequest.getContextPath() + "/car/user");
         boolean iscar = currentUrl.equals(httpRequest.getContextPath() + "/car");
 
         //访问接口文档
@@ -61,7 +63,11 @@ public class AuthFilter implements Filter {
         }
 
         // 检查 session 中是否有用户信息
-        if (session != null && session.getAttribute("user") != null&&session.getAttribute("id")!=null) {
+        String username = (String) session.getAttribute("user");
+        int userid = (int)session.getAttribute("id");//会先包装成integer，然后拆箱为int，如果包装不了，会报错；
+        if (session != null && username != null && userid != 0) {
+            //把用户信息放到ThreadLocal，用完记得clean
+            UserContext.setUserInfo(new UserContext.UserInfo(username,userid));//静态内部类可以被实例，且不需要外部类的实例才能操作
             // 有用户信息，放行请求
             chain.doFilter(request, response);
         } else {
