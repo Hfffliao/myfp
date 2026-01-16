@@ -126,6 +126,7 @@
 <!--              </archive>-->
 <!--            </configuration>-->
 <!--          </plugin>-->
+          <!-- 添加src/main/jetty包下的代码一起编译打包 -->
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>build-helper-maven-plugin</artifactId>
@@ -143,6 +144,7 @@
               </execution>
             </executions>
           </plugin>
+          <!-- 用shade来打包依赖进jar文件 -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
@@ -154,6 +156,7 @@
                 <configuration>
                   <transformers>
                     <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                      <!-- 这个有时候要设置包名，不然会找不到主类 -->
                       <mainClass>JettyStarter</mainClass>
                     </transformer>
                     <!-- 关键：合并 META-INF/services 文件 -->
