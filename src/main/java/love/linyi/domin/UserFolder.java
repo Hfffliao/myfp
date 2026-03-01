@@ -1,5 +1,5 @@
 package love.linyi.domin;
-
+//这个模型类表示用户文件夹和文件的信息
 public class UserFolder {
     private int id;
     private String path;

@@ -12,7 +12,6 @@ public class AcquisitionTimeImpl implements AcquisitionTime {
         LocalDateTime now = LocalDateTime.now();
         // 定义格式
 //        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        // TODO Auto-generated method stub
         System.out.println(now);
         return now;
     }

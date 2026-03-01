@@ -1,0 +1,35 @@
+graph TD
+    Start([开始]) --> A[接收重命名请求]
+    A --> B{参数校验<br/>id 和 newName 是否有效}
+    B -->|无效| C[返回参数错误]
+    C --> End([结束])
+
+    B -->|有效| D[获取当前登录用户ID]
+    D --> E[根据id和userId查询数据库<br/>获取原记录信息]
+
+    E --> F{记录是否存在<br/>且属于当前用户}
+    F -->|否| G[返回无权限或资源不存在]
+    G --> End
+
+    F -->|是| H[提取原path和原name]
+    H --> I{新名称是否合法<br/>（非空、不包含分隔符等）}
+    I -->|否| J[返回名称非法错误]
+    J --> End
+
+    I -->|是| K[计算新path<br/>新path = 原父目录 + '/' + newName]
+    K --> L[检查同一父目录下<br/>是否存在同名对象<br/>（查询 path = 新path 且 user_id = 当前用户）]
+
+    L -->|存在| M[返回冲突错误]
+    M --> End
+
+    L -->|不存在| N{记录type是文件还是文件夹}
+    N -->|文件| O[直接更新该记录的 name 和 path]
+    O --> P[提交事务]
+    P --> Q[返回成功]
+
+    N -->|文件夹| R[更新当前文件夹记录的 name 和 path]
+    R --> S[递归更新所有子项的 path]
+    S --> T[将原路径前缀替换为新路径前缀<br/>UPDATE folder SET path = REPLACE(path, 旧path, 新path)<br/>WHERE path LIKE CONCAT(旧path, '/%') AND user_id = 当前用户]
+    T --> P
+    P --> Q
+    Q --> End

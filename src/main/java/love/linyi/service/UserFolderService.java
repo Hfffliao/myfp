@@ -9,7 +9,7 @@ import java.util.List;
 public interface UserFolderService {
     int save(List<UserFolder> userFolderList);
     List<UserFolder> getUserFolderList(int id);
-    void updateFileName(String path);
-    //UserFolder getUserFolderById(int id);
+    String reNameFileOrFolder(long id,String newName);//返回旧的名称
+    UserFolder getUserFolderById(int id);
 
 }

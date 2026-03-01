@@ -1,0 +1,10 @@
+数据库名称：jiankong（由于此项目最初是监控后台）
+folder表：
+字段：
+id  int unsigned NOT NULL （主键，是每个文件或文件夹的唯一标识）
+
+path  varchar(512) NOT NULL  （路径，规范为：1. 对于文件夹c，路径：/a/b/c,写入路径为/a/b；2.对于文件c，路径/a/b/c，写入路径为/a/b；3.对于在根目录的文件或目录，路径为空字符串；4.最长为512个字符）
+
+name     varchar(255) NOT NULL
+type     char(10) NOT NULL
+user_id     int unsigned NOT NULL

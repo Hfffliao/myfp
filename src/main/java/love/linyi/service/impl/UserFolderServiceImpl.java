@@ -28,10 +28,16 @@ private UserFolderDao userFolderDao;
     }
 
     @Override
-    public void updateFileName(String path) {
-        int id = UserContext.getUserId();
+    public String reNameFileOrFolder(long id,String newName) {
+        // TODO 实现在数据库重命名文件或文件夹
+        int userId = UserContext.getUserId();
         UserContext.clear();
-        userFolderDao.updateFileName(path, id);
+        return "";
+    }
+
+    @Override
+    public UserFolder getUserFolderById(int id) {
+        return null;
     }
 
 }

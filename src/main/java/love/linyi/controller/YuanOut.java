@@ -59,9 +59,4 @@ public class YuanOut {
         return modelAndView;
     }
 
-    // 这里可以根据实际需求实现 POST 请求处理逻辑
-    // @PostMapping
-    // public ModelAndView doPost(HttpServletRequest request, HttpServletResponse response) {
-    //     // TODO: 实现 POST 请求处理逻辑
-    // }
 }

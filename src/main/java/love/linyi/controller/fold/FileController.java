@@ -1,10 +1,9 @@
 package love.linyi.controller.fold;
 import love.linyi.controller.Code;
-import love.linyi.domin.UserFolder;
 import love.linyi.service.UserFolderService;
 import love.linyi.service.folderUtilService.Deletefile;
+import love.linyi.service.folderUtilService.ReNameFileOrFolderOnSystem;
 import love.linyi.service.security.FilePath;
-import love.linyi.common.context.UserContext;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -19,6 +18,8 @@ import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/file")
@@ -29,7 +30,8 @@ public class FileController {
     FilePath filePathImpl;
     @Autowired
     UserFolderService userFolderService;
-
+    @Autowired
+    ReNameFileOrFolderOnSystem reNameFileOrFolderOnSystem;
     /**
      * 返回本地文件
      *
@@ -138,29 +140,62 @@ public class FileController {
 
     @PatchMapping
     //重命名文件或文件夹,需要文件id和新文件名
-    public ResponseEntity<String> updateName(@RequestParam("id") int fileId
-            ,@RequestParam("newfilename") String newfilename
-                                             ) {
-        String username = UserContext.getUsername();
-        //获取文件model
-//        UserFolder userFolder = userFolderService.getUserFolderbyId(fileId);
-//        //检查文件是否存在
-//        if (userFolder == null) {
-//            return ResponseEntity.notFound().build();
-//        }
-//
-//        //规范化输入路径
-//        Path SystargetPath = filePathImpl.formalFilePath(Path.of(Code.root, username), path);
-//        //把输入转化为/dd/dd形式
-//        String dbtargetPath = filePathImpl.formalFilePathToDB(path);
-//        if (SystargetPath == null) {//处理之后不合理的路径都会返回null
-            return ResponseEntity.badRequest().body("路径无效");
-//        }
-//        if (dbtargetPath == null) {//处理之后不合理的路径都会返回null
-//            return ResponseEntity.badRequest().body("路径无效");
-//        }
-//        userFolderService.updateFileName(dbtargetPath);
-//        return ResponseEntity.ok("重命名成功");
+    public ResponseEntity<Map<String,Object>> reName(@RequestBody Map<String, Object> params) {
+        Map<String, Object> response = new HashMap<>();
+
+        // 获取参数
+        Long id = (Long) params.get("id");
+        String newName = (String) params.get("newName");
+
+        // 验证参数
+        if (id == null) {
+            response.put("code", 400);
+            response.put("message", "文件/文件夹ID不能为空");
+            response.put("data", null);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (newName == null || newName.trim().isEmpty()) {
+            response.put("code", 400);
+            response.put("message", "新名称不能为空");
+            response.put("data", null);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        if (newName.contains("/") || newName.contains("\\")) {
+            response.put("code", 400);
+            response.put("message", "新名称不能含路径分隔符");
+            response.put("data", null);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+            // 执行重命名操作
+            // 数据库重命名
+            String oldName = userFolderService.reNameFileOrFolder(id,newName);
+
+            // TODO: 从数据库中获取文件路径
+            String filePath = "";
+            // 更新文件系统中的名称
+            reNameFileOrFolderOnSystem.reName(filePath,oldName,newName);
+
+            // 构建成功响应
+            Map<String, Object> data = new HashMap<>();
+            data.put("id", id);
+            data.put("oldName", oldName);
+            data.put("newName", newName);
+
+            response.put("code", 200);
+            response.put("message", "重命名成功");
+            response.put("data", data);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("code", 500);
+            response.put("message", "重命名失败: " + e.getMessage());
+            response.put("data", null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
 }
