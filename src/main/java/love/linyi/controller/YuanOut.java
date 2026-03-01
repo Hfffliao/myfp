@@ -3,7 +3,6 @@ package love.linyi.controller;
 import love.linyi.domin.ShiJian;
 import love.linyi.service.ShiJianService;
 import love.linyi.service.TransWithShijian;
-import love.linyi.service.impl.TransWithShijianImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
