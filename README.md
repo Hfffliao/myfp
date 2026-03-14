@@ -31,13 +31,20 @@ Spring SpringMVC MySQL MyBatis
 
 ## 快速开始
 
-windows
+windows和linux
 
 1.打开命令提示符，进入一个空目录，运行`git clone https://github.com/Hfffliao/myfp.git ` 克隆完整的仓库到电脑本地；成功的话会在这个目录下生成myfp文件夹。
 
-2.进入myfp项目的目录，使用`mvn clean` 清空编译完成的文件，然后使用`mvn package` 编译myfp项目；编译完成之后在myfp目录中能找到"\target\springmvc-1.0-SNAPSHOT.war"文件。
 
-3.把springmvc-1.0-SNAPSHOT.war文件复制到tomcat的webapps目录下，改名为ROOT.war并启动tomcat（使用jetty也是类似的）
+2.进入myfp项目的目录，决定使用tomcat版还是jetty版;
+2.1 jetty版：（内嵌jetty容器，使用）
+使用`mvn clean package -Pjetty-embedded -DskipTests` 编译myfp项目；编译完成之后在myfp目录中能找到"\target\springmvc-1.0-SNAPSHOT.jar"文件。
+使用java -jar ./target/springmvc-1.0-SNAPSHOT.jar来运行
+2.2 tomcat版：
+使用`mvn clean package -Ptomcat-war -DskipTests` 编译myfp项目；编译完成之后在myfp目录中能找到"\target\springmvc-1.0-SNAPSHOT.war"文件。
+把springmvc-1.0-SNAPSHOT.war文件复制到tomcat的webapps目录下，改名为ROOT.war并启动tomcat（也可以使用jetty容器，也是类似的）
+
+
 
 ## 项目配置
 
