@@ -30,7 +30,6 @@ private UserFolderDao userFolderDao;
     public String reNameFileOrFolder(long id,String newName) {
         // TODO 实现在数据库重命名文件或文件夹
         int userId = UserContext.getUserId();
-        UserContext.clear();
         return "";
     }
 
