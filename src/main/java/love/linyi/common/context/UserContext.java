@@ -1,12 +1,13 @@
 package love.linyi.common.context;
 
-// UserContext.java
+import java.util.Optional;
+
 public class UserContext {
     private static final ThreadLocal<UserInfo> userThreadLocal = new ThreadLocal<>();
     
     public static class UserInfo {
-        private String username;
-        private int id;
+        private final String username;
+        private final int id;
         
         public UserInfo(String username, int id) {
             this.username = username;
@@ -21,18 +22,24 @@ public class UserContext {
         userThreadLocal.set(userInfo);
     }
     
-    public static UserInfo getUserInfo() {
-        return userThreadLocal.get();
-    }
-
-    public static String getUsername() {
-        UserInfo userInfo = userThreadLocal.get();
-        return userInfo != null ? userInfo.getUsername() : null;
+    public static void setUserInfo(String username, int id) {
+        userThreadLocal.set(new UserInfo(username, id));
     }
     
-    public static int getUserId() {
-        UserInfo userInfo = userThreadLocal.get();
-        return userInfo != null ? userInfo.getId() : 0;
+    public static Optional<UserInfo> getUserInfo() {
+        return Optional.ofNullable(userThreadLocal.get());
+    }
+
+    public static Optional<String> getUsername() {
+        return getUserInfo().map(UserInfo::getUsername);
+    }
+    
+    public static Optional<Integer> getUserId() {
+        return getUserInfo().map(UserInfo::getId);
+    }
+    
+    public static boolean isLoggedIn() {
+        return userThreadLocal.get() != null;
     }
     
     public static void clear() {

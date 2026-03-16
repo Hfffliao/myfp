@@ -2,22 +2,34 @@ package love.linyi.config.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;
-import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import love.linyi.common.context.UserContext;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 public class AuthFilter implements Filter {
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
+    
+    private static final Set<String> EXACT_MATCH_WHITELIST = Set.of(
+            "/login", "/register", "/logout", "/car/user", "/car", "/favicon.ico"
+    );
+    
+    private static final Set<String> PREFIX_MATCH_WHITELIST = Set.of(
+            "/pages", "/image", "/video-stream", "/swagger-ui", "/v3"
+    );
+
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        // 初始化方法
+        if (this.objectMapper == null) {
+            this.objectMapper = new ObjectMapper();
+        }
     }
 
     @Override
@@ -25,72 +37,62 @@ public class AuthFilter implements Filter {
             throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
-        HttpSession session = httpRequest.getSession(false); // 获取现有 session，不存在则不创建
-
-        // 定义不需要过滤的路径，比如登录页面和登录请求
-        String loginUrl = httpRequest.getContextPath() + "/login";
-        String registerUrl = httpRequest.getContextPath() + "/register";
-        String logoutUrl = httpRequest.getContextPath() + "/logout";
-        String main=httpRequest.getContextPath() + "/pages/main.html";
-
+        String contextPath = httpRequest.getContextPath();
         String currentUrl = httpRequest.getRequestURI();
+        String path = currentUrl.substring(contextPath.length());
 
-        if(currentUrl.equals(httpRequest.getContextPath()+"/")){
-            httpResponse.sendRedirect(main);
+        if (path.isEmpty() || "/".equals(path)) {
+            httpResponse.sendRedirect(contextPath + "/pages/main.html");
             return;
         }
-        System.out.println("开始判断是否登录");
-        boolean isStaticResource = currentUrl.startsWith(httpRequest.getContextPath() + "/pages");
-        boolean isImageResource = currentUrl.startsWith(httpRequest.getContextPath() + "/image");
-        boolean isfaviconResource = currentUrl.equals(httpRequest.getContextPath() + "/favicon.ico");
-        boolean isvideoResource = currentUrl.startsWith(httpRequest.getContextPath() + "/video-stream");
-        boolean iscarUser = currentUrl.equals(httpRequest.getContextPath() + "/car/user");
-        boolean iscar = currentUrl.equals(httpRequest.getContextPath() + "/car");
 
-        //访问接口文档
-        boolean isswagger = currentUrl.startsWith(httpRequest.getContextPath() + "/swagger-ui");
-
-        boolean isv3 = currentUrl.startsWith(httpRequest.getContextPath() + "/v3");
-
-        // 若请求的是登录页面或登录请求，直接放行
-        if (currentUrl.equals(loginUrl) || currentUrl.equals(registerUrl)
-                ||currentUrl.equals(logoutUrl)|| isStaticResource||isImageResource
-                ||isfaviconResource||isvideoResource||iscarUser||iscar
-                ||isswagger||isv3) {
-            System.out.println("放行");
+        if (isWhitelisted(path)) {
             chain.doFilter(request, response);
             return;
         }
 
-        // 检查 session 中是否有用户信息
-        String username = (String) session.getAttribute("user");
-        int userid = (int)session.getAttribute("id");//会先包装成integer，然后拆箱为int，如果包装不了，会报错；
-        if (session != null && username != null && userid != 0) {
-            //把用户信息放到ThreadLocal，用完记得clean
-            UserContext.setUserInfo(new UserContext.UserInfo(username,userid));//静态内部类可以被实例，且不需要外部类的实例才能操作
-            // 有用户信息，放行请求
+        try {
+            HttpSession session = httpRequest.getSession(false);
+            if (session == null) {
+                sendUnauthorized(httpResponse);
+                return;
+            }
+            
+            String username = (String) session.getAttribute("user");
+            Integer userId = (Integer) session.getAttribute("id");
+            
+            if (username == null || userId == null || userId == 0) {
+                sendUnauthorized(httpResponse);
+                return;
+            }
+
+            UserContext.setUserInfo(username, userId);
             chain.doFilter(request, response);
-        } else {
-            // 没有用户信息，返回类似 ResponseEntity 的响应
-            httpResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            httpResponse.setContentType("application/json");
-            httpResponse.setCharacterEncoding("UTF-8");
+        } finally {
+            UserContext.clear();
+        }
+    }
 
-            Map<String, Object> body = new HashMap<>();
-            body.put("success", false);
-            body.put("message", "未授权，请先登录");
-
-            try {
-                String json = objectMapper.writeValueAsString(body);
-                httpResponse.getWriter().write(json);
-            } catch (IOException e) {
-                throw new ServletException("写入响应时出错", e);
+    private boolean isWhitelisted(String path) {
+        if (EXACT_MATCH_WHITELIST.contains(path)) {
+            return true;
+        }
+        for (String prefix : PREFIX_MATCH_WHITELIST) {
+            if (path.startsWith(prefix)) {
+                return true;
             }
         }
+        return false;
+    }
+
+    private void sendUnauthorized(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"success\":false,\"message\":\"未授权，请先登录\"}");
     }
 
     @Override
     public void destroy() {
-        // 销毁方法
     }
 }
