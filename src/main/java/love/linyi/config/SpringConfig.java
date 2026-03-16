@@ -6,6 +6,7 @@ import love.linyi.netapi.websocket.WebSocketToEsp8266;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.beanvalidation.OptionalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -31,6 +33,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 //@EnableJpaRepositories(basePackages = "love.linyi.dao")
 @EnableTransactionManagement
 @EnableScheduling
+@EnableAsync
 @EnableWebMvc
 @EnableWebSocket
 public class SpringConfig implements WebMvcConfigurer, WebSocketConfigurer{
@@ -71,4 +74,8 @@ public class SpringConfig implements WebMvcConfigurer, WebSocketConfigurer{
         registry.addHandler(webSocketToEsp8266, "/car")
                 .setAllowedOrigins("*");
     }
+//    @Bean
+//    public OptionalValidatorFactoryBean validator() {
+//        return new OptionalValidatorFactoryBean(); // 这个 bean 允许验证器可选
+//    }
 }

@@ -1,0 +1,17 @@
+测试风格特点详细总结
+基于 FilePathImplTest 的测试风格，我总结了以下特点：
+
+1. 测试框架选择
+使用 JUnit 5：利用 @Test 注解标记测试方法
+集成 Mockito：通过 @ExtendWith(MockitoExtension.class) 扩展，使用 @InjectMocks 注入测试对象
+2. 测试方法命名规范
+方法名格式：被测试方法名_测试场景
+示例：formalFilePath_standard、formalFilePath_Directory_Traversal
+清晰表达：通过方法名直接了解测试的功能和场景
+3. 测试结构组织
+三步式结构：
+
+准备：设置测试数据和环境
+开始测试：调用被测试方法
+检测结果：验证测试结果
+注释说明：每个测试方法都有注释，简要说明测试场景和预期行为

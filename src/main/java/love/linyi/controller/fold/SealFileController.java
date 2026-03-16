@@ -2,8 +2,9 @@ package love.linyi.controller.fold;
 
 import love.linyi.controller.Code;
 import love.linyi.domin.SealFileRequset;
+import love.linyi.service.folderUtilService.AsyncFileDecodingTask;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
@@ -11,7 +12,6 @@ import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Base64;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 //用FileInputStream的 byte[] bytes = new byte[fis.available()];说明只能处理小文件，
 //用duration说明封印时间不能超过一个月
@@ -19,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 @ResponseBody
 @RequestMapping("/sealFile")
 public class SealFileController {
-    private final ConcurrentHashMap<String, FileDecodingTask> tasks = new ConcurrentHashMap<>();
+   @Autowired
+   private AsyncFileDecodingTask asyncFileDecodingTask;
 
     @PostMapping
     public ResponseEntity<String> sealFile(@RequestBody SealFileRequset sealFileRequset,
@@ -39,7 +40,7 @@ public class SealFileController {
         long seconds = duration.getSeconds();
         System.out.println("封印秒数"+seconds);
         try {
-            byte[] bytes = new byte[0];
+            byte[] bytes ;
             try (FileInputStream fis = new FileInputStream(file);
                  // 使用 BufferedInputStream 包装 FileInputStream 以提高读取效率
                  BufferedInputStream bis = new BufferedInputStream(fis)) {
@@ -66,11 +67,7 @@ public class SealFileController {
             }
             String base64 = Base64.getEncoder().encodeToString(bytes);
 
-            FileDecodingTask task = new FileDecodingTask(base64, path);
-            tasks.put(path, task);
-
-            // 提交异步任务，120 小时后执行
-            task.schedule(seconds, TimeUnit.SECONDS);
+            asyncFileDecodingTask.decodeFileAsync(base64, path, seconds, TimeUnit.SECONDS);
 
         } catch (Exception e) {
            throw new RuntimeException(e);
@@ -79,31 +76,6 @@ public class SealFileController {
         return ResponseEntity.ok("sealFile");
     }
 
-    @Async
-    static class FileDecodingTask {
-        private final String base64;
-        private final String path;
 
-        public FileDecodingTask(String base64, String path) {
-            this.base64 = base64;
-            this.path = path;
-        }
 
-        public void schedule(long delay, TimeUnit unit) {
-            try {
-                // 等待指定时间
-                Thread.sleep(unit.toMillis(delay));
-                byte[] decodedBytes = Base64.getDecoder().decode(base64);
-                File decodedFile = new File(path);
-                try (FileOutputStream fos = new FileOutputStream(decodedFile)) {
-                    fos.write(decodedBytes);
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 }

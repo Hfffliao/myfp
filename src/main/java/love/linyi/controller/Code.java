@@ -24,7 +24,7 @@ public class Code {
     //public static final int receivePort=25570;
     public static final int UdpRecvAndH3SendPort=25571;
     public static final String KeyStorePath= Paths.get(System.getProperty("user.home"), "linyi.love_nginx").toString();
-    public static final String KeyStorePassword="o71hqn93c9zy5 ";
+    public static final String KeyStorePassword="o71hqn93c9zy5";
     public static final int jettyhttp3Andhttp2Port=8443;
     //public static final String jettyProgramPath = "F:\\apache-tomcat-9.0.106\\webapps\\ROOT" ;//本来是告诉jetty项目的部署路径的，但是不需要，它自己知道
     //public static final String jettyProgramPath = "/opt/apache-tomcat-11.0.11/webapps/ROOT/" ;
