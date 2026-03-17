@@ -144,10 +144,15 @@ public class FileController {
     public ResponseEntity<Map<String,Object>> reName(@RequestBody Map<String, Object> params) {
         Map<String, Object> response = new HashMap<>();
 
-        Long id = (Long) params.get("id");
+        Object idObj = params.get("id");
+        int id = 0;
+        if (idObj != null) {
+            Long idLong = idObj instanceof Long ? (Long) idObj : ((Integer) idObj).longValue();
+            id = idLong.intValue();
+        }
         String newName = (String) params.get("newName");
 
-        if (id == null) {
+        if (idObj == null) {
             response.put("code", 400);
             response.put("message", "文件/文件夹ID不能为空");
             response.put("data", null);
@@ -179,7 +184,7 @@ public class FileController {
 
             String oldName = userFolderService.reNameFileOrFolder(id, newName, userId);
 
-            UserFolder updatedFolder = userFolderService.getUserFolderById(id.intValue());
+            UserFolder updatedFolder = userFolderService.getUserFolderById(id);
             if (updatedFolder == null) {
                 throw new RuntimeException("无法获取更新后的文件夹信息");
             }

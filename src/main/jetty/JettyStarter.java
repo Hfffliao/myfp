@@ -36,7 +36,7 @@ public class JettyStarter {
         sslContextFactory.setKeyStorePath(KeyStorePath+File.separator+"linyi.love.p12"); // 替换为实际证书路径
         sslContextFactory.setKeyStorePassword(KeyStorePassword); // 替换为证书密码
 
-        sslContextFactory.setIncludeProtocols("TLSv1.3");
+        sslContextFactory.setIncludeProtocols("TLSv1.2", "TLSv1.3");
 
         // 2. HTTP 基础配置
         HttpConfiguration httpConfig = new HttpConfiguration();
@@ -64,6 +64,7 @@ public class JettyStarter {
         // 创建 HTTP/2 连接工厂
         org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory http2 =
                 new org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory(httpsConfig);
+
         //http2.setMaxConcurrentStreams(800); // 最大并发流
         // 创建 ALPN 协议协商工厂
         ALPNServerConnectionFactory alpn =
@@ -80,6 +81,15 @@ public class JettyStarter {
         tlsConnector.setPort(Code.jettyhttp3Andhttp2Port);
         server.addConnector(tlsConnector);
 
+        // 添加非加密的 HTTP/1.1 连接器
+        HttpConfiguration http1Config = new HttpConfiguration();
+        http1Config.setSendXPoweredBy(false);
+        http1Config.setSendDateHeader(false);
+        org.eclipse.jetty.server.HttpConnectionFactory http1ConnectionFactory = 
+                new org.eclipse.jetty.server.HttpConnectionFactory(http1Config);
+        ServerConnector http1Connector = new ServerConnector(server, http1ConnectionFactory);
+        http1Connector.setPort(8080); // 普通HTTP端口
+        server.addConnector(http1Connector);
 
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
@@ -111,7 +121,8 @@ public class JettyStarter {
 
         configureFilters(context, applicationContext);
 // 使用初始化参数配置 ResourceServlet。
-        servletHolder.setInitParameter("baseResource", "/home/your_username/IdeaProjects/myfp/src/main/webapp/pages");
+        // servletHolder.setInitParameter("baseResource", "/home/your_username/IdeaProjects/myfp/src/main/webapp/pages");
+        servletHolder.setInitParameter("baseResource", "C:\\Users\\HMCL\\javaeeeclipse-jee-2021-06-R-win32-x86_64\\workspase\\springmvc\\myfp\\src\\main\\webapp\\pages");
         servletHolder.setInitParameter("pathInfoOnly", "true");
         servletHolder.setAsyncSupported(true);
         // 配置 WebSocket

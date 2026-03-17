@@ -28,7 +28,7 @@ private UserFolderDao userFolderDao;
 
     @Override
     public String reNameFileOrFolder(long id, String newName, int userId) {
-        UserFolder folder = userFolderDao.getFolderByIdAndUserId(id, userId);
+        UserFolder folder = userFolderDao.getFolderByIdAndUserId((int) id, userId);
         if (folder == null) {
             throw new RuntimeException("文件夹不存在或无权限访问");
         }
@@ -65,7 +65,7 @@ private UserFolderDao userFolderDao;
             throw new RuntimeException("同名文件或文件夹已存在");
         }
 
-        int updateResult = userFolderDao.updateFolderNameAndPath(id, newName, newPath, userId);
+        int updateResult = userFolderDao.updateFolderNameAndPath((int) id, newName, newPath, userId);
         if (updateResult == 0) {
             throw new RuntimeException("更新文件夹失败");
         }
