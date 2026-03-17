@@ -52,6 +52,7 @@ public class JettyStarter {
         HTTP3ServerConnectionFactory http3 = new HTTP3ServerConnectionFactory(serverQuicConfig);
         QuicServerConnector quicConnector = new QuicServerConnector(server, serverQuicConfig, http3);
         quicConnector.setPort(Code.jettyhttp3Andhttp2Port);
+        quicConnector.setIdleTimeout(600000); // 10分钟空闲超时
 
 
         server.addConnector(quicConnector);
