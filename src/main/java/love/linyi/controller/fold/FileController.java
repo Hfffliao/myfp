@@ -147,8 +147,18 @@ public class FileController {
         Object idObj = params.get("id");
         int id = 0;
         if (idObj != null) {
-            Long idLong = idObj instanceof Long ? (Long) idObj : ((Integer) idObj).longValue();
-            id = idLong.intValue();
+            try {
+                if (idObj instanceof Number) {
+                    id = ((Number) idObj).intValue();
+                } else if (idObj instanceof String) {
+                    id = Integer.parseInt((String) idObj);
+                }
+            } catch (NumberFormatException e) {
+                response.put("code", 400);
+                response.put("message", "文件ID格式错误");
+                response.put("data", null);
+                return ResponseEntity.badRequest().body(response);
+            }
         }
         String newName = (String) params.get("newName");
 
