@@ -1,5 +1,7 @@
 package love.linyi.controller.fold;
+import love.linyi.common.context.UserContext;
 import love.linyi.controller.Code;
+import love.linyi.domin.UserFolder;
 import love.linyi.service.UserFolderService;
 import love.linyi.service.folderUtilService.Deletefile;
 import love.linyi.service.folderUtilService.ReNameFileOrFolderOnSystem;
@@ -17,6 +19,7 @@ import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -138,15 +141,12 @@ public class FileController {
     }
 
     @PatchMapping
-    //重命名文件或文件夹,需要文件id和新文件名
     public ResponseEntity<Map<String,Object>> reName(@RequestBody Map<String, Object> params) {
         Map<String, Object> response = new HashMap<>();
 
-        // 获取参数
         Long id = (Long) params.get("id");
         String newName = (String) params.get("newName");
 
-        // 验证参数
         if (id == null) {
             response.put("code", 400);
             response.put("message", "文件/文件夹ID不能为空");
@@ -169,16 +169,37 @@ public class FileController {
         }
 
         try {
-            // 执行重命名操作
-            // 数据库重命名
-            String oldName = userFolderService.reNameFileOrFolder(id,newName);
+            Integer userId = UserContext.getUserId().orElse(0);
+            if (userId == 0) {
+                response.put("code", 401);
+                response.put("message", "用户未登录");
+                response.put("data", null);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
 
-            // TODO: 从数据库中获取文件路径
-            String filePath = "";
-            // 更新文件系统中的名称
-            reNameFileOrFolderOnSystem.reName(filePath,oldName,newName);
+            String oldName = userFolderService.reNameFileOrFolder(id, newName, userId);
 
-            // 构建成功响应
+            UserFolder updatedFolder = userFolderService.getUserFolderById(id.intValue());
+            if (updatedFolder == null) {
+                throw new RuntimeException("无法获取更新后的文件夹信息");
+            }
+
+            String dbPath = updatedFolder.getPath();
+            String parentPath = getParentPath(dbPath);
+
+            String username = UserContext.getUsername().orElse("");
+            if (username.isEmpty()) {
+                throw new RuntimeException("无法获取用户名");
+            }
+
+            Path baseDir = Paths.get(Code.root, username);
+            Path parentDirPath = filePathImpl.formalFilePath(baseDir, parentPath);
+            if (parentDirPath == null) {
+                throw new RuntimeException("非法路径");
+            }
+
+            reNameFileOrFolderOnSystem.reName(parentDirPath.toString(), oldName, newName);
+
             Map<String, Object> data = new HashMap<>();
             data.put("id", id);
             data.put("oldName", oldName);
@@ -195,6 +216,18 @@ public class FileController {
             response.put("data", null);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
+    }
+
+    private String getParentPath(String dbPath) {
+        if (dbPath == null || dbPath.equals("/")) {
+            return "/";
+        }
+        int lastSlashIndex = dbPath.lastIndexOf('/');
+        if (lastSlashIndex <= 0) {
+            return "/";
+        }
+        String parentPath = dbPath.substring(0, lastSlashIndex);
+        return parentPath.isEmpty() ? "/" : parentPath;
     }
 
 }
