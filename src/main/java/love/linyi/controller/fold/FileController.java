@@ -191,7 +191,7 @@ public class FileController {
             if (updatedFolder == null) {
                 throw new RuntimeException("无法获取更新后的文件夹信息");
             }
-             //begin update system file name
+            //begin update system file name
             String parentPath = updatedFolder.getPath();
 
             String username = UserContext.getUsername().orElse("");
