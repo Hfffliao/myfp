@@ -1,6 +1,8 @@
 package love.linyi.service.folderUtilService;
 
+import java.io.IOException;
+
 public interface ReNameFileOrFolderOnSystem {
-        //TODO 实现在系统重命名文件或文件夹
-        void reName(String filePath,String oldName,String newName);
+
+        void reName(String filePath,String oldName,String newName) throws IOException;
 }
