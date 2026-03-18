@@ -2,6 +2,7 @@ package love.linyi.controller.fold;
 import love.linyi.common.context.UserContext;
 import love.linyi.controller.Code;
 import love.linyi.domin.UserFolder;
+import love.linyi.exception.BusinessException;
 import love.linyi.service.UserFolderService;
 import love.linyi.service.folderUtilService.Deletefile;
 import love.linyi.service.folderUtilService.ReNameFileOrFolderOnSystem;
@@ -139,68 +140,59 @@ public class FileController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
-
+//newname 新名称 cannot contain / or \
+    //id 文件/文件夹ID can be int or string(can transform to int)
     @PatchMapping
     public ResponseEntity<Map<String,Object>> reName(@RequestBody Map<String, Object> params) {
         Map<String, Object> response = new HashMap<>();
-
+        //check id and newname
         Object idObj = params.get("id");
         int id = 0;
-        if (idObj != null) {
-            try {
-                if (idObj instanceof Number) {
-                    id = ((Number) idObj).intValue();
-                } else if (idObj instanceof String) {
-                    id = Integer.parseInt((String) idObj);
-                }
-            } catch (NumberFormatException e) {
-                response.put("code", 400);
-                response.put("message", "文件ID格式错误");
-                response.put("data", null);
-                return ResponseEntity.badRequest().body(response);
-            }
-        }
-        String newName = (String) params.get("newName");
-
         if (idObj == null) {
-            response.put("code", 400);
-            response.put("message", "文件/文件夹ID不能为空");
-            response.put("data", null);
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        if (newName == null || newName.trim().isEmpty()) {
-            response.put("code", 400);
-            response.put("message", "新名称不能为空");
-            response.put("data", null);
-            return ResponseEntity.badRequest().body(response);
-        }
-
-        if (newName.contains("/") || newName.contains("\\")) {
-            response.put("code", 400);
-            response.put("message", "新名称不能含路径分隔符");
-            response.put("data", null);
-            return ResponseEntity.badRequest().body(response);
+            // 明确处理 null：抛出异常或返回错误，避免后续使用未初始化的 id
+            throw new IllegalArgumentException("ID不能为空");
         }
 
         try {
-            Integer userId = UserContext.getUserId().orElse(0);
-            if (userId == 0) {
-                response.put("code", 401);
-                response.put("message", "用户未登录");
-                response.put("data", null);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            if (idObj instanceof Integer) {
+                id = (Integer) idObj;                 // 自动拆箱为 int
+            } else if (idObj instanceof String) {
+                id = Integer.parseInt((String) idObj);
+            } else {
+                // 理论上不会发生，但保留防御性检查
+                throw new IllegalArgumentException("ID类型错误，应为整数或字符串");
             }
+        } catch (NumberFormatException e) {
+            // 字符串解析失败
+            throw new IllegalArgumentException("ID格式错误", e);
+        }
 
+
+
+        String newName = (String) params.get("newName");
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new IllegalArgumentException("新名称不能为空");
+        }
+
+        if (newName.contains("/") || newName.contains("\\")) {
+           throw new BusinessException(Code.BAD_REQUEST,"新名称不能含路径分隔符");
+        }
+
+        try {
+            //check userinfo
+            int userId = UserContext.getUserId().orElse(0);
+            if (userId == 0) {
+               throw new BusinessException(Code.BAD_REQUEST,"用户登录,dan_shi_mei_xing_xi");
+            }
+            //begin rename file or folder in db
             String oldName = userFolderService.reNameFileOrFolder(id, newName, userId);
 
             UserFolder updatedFolder = userFolderService.getUserFolderById(id);
             if (updatedFolder == null) {
                 throw new RuntimeException("无法获取更新后的文件夹信息");
             }
-
-            String dbPath = updatedFolder.getPath();
-            String parentPath = getParentPath(dbPath);
+             //begin update system file name
+            String parentPath = updatedFolder.getPath();
 
             String username = UserContext.getUsername().orElse("");
             if (username.isEmpty()) {
@@ -226,23 +218,8 @@ public class FileController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("code", 500);
-            response.put("message", "重命名失败: " + e.getMessage());
-            response.put("data", null);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+            throw new BusinessException(Code.UPDATE_ERR,"重命名失败: " + e.getMessage());
         }
-    }
-
-    private String getParentPath(String dbPath) {
-        if (dbPath == null || dbPath.equals("/")) {
-            return "/";
-        }
-        int lastSlashIndex = dbPath.lastIndexOf('/');
-        if (lastSlashIndex <= 0) {
-            return "/";
-        }
-        String parentPath = dbPath.substring(0, lastSlashIndex);
-        return parentPath.isEmpty() ? "/" : parentPath;
     }
 
 }

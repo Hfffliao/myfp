@@ -7,7 +7,7 @@ import java.util.List;
 public interface UserFolderService {
     int save(List<UserFolder> userFolderList);
     List<UserFolder> getUserFolderList(int id);
-    String reNameFileOrFolder(long id, String newName, int userId);
+    String reNameFileOrFolder(int id, String newName, int userId);
     UserFolder getUserFolderById(int id);
 
 }
