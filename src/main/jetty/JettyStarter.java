@@ -121,8 +121,8 @@ public class JettyStarter {
 
         configureFilters(context, applicationContext);
 // 使用初始化参数配置 ResourceServlet。
-        // servletHolder.setInitParameter("baseResource", "/home/your_username/IdeaProjects/myfp/src/main/webapp/pages");
-        servletHolder.setInitParameter("baseResource", "C:\\Users\\HMCL\\javaeeeclipse-jee-2021-06-R-win32-x86_64\\workspase\\springmvc\\myfp\\src\\main\\webapp\\pages");
+        servletHolder.setInitParameter("baseResource", "/home/your_username/IdeaProjects/myfp/src/main/webapp/pages");
+//        servletHolder.setInitParameter("baseResource", "C:\\Users\\HMCL\\javaeeeclipse-jee-2021-06-R-win32-x86_64\\workspase\\springmvc\\myfp\\src\\main\\webapp\\pages");
         servletHolder.setInitParameter("pathInfoOnly", "true");
         servletHolder.setAsyncSupported(true);
         // 配置 WebSocket

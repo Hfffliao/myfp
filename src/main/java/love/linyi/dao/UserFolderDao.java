@@ -29,18 +29,19 @@ public interface UserFolderDao {
     void updateFileName(@Param("Path") String Path, @Param("id") int id);
 
     @Select("SELECT id, path, name, type FROM folder WHERE id = #{id} AND user_id = #{userId}")
-    UserFolder getFolderByIdAndUserId(@Param("id") Integer id, @Param("userId") int userId);
+    UserFolder getFolderByIdAndUserId(@Param("id") int id, @Param("userId") int userId);
 
     @Select("SELECT id, path, name, type FROM folder WHERE id = #{id}")
-    UserFolder getFolderById(@Param("id") Integer id);
+    UserFolder getFolderById(@Param("id") int id);
 
-    @Select("SELECT COUNT(*) FROM folder WHERE path = #{path} AND user_id = #{userId}")
-    int countByPathAndUserId(@Param("path") String path, @Param("userId") int userId);
+    @Select("SELECT COUNT(*) FROM folder WHERE path = #{path} AND user_id = #{userId} AND type = #{type} AND name = #{name}")
+    int countByPathAndUserId(@Param("path") String path, @Param("userId") int userId, @Param("type") String type, @Param("name") String name);
 
-    @Update("UPDATE folder SET name = #{newName}, path = #{newPath} WHERE id = #{id} AND user_id = #{userId}")
-    int updateFolderNameAndPath(@Param("id") Integer id, @Param("newName") String newName, @Param("newPath") String newPath, @Param("userId") int userId);
-
-    @Update("UPDATE folder SET path = REPLACE(path, #{oldPath}, #{newPath}) WHERE user_id = #{userId} AND path LIKE CONCAT(#{oldPath}, '/%')")
+    //update path for extence(now it has no useage)
+    @Update("UPDATE folder SET name = #{newName}, path = #{newPath} WHERE id = #{id}")
+    int updateFolderNameAndPath(@Param("id") int id, @Param("newName") String newName, @Param("newPath") String newPath, @Param("userId") int userId);
+     //checked
+    @Update("UPDATE folder SET path = REPLACE(path, #{oldPath}, #{newPath}) WHERE user_id = #{userId} AND (path = #{oldPath} OR path LIKE CONCAT(#{oldPath}, '/%'))")
     int updateChildrenPaths(@Param("oldPath") String oldPath, @Param("newPath") String newPath, @Param("userId") int userId);
 
 }
