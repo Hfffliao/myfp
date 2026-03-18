@@ -111,7 +111,7 @@ public class FileControllerTest {
     }
     
     @Test
-    void reName_success() {
+    void reName_success() throws IOException {
         Map<String, Object> params = new HashMap<>();
         params.put("id", 1L);
         params.put("newName", "newname.txt");
@@ -121,7 +121,7 @@ public class FileControllerTest {
         updatedFolder.setPath("/docs/newname.txt");
         updatedFolder.setName("newname.txt");
         
-        when(userFolderService.reNameFileOrFolder(1L, "newname.txt", 1)).thenReturn("oldname.txt");
+        when(userFolderService.reNameFileOrFolder(300, "newname.txt", 1)).thenReturn("oldname.txt");
         when(userFolderService.getUserFolderById(1)).thenReturn(updatedFolder);
         when(filePathImpl.formalFilePath(any(Path.class), eq("/docs"))).thenReturn(Path.of(Code.root, "testuser", "docs"));
         
@@ -208,7 +208,7 @@ public class FileControllerTest {
         params.put("id", 1L);
         params.put("newName", "newname.txt");
         
-        when(userFolderService.reNameFileOrFolder(1L, "newname.txt", 1))
+        when(userFolderService.reNameFileOrFolder(50, "newname.txt", 1))
             .thenThrow(new RuntimeException("同名文件或文件夹已存在"));
         
         ResponseEntity<Map<String, Object>> response = fileController.reName(params);

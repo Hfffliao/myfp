@@ -1,4 +1,4 @@
-package love.linyi.service.impl;
+package love.linyi.service.Impl;
 
 import love.linyi.dao.UserProfitDao;
 import love.linyi.domin.UserProfit;
