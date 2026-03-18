@@ -27,50 +27,53 @@ private UserFolderDao userFolderDao;
     }
 
     @Override
-    public String reNameFileOrFolder(int id, String newName, int userId) {
-        UserFolder folder = userFolderDao.getFolderByIdAndUserId(id, userId);
+    public String reNameFileOrFolder(long id, String newName, int userId) {
+        UserFolder folder = userFolderDao.getFolderByIdAndUserId((int) id, userId);
         if (folder == null) {
             throw new RuntimeException("文件夹不存在或无权限访问");
         }
 
         String oldName = folder.getName();
-        String oldPath = folder.getPath();// "" or "/folder1/folder2"
+        String oldPath = folder.getPath();
         String type = folder.getType();
 
         if (oldName.equals(newName)) {
-            throw new RuntimeException("新名称与旧名称相同");
-        }
-        //extract standrad parent path
-        String parentPath;
-        if (oldPath.equals("")) parentPath = "/";
-        else {
-          parentPath = oldPath;
-        }
-        //construct standard old and new path
-        String standardNewPath ="";
-        String standardOldPath ="";
-        if (parentPath.equals("/")){
-            standardOldPath = parentPath + oldName;
-            standardNewPath = parentPath + newName;
-        }else {
-            standardOldPath = parentPath + "/" + oldName;
-            standardNewPath = parentPath + "/" + newName;
+            return oldName;
         }
 
-//      checked,this is sql action,so use "/"
-        int count = userFolderDao.countByPathAndUserId(oldPath, userId,type,newName);
+        String parentPath;
+        if (oldPath.equals("/")) {
+            parentPath = "/";
+        } else {
+            int lastSlashIndex = oldPath.lastIndexOf('/');
+            if (lastSlashIndex <= 0) {
+                parentPath = "/";
+            } else {
+                parentPath = oldPath.substring(0, lastSlashIndex);
+            }
+        }
+
+        String newPath;
+        if (parentPath.equals("/")) {
+            newPath = "/" + newName;
+        } else {
+            newPath = parentPath + "/" + newName;
+        }
+
+        int count = userFolderDao.countByPathAndUserId(newPath, userId);
         if (count > 0) {
             throw new RuntimeException("同名文件或文件夹已存在");
         }
-        //update folder name but path
-        int updateResult = userFolderDao.updateFolderNameAndPath(id, newName, oldPath, userId);
+
+        int updateResult = userFolderDao.updateFolderNameAndPath((int) id, newName, newPath, userId);
         if (updateResult == 0) {
-            throw new RuntimeException("更新文件夹失败:exec sql but not effect");
+            throw new RuntimeException("更新文件夹失败");
         }
 
-        if (type.equals("folder")){
-            userFolderDao.updateChildrenPaths(standardOldPath, standardNewPath, userId);
+        if ("folder".equals(type)) {
+            userFolderDao.updateChildrenPaths(oldPath, newPath, userId);
         }
+
         return oldName;
     }
 
