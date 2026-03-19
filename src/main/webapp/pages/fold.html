@@ -574,9 +574,8 @@
         listItem.appendChild(cancelBtn);
     }
     // 保存重命名
-    function saveRename(index, newName, listItem, oldName) {
+    async function saveRename(index, newName, listItem, oldName) {
         if (newName.trim()) {
-            // 获取当前路径下的文件系统数据
             let currentFileSystem = fileSystem;
             currentPath.forEach(pathPart => {
                 const folder = currentFileSystem.find(item => item.name === pathPart && item.type === 'folder');
@@ -585,8 +584,30 @@
                 }
             });
 
-            currentFileSystem[index].name = newName;
-            initFileList();
+            const item = currentFileSystem[index];
+            try {
+                const response = await fetch(`${endpointPath}/file`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        id: item.id,
+                        newName: newName.trim()
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('重命名失败');
+                }
+
+                item.name = newName;
+                initFileList();
+            } catch (error) {
+                console.error('重命名出错:', error);
+                cancelRename(index, listItem, oldName);
+            }
         } else {
             cancelRename(index, listItem, oldName);
         }
