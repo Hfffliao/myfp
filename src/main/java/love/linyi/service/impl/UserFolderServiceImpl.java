@@ -6,6 +6,8 @@ import love.linyi.service.UserFolderService;
 import love.linyi.common.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
@@ -27,6 +29,7 @@ private UserFolderDao userFolderDao;
     }
 
     @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public String reNameFileOrFolder(int id, String newName, int userId) {
         UserFolder folder = userFolderDao.getFolderByIdAndUserId(id, userId);
         if (folder == null) {

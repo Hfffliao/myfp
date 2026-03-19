@@ -25,3 +25,8 @@ https://linyi.love/file?filepn=../../../../etc/passwd
 **2.解决方法**是用底层文件写入方法替代file.transferTo(destFile)方法
 
 **3.解决方法**：出现现象之后debug到造成问题的原因
+
+# 4.部署到debian之后上传文件夹失败
+调试看到日志：java.nio.file.InvalidPathException: Malformed input or input contains unmappable characters: （真实路径）
+就是系统字符集不支持输入的字符，因为是en_US.ISO-8859-1等编码
+修复：调整系统编码到utf-8,在./bashrc文件

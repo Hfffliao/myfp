@@ -184,28 +184,31 @@ public class FileController {
             if (userId == 0) {
                throw new BusinessException(Code.BAD_REQUEST,"用户登录,dan_shi_mei_xing_xi");
             }
-            //begin rename file or folder in db
-            String oldName = userFolderService.reNameFileOrFolder(id, newName, userId);
-
-            UserFolder updatedFolder = userFolderService.getUserFolderById(id);
-            if (updatedFolder == null) {
-                throw new RuntimeException("无法获取更新后的文件夹信息");
-            }
-             //begin update system file name
-            String parentPath = updatedFolder.getPath();
-
             String username = UserContext.getUsername().orElse("");
             if (username.isEmpty()) {
                 throw new RuntimeException("无法获取用户名");
             }
 
+            // 获取当前文件夹信息
+            UserFolder folder = userFolderService.getUserFolderById(id);
+            if (folder == null) {
+                throw new RuntimeException("文件夹不存在");
+            }
+            String oldName = folder.getName();
+            String parentPath = folder.getPath();
+
+            // 构建系统文件路径
             Path baseDir = Paths.get(Code.root, username);
             Path parentDirPath = filePathImpl.formalFilePath(baseDir, parentPath);
             if (parentDirPath == null) {
                 throw new RuntimeException("非法路径");
             }
 
+            // 先重命名系统文件，失败直接抛异常，数据库不会执行
             reNameFileOrFolderOnSystem.reName(parentDirPath.toString(), oldName, newName);
+
+            // 系统文件操作成功，再更新数据库
+            userFolderService.reNameFileOrFolder(id, newName, userId);
 
             Map<String, Object> data = new HashMap<>();
             data.put("id", id);
