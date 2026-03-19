@@ -694,12 +694,12 @@
             if (
             //    filetype == 'doc'  || filetype == 'docx' || filetype == 'xls' || filetype == 'xlsx' ||
             // filetype == 'ppt' || filetype == 'pptx' || filetype == 'pdf'||
-            filetype == 'txt'||filetype=='jpg'||filetype=='png') {
+            filetype == 'txt'||filetype=='md'||filetype=='jpg'||filetype=='png') {
 
                 let show = document.getElementById('fileshow');
                 let showcontent = document.getElementById('fileshowcontent');
                 showcontent.innerHTML = '';
-                if (filetype === 'txt') {
+                if (filetype === 'txt' || filetype === 'md') {
                     const reader = new FileReader();
                     reader.onload = function (e) {
                         const textarea = document.createElement('textarea');
