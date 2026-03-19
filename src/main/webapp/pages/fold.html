@@ -54,8 +54,57 @@
         );
     </script>
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         /* CSS变量定义 */
+
+        /* md文件渲染（开始） */
+        .markdown-body {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+        }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+            margin-top: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+            line-height: 1.25;
+        }
+        .markdown-body h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: .3em; }
+        .markdown-body h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: .3em; }
+        .markdown-body h3 { font-size: 1.25em; }
+        .markdown-body code {
+            padding: .2em .4em;
+            margin: 0;
+            font-size: 85%;
+            background-color: rgba(27,31,35,.05);
+            border-radius: 3px;
+        }
+        .markdown-body pre {
+            padding: 16px;
+            overflow: auto;
+            font-size: 85%;
+            line-height: 1.45;
+            background-color: #f6f8fa;
+            border-radius: 3px;
+        }
+        .markdown-body pre code { background-color: transparent; padding: 0; }
+        .markdown-body blockquote {
+            padding: 0 1em;
+            color: #6a737d;
+            border-left: .25em solid #dfe2e5;
+        }
+        .markdown-body ul, .markdown-body ol { padding-left: 2em; }
+        .markdown-body table { border-collapse: collapse; width: 100%; }
+        .markdown-body table th, .markdown-body table td {
+            padding: 6px 13px;
+            border: 1px solid #dfe2e5;
+        }
+        .markdown-body table tr:nth-child(2n) { background-color: #f6f8fa; }
+        /* md文件渲染（结束） */
 
         /* 卡片布局 */
         .card-container {
@@ -699,7 +748,7 @@
                 let show = document.getElementById('fileshow');
                 let showcontent = document.getElementById('fileshowcontent');
                 showcontent.innerHTML = '';
-                if (filetype === 'txt' || filetype === 'md') {
+                if (filetype === 'txt') {
                     const reader = new FileReader();
                     reader.onload = function (e) {
                         const textarea = document.createElement('textarea');
@@ -708,6 +757,17 @@
                         textarea.style.height = '100%';
                         textarea.style.resize = 'none';
                         showcontent.appendChild(textarea);
+                    };
+                    reader.readAsText(blob);
+                    show.style.display = 'block';
+                }
+                if (filetype === 'md') {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const div = document.createElement('div');
+                        div.className = 'markdown-body';
+                        div.innerHTML = marked.parse(e.target.result);
+                        showcontent.appendChild(div);
                     };
                     reader.readAsText(blob);
                     show.style.display = 'block';
