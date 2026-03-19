@@ -3,9 +3,11 @@ package love.linyi.service.folderUtilService.impl;
 import love.linyi.controller.Code;
 import love.linyi.domin.UserFolder;
 import love.linyi.service.folderUtilService.BuildFilePathByModel;
+import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
 
+@Service
 public class BuildFilePathByModelImpl implements BuildFilePathByModel {
     @Override
     //通过文件模型和用户名构建文件在操作系统的路径

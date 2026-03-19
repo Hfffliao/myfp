@@ -1,4 +1,4 @@
-package love.linyi.service.login.Impl;
+package love.linyi.service.login.impl;
 
 import love.linyi.service.login.CheckIfLogin;
 import org.springframework.stereotype.Service;

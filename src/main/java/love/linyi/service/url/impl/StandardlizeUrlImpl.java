@@ -1,4 +1,4 @@
-package love.linyi.service.url.Impl;
+package love.linyi.service.url.impl;
 
 import love.linyi.service.url.StandardlizeUrl;
 

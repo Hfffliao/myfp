@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
-public class UserServiceImpl implements UserService {
+public class UserImpl implements UserService {
     @Autowired
     private UserDao userDao;
 
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserImpl.class);
     @Override
     public List<User> getAll() {
 

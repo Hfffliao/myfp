@@ -19,13 +19,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class UserFolderServiceImplTest {
+class UserFolderImplTest {
 
     @Mock
     private UserFolderDao userFolderDao;
 
     @InjectMocks
-    private UserFolderServiceImpl userFolderService;
+    private UserFolderImpl userFolderService;
 
     @Test
     void reNameFileOrFolder_renameFile_success() {

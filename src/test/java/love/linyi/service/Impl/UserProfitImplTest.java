@@ -2,7 +2,7 @@ package love.linyi.service.Impl;
 
 import love.linyi.dao.UserProfitDao;
 import love.linyi.domin.UserProfit;
-import love.linyi.service.impl.UserProfitServiceImpl;
+import love.linyi.service.impl.UserProfitImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,11 +16,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserProfitServiceImplTest {
+public class UserProfitImplTest {
    @Mock
    UserProfitDao userProfitDao;
    @InjectMocks
-    UserProfitServiceImpl userProfitService;
+     UserProfitImpl userProfitService;
    @BeforeEach
    void upset(){
 

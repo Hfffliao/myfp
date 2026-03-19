@@ -23,7 +23,7 @@ import java.util.Map;
 //调用UserFolderService类存文件信息到数据库
 //在本类存储文件到本地，除了存文件到本地的函数，其它地方用的路径分割符都是"/"（windows）
 @Service
-public class HandleMultipartServiceImpl implements HandleMultipartService {
+public class HandleMultipartImpl implements HandleMultipartService {
     @Autowired
     public UserFolderService userFolderService;
     public ObjectMapper objectMapper = new ObjectMapper();

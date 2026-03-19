@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserProfitServiceImpl implements UserProfitService {
+public class UserProfitImpl implements UserProfitService {
     @Autowired
     UserProfitDao userProfitDao;
     @Override

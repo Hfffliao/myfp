@@ -1,7 +1,7 @@
 package love.linyi.service.folderUtilService.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import love.linyi.service.impl.UserFolderServiceImpl;
+import love.linyi.service.impl.UserFolderImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,12 +14,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-    class HandleMultipartServiceImplTest {
+    class HandleMultipartImplTest {
 
         @Mock
-        private UserFolderServiceImpl userFolderService;
+        private UserFolderImpl userFolderService;
         @InjectMocks
-        private HandleMultipartServiceImpl handleMultipartService;
+        private HandleMultipartImpl handleMultipartService;
         @InjectMocks
         private ObjectMapper objectMapper;
 

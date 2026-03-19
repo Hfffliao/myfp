@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
-public class UserFolderServiceImpl implements UserFolderService {
+public class UserFolderImpl implements UserFolderService {
 @Autowired
 private UserFolderDao userFolderDao;
 
@@ -23,7 +23,7 @@ private UserFolderDao userFolderDao;
     @Override
     public int save(List<UserFolder> userFolderList) {
         userFolderDao.save(userFolderList);
-        System.out.println("UserFolderServiceImpl out");
+        System.out.println("UserFolderImpl out");
 
         return 0;
     }

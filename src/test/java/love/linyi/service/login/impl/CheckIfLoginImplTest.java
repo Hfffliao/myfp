@@ -1,4 +1,4 @@
-package love.linyi.service.login.Impl;
+package love.linyi.service.login.impl;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
