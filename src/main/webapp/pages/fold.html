@@ -541,8 +541,7 @@
         }
     }
     //////////// 开始重命名
-    function startRename(index){
-        // 获取当前路径下的文件系统数据
+    function startRename(id){
         let currentFileSystem = fileSystem;
         currentPath.forEach(pathPart => {
             const folder = currentFileSystem.find(item => item.name === pathPart && item.type === 'folder');
@@ -550,6 +549,9 @@
                 currentFileSystem = folder.children;
             }
         });
+
+        let index = currentFileSystem.findIndex(item => item.id == id);
+        if (index === -1) return;
 
         const item = currentFileSystem[index];
         const listItem = document.querySelectorAll('.file-item')[index + (currentPath.length > 0 ? 1 : 0)];
@@ -564,17 +566,17 @@
         const saveBtn = document.createElement('button');
         saveBtn.className = 'rename-btn';
         saveBtn.textContent = '保存';
-        saveBtn.onclick = () => saveRename(index, input.value, listItem, oldName);
+        saveBtn.onclick = () => saveRename(id, input.value, listItem, oldName);
         listItem.replaceChild(saveBtn, listItem.querySelector('.rename-btn'));
 
         const cancelBtn = document.createElement('button');
         cancelBtn.className = 'delete-btn';
         cancelBtn.textContent = '取消';
-        cancelBtn.onclick = () => cancelRename(index, listItem, oldName);
+        cancelBtn.onclick = () => cancelRename(id, listItem, oldName);
         listItem.appendChild(cancelBtn);
     }
     // 保存重命名
-    async function saveRename(index, newName, listItem, oldName) {
+    async function saveRename(id, newName, listItem, oldName) {
         if (newName.trim()) {
             let currentFileSystem = fileSystem;
             currentPath.forEach(pathPart => {
@@ -584,7 +586,9 @@
                 }
             });
 
-            const item = currentFileSystem[index];
+            const item = currentFileSystem.find(item => item.id == id);
+            if (!item) return;
+
             try {
                 const response = await fetch(`${endpointPath}/file`, {
                     method: 'PATCH',
@@ -593,7 +597,7 @@
                     },
                     credentials: 'include',
                     body: JSON.stringify({
-                        id: item.id,
+                        id: id,
                         newName: newName.trim()
                     })
                 });
@@ -606,14 +610,14 @@
                 initFileList();
             } catch (error) {
                 console.error('重命名出错:', error);
-                cancelRename(index, listItem, oldName);
+                cancelRename(id, listItem, oldName);
             }
         } else {
-            cancelRename(index, listItem, oldName);
+            cancelRename(id, listItem, oldName);
         }
     }
     // 取消重命名
-    function cancelRename(index, listItem, oldName) {
+    function cancelRename(id, listItem, oldName) {
         const nameElement = document.createElement('span');
         nameElement.className = 'file-name';
         nameElement.textContent = oldName;
@@ -622,7 +626,7 @@
         const renameBtn = document.createElement('button');
         renameBtn.className = 'rename-btn';
         renameBtn.textContent = '重命名';
-        renameBtn.onclick = () => startRename(index);
+        renameBtn.onclick = () => startRename(id);
         listItem.replaceChild(renameBtn, listItem.querySelector('.rename-btn'));
 
         listItem.removeChild(listItem.querySelector('.delete-btn:last-child'));
