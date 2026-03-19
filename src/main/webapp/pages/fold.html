@@ -561,22 +561,23 @@
         const input = document.createElement('input');
         input.className = 'rename-input';
         input.value = oldName;
-        listItem.replaceChild(input, nameElement);
+        nameElement.parentNode.replaceChild(input, nameElement);
 
         const saveBtn = document.createElement('button');
         saveBtn.className = 'rename-btn';
         saveBtn.textContent = '保存';
-        saveBtn.onclick = () => saveRename(id, input.value, listItem, oldName);
-        listItem.replaceChild(saveBtn, listItem.querySelector('.rename-btn'));
+        saveBtn.onclick = () => saveRename(id, input, listItem, oldName);
+        listItem.querySelector('.rename-btn').replaceWith(saveBtn);
 
         const cancelBtn = document.createElement('button');
-        cancelBtn.className = 'delete-btn';
+        cancelBtn.className = 'cancel-btn';
         cancelBtn.textContent = '取消';
         cancelBtn.onclick = () => cancelRename(id, listItem, oldName);
         listItem.appendChild(cancelBtn);
     }
     // 保存重命名
-    async function saveRename(id, newName, listItem, oldName) {
+    async function saveRename(id, inputElement, listItem, oldName) {
+        const newName = inputElement.value;
         if (newName.trim()) {
             let currentFileSystem = fileSystem;
             currentPath.forEach(pathPart => {
@@ -618,18 +619,19 @@
     }
     // 取消重命名
     function cancelRename(id, listItem, oldName) {
+        const inputElement = listItem.querySelector('.rename-input');
         const nameElement = document.createElement('span');
         nameElement.className = 'file-name';
         nameElement.textContent = oldName;
-        listItem.replaceChild(nameElement, listItem.querySelector('.rename-input'));
+        inputElement.parentNode.replaceChild(nameElement, inputElement);
 
         const renameBtn = document.createElement('button');
         renameBtn.className = 'rename-btn';
         renameBtn.textContent = '重命名';
         renameBtn.onclick = () => startRename(id);
-        listItem.replaceChild(renameBtn, listItem.querySelector('.rename-btn'));
+        listItem.querySelector('.rename-btn').replaceWith(renameBtn);
 
-        listItem.removeChild(listItem.querySelector('.delete-btn:last-child'));
+        listItem.querySelector('.cancel-btn')?.remove();
     }
     ////////// 单击文件项
     async function clickFileItem(name) {
