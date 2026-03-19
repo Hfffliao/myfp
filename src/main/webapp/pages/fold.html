@@ -732,13 +732,13 @@
                 const a = document.createElement('a');
                 a.href = urlObject;
                 if (filenameMatch) {
-                    a.download = filenameMatch[1];
+                    a.download = decodeURIComponent(filenameMatch[1]);
                 }
                 a.click();
                window.URL.revokeObjectURL(urlObject);
             }
             //获取文件类型
-            let filetype = filenameMatch[1].substring(filenameMatch[1].lastIndexOf('.') + 1);
+            let filetype = decodeURIComponent(filenameMatch[1]).substring(decodeURIComponent(filenameMatch[1]).lastIndexOf('.') + 1);
             //如果是可显示的则显示
             if (
             //    filetype == 'doc'  || filetype == 'docx' || filetype == 'xls' || filetype == 'xlsx' ||
