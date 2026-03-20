@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 @Configuration
 @PropertySource("classpath:love/linyi/config/jdbc.properties")
-@EnableTransactionManagement // 启用事务管理
 public class JdbcConfig {
     @Value("${jdbc.driver}")
    private String driver;

@@ -1,7 +1,7 @@
 package love.linyi.controller;
 
 import love.linyi.domin.ShiJian;
-import love.linyi.service.ShiJianService;
+import love.linyi.service.util.ShiJianService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +23,7 @@ public class ShiJianCon {
 //    @PostMapping
 //    public Result save(@RequestBody ShiJian shiJian) {
 //        boolean flag = shiJianService.save(shiJian);
-//        return new Result(flag?Code.SAVE_OK:Code.SAVE_ERR,flag);
+//        return new Result(flag?Config.SAVE_OK:Config.SAVE_ERR,flag);
 //    }
 //    @PutMapping
 //    public boolean update(@RequestBody ShiJian shiJian) {

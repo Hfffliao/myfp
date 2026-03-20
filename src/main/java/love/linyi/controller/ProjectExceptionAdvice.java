@@ -11,16 +11,16 @@ public class ProjectExceptionAdvice {
     @ExceptionHandler(SystemException.class)
     public Result doSystemException(SystemException ex){
         System.out.println("出异常了");
-        return new Result(ex.getCode(),null,ex.getMessage());
+        return new Result(400,null,ex.getMessage());
     }
     @ExceptionHandler(BusinessException.class)
     public Result doBusinessException(BusinessException ex){
         System.out.println("出异常了");
-        return new Result(ex.getCode(),null,ex.getMessage());
+        return new Result(400,null,ex.getMessage());
     }
     @ExceptionHandler(Exception.class)
     public Result doException(Exception ex){
-        return new Result(0,null,ex.getMessage());
+        return new Result(400,null,ex.getMessage());
 
     }
 }

@@ -1,0 +1,17 @@
+package love.linyi.service.util.impl;
+
+import love.linyi.service.util.AcquisitionTime;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+@Service
+public class AcquisitionTimeImpl implements AcquisitionTime {
+    public LocalDateTime getdata() {
+        //获取现在的时间
+        LocalDateTime now = LocalDateTime.now();
+        // 定义格式
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        System.out.println(now);
+        return now;
+    }
+}

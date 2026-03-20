@@ -4,7 +4,7 @@
 //
 //package love.linyi.netapi.udp;
 //
-//import love.linyi.controller.Code;
+//import love.linyi.Config.Config;
 //import love.linyi.controller.camera.http3.VideoStreamController;
 //import love.linyi.netapi.websocket.VideoStreamWebSocketHandler;
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@
 //    VideoStreamWebSocketHandler videoStreamWebSocketHandler;
 //    //VideoStreamController videoStreamController;
 //    // 1. 添加 UDP 接收端口（根据 ESP32 发送的目标端口配置，例如 8888）
-//    private final int receivePort= Code.receivePort;
+//    private final int receivePort= Config.receivePort;
 //    private DatagramSocket receiveSocket; // 接收用的 UDP 套接字
 //    private volatile boolean isRunning = true; // 控制接收循环的标志
 //    // 3. 初始化：启动 UDP 接收线程（服务启动时执行）

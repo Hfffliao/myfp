@@ -3,12 +3,12 @@ package love.linyi.controller.fold;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import love.linyi.common.context.UserContext;
-import love.linyi.controller.Code;
+import love.linyi.config.Config;
 import love.linyi.domin.UserFolder;
-import love.linyi.service.UserFolderService;
-import love.linyi.service.folderUtilService.Deletefile;
-import love.linyi.service.folderUtilService.ReNameFileOrFolderOnSystem;
-import love.linyi.service.security.FilePath;
+import love.linyi.service.domain.user.UserFolderService;
+import love.linyi.service.infra.file.Deletefile;
+import love.linyi.service.infra.file.ReNameFileOrFolderOnSystem;
+import love.linyi.service.infra.security.FilePath;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -67,10 +66,10 @@ public class FileControllerTest {
         when(httpSession.getAttribute("user")).thenReturn((Object)"3390351358@qq.com");
         when(httpSession.getAttribute("id")).thenReturn((Object)1);
         when(httpServletRequest.getHeader("User-Agent")).thenReturn("Mozilla");
-        when(filePathImpl.formalFilePath(Path.of(Code.root,"3390351358@qq.com"),filepn))
-                .thenReturn(Path.of(Code.root,"3390351358@qq.com",filepn));
+        when(filePathImpl.formalFilePath(Path.of(Config.root,"3390351358@qq.com"),filepn))
+                .thenReturn(Path.of(Config.root,"3390351358@qq.com",filepn));
 
-        File dir = new File(Code.root + File.separator + "3390351358@qq.com");
+        File dir = new File(Config.root + File.separator + "3390351358@qq.com");
         if (!dir.exists()) {
             dir.mkdirs();
         }
@@ -92,9 +91,9 @@ public class FileControllerTest {
         String filepn ="jin.jps";
         when(httpSession.getAttribute("user")).thenReturn((Object)"3390351358@qq.com");
         when(httpSession.getAttribute("id")).thenReturn((Object)1);
-        when(filePathImpl.formalFilePath(Path.of(Code.root,"3390351358@qq.com"),filepn)).thenReturn(null);
+        when(filePathImpl.formalFilePath(Path.of(Config.root,"3390351358@qq.com"),filepn)).thenReturn(null);
 
-        File dir = new File(Code.root);
+        File dir = new File(Config.root);
         if (!dir.exists()) {
             dir.mkdirs();
         }
@@ -123,7 +122,7 @@ public class FileControllerTest {
         
         when(userFolderService.reNameFileOrFolder(300, "newname.txt", 1)).thenReturn("oldname.txt");
         when(userFolderService.getUserFolderById(1)).thenReturn(updatedFolder);
-        when(filePathImpl.formalFilePath(any(Path.class), eq("/docs"))).thenReturn(Path.of(Code.root, "testuser", "docs"));
+        when(filePathImpl.formalFilePath(any(Path.class), eq("/docs"))).thenReturn(Path.of(Config.root, "testuser", "docs"));
         
         ResponseEntity<Map<String, Object>> response = fileController.reName(params);
         

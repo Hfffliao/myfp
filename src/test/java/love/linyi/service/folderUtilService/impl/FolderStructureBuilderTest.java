@@ -2,6 +2,7 @@
 package love.linyi.service.folderUtilService.impl;
 
 import love.linyi.domin.UserFolder;
+import love.linyi.service.infra.file.impl.FolderStructureBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

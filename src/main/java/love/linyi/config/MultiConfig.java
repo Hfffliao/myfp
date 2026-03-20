@@ -1,4 +1,4 @@
-//package love.linyi.config;
+//package love.linyi.Config;
 //
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.context.annotation.Configuration;

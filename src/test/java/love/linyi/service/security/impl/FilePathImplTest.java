@@ -1,6 +1,7 @@
 package love.linyi.service.security.impl;
 
-import love.linyi.controller.Code;
+import love.linyi.config.Config;
+import love.linyi.service.infra.security.impl.FilePathImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,13 +23,13 @@ public class FilePathImplTest {
         //输入C:/dd和/dd，输出C:/dd/dd
     void formalFilePath_standard(){
         //准备
-        Path basepath=Path.of(Code.root,"3390351358@qq.com");
+        Path basepath=Path.of(Config.root,"3390351358@qq.com");
         String userPath ="/jin/jin.jps";
         //开始测试
         Path result=filePath.formalFilePath(basepath,userPath);
         //检测结果
         System.out.println(result);
-        assertEquals(Path.of(Code.root,"3390351358@qq.com","jin","jin.jps"),result);
+        assertEquals(Path.of(Config.root,"3390351358@qq.com","jin","jin.jps"),result);
     }
     @Test
         //输入""和/dd/dd,输出dd/dd
@@ -58,7 +59,7 @@ public class FilePathImplTest {
     //目录穿越
     void formalFilePath_Directory_Traversal(){
         //准备
-        Path basepath=Path.of(Code.root,"3390351358@qq.com");
+        Path basepath=Path.of(Config.root,"3390351358@qq.com");
         String userPath ="../jin.jps";
         //开始测试
         Path result=filePath.formalFilePath(basepath,userPath);

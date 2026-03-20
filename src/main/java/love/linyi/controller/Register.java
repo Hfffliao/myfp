@@ -1,16 +1,13 @@
 package love.linyi.controller;
 import love.linyi.domin.User;
-import love.linyi.service.SendVerificationCode;
-import love.linyi.service.UserService;
+import love.linyi.service.domain.auth.SendVerificationCode;
+import love.linyi.service.domain.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.function.EntityResponse;
-import org.springframework.web.servlet.function.ServerResponse;
 
 import jakarta.servlet.ServletException;
 
@@ -104,7 +101,8 @@ public class Register{
 			request.getSession().setAttribute("username", name);
 		    pw.print("send success");
 		} catch (Exception e) {
-			pw.print("send failed");
+			//pw.print("send failed");
+			throw new RuntimeException(e);
 		}
 
 

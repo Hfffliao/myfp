@@ -1,5 +1,6 @@
 package love.linyi.service.folderUtilService.impl;
  
+import love.linyi.service.infra.file.impl.AsyncFileDecodingTaskImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

@@ -1,7 +1,7 @@
 ////用来和esp32建立tcp连接，用来接收视频流
 //package love.linyi.service.camera.tcp;
 //
-//import love.linyi.controller.Code;
+//import love.linyi.Config.Config;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;
 //import jakarta.annotation.PostConstruct;
@@ -16,7 +16,7 @@
 //@Component
 //public class TcpServer  {
 //
-//    private final int port= Code.tcpserverPort;
+//    private final int port= Config.tcpserverPort;
 //    private ServerSocket serverSocket;
 //    private ExecutorService executorService;
 //    private volatile boolean running;

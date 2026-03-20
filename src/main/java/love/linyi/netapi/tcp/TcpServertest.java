@@ -1,6 +1,6 @@
 //package love.linyi.service.camera.tcp;
 //
-//import love.linyi.controller.Code;
+//import love.linyi.Config.Config;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.stereotype.Component;
 //
@@ -16,7 +16,7 @@
 //@Component
 //public class TcpServertest {
 //
-//    private final int port= Code.tcpserverPort;
+//    private final int port= Config.tcpserverPort;
 //    private ServerSocket serverSocket;
 //    private ExecutorService executorService;
 //    private volatile boolean running;

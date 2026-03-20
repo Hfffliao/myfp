@@ -1,7 +1,8 @@
 package love.linyi.service.folderUtilService.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import love.linyi.service.impl.UserFolderImpl;
+import love.linyi.service.domain.user.impl.UserFolderImpl;
+import love.linyi.service.infra.file.impl.HandleMultipartImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

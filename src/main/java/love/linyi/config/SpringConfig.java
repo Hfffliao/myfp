@@ -29,8 +29,6 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 @PropertySource("classpath:love/linyi/config/jdbc.properties")
 @EnableAspectJAutoProxy
 @MapperScan("love.linyi.dao")
-@Import({JdbcConfig.class,MybatisConfig.class})
-//@EnableJpaRepositories(basePackages = "love.linyi.dao")
 @EnableTransactionManagement
 @EnableScheduling
 @EnableAsync

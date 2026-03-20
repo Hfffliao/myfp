@@ -12,5 +12,6 @@ logs/
 
 # 忽略临时文件
 *.tmp
+*.properties
 
 dependency-reduced-pom.xml

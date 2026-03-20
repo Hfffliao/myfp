@@ -1,8 +1,8 @@
 package love.linyi.service.folderUtilService.impl;
 
-import love.linyi.controller.Code;
+import love.linyi.config.Config;
 import love.linyi.domin.UserFolder;
-import love.linyi.service.folderUtilService.BuildFilePathByModel;
+import love.linyi.service.infra.file.impl.BuildFilePathByModelImpl;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -39,9 +39,9 @@ public class BuildFilePathByModelImplTest {
    static Stream<Arguments> buildFilePathByModelImplTestProvider() {
         return Stream.of(
                 //测试文件
-                Arguments.of(new UserFolder(1,"1.txt","/dd","file"), "liao", Path.of(Code.root,"liao","dd","1.txt")),
+                Arguments.of(new UserFolder(1,"1.txt","/dd","file"), "liao", Path.of(Config.root,"liao","dd","1.txt")),
                 //测试文件夹
-                Arguments.of(new UserFolder(1,"dd","/dd","folder"), "liao", Path.of(Code.root,"liao","dd","dd"))
+                Arguments.of(new UserFolder(1,"dd","/dd","folder"), "liao", Path.of(Config.root,"liao","dd","dd"))
                 );
    }
 }

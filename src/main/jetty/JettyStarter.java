@@ -1,9 +1,9 @@
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.MultipartConfigElement;
+import love.linyi.config.Config;
 import love.linyi.config.MultiConfig;
 import love.linyi.config.SpringConfig;
 import love.linyi.config.SpringMvcConfig;
-import love.linyi.controller.Code;
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory;
 import org.eclipse.jetty.ee10.servlet.*;
 import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
@@ -22,8 +22,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.EnumSet;
 
-import static love.linyi.controller.Code.KeyStorePassword;
-import static love.linyi.controller.Code.KeyStorePath;
+import static love.linyi.config.Config.KeyStorePassword;
+import static love.linyi.config.Config.KeyStorePath;
 
 public class JettyStarter {
 
@@ -51,7 +51,7 @@ public class JettyStarter {
         //serverQuicConfig.setOutputBufferSize(20 * 1024 * 1024);
         HTTP3ServerConnectionFactory http3 = new HTTP3ServerConnectionFactory(serverQuicConfig);
         QuicServerConnector quicConnector = new QuicServerConnector(server, serverQuicConfig, http3);
-        quicConnector.setPort(Code.jettyhttp3Andhttp2Port);
+        quicConnector.setPort(Config.jettyhttp3Andhttp2Port);
         quicConnector.setIdleTimeout(600000); // 10分钟空闲超时
 
 
@@ -78,7 +78,7 @@ public class JettyStarter {
                 alpn,
                 http2
         );
-        tlsConnector.setPort(Code.jettyhttp3Andhttp2Port);
+        tlsConnector.setPort(Config.jettyhttp3Andhttp2Port);
         server.addConnector(tlsConnector);
 
         // 添加非加密的 HTTP/1.1 连接器

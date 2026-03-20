@@ -1,0 +1,21 @@
+package love.linyi.service.infra.file.impl;
+
+import love.linyi.config.Config;
+import love.linyi.domin.UserFolder;
+import love.linyi.service.infra.file.BuildFilePathByModel;
+import org.springframework.stereotype.Service;
+
+import java.nio.file.Path;
+
+@Service
+public class BuildFilePathByModelImpl implements BuildFilePathByModel {
+    @Override
+    //通过文件模型和用户名构建文件在操作系统的路径
+    //因为用户名是通过UserContext获取的，所以不需要校验用户名是否为空，以及是否被篡改
+    public Path buildFilePathByuserFolderAndUserName(UserFolder userFolder, String userName) {
+        String path = userFolder.getPath();
+        String fileName = userFolder.getName();
+        Path filePath = Path.of(Config.root,userName, path, fileName);
+        return filePath;
+    }
+}

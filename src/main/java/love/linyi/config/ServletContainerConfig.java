@@ -1,3 +1,5 @@
+
+//只属于tomcat，不属于jetty
 package love.linyi.config;
 import jakarta.servlet.*;
 import org.springframework.web.context.WebApplicationContext;

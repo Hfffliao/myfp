@@ -1,8 +1,8 @@
 package love.linyi.controller.fold;
 
-import love.linyi.controller.Code;
+import love.linyi.config.Config;
 import love.linyi.domin.SealFileRequset;
-import love.linyi.service.folderUtilService.AsyncFileDecodingTask;
+import love.linyi.service.infra.file.AsyncFileDecodingTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -28,7 +28,7 @@ public class SealFileController {
         String username = (String) session.getAttribute("user");
         String sealFilePath = sealFileRequset.getFilepath();//这个函数处理\和$的时候要特殊处理，看源码
         sealFilePath = sealFilePath.replaceAll("/", File.separator);
-        String path = Code.root + File.separator + username + File.separator + sealFilePath + File.separator + sealFileRequset.getFilename();
+        String path = Config.root + File.separator + username + File.separator + sealFilePath + File.separator + sealFileRequset.getFilename();
         File file = new File(path);
         LocalDateTime sealTime = sealFileRequset.getSealTime();
         LocalDateTime now = LocalDateTime.now();

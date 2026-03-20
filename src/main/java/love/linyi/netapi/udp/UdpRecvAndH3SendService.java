@@ -1,7 +1,7 @@
 //可直接使用，但端口可能和其他软件冲突
 package love.linyi.netapi.udp;
 
-import love.linyi.controller.Code;
+import love.linyi.config.Config;
 //import love.linyi.netapi.websocket.VideoStreamWebSocketHandler;
 import love.linyi.service.camera.http3.StreamManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class UdpRecvAndH3SendService {
     private StreamManager streamManager;
     //VideoStreamController videoStreamController;
     // 1. 添加 UDP 接收端口（根据 ESP32 发送的目标端口配置，例如 8888）
-    private final int jettyUdpPort= Code.UdpRecvAndH3SendPort;
+    private final int jettyUdpPort= Config.UdpRecvAndH3SendPort;
     private DatagramSocket receiveSocket; // 接收用的 UDP 套接字
     public volatile boolean isRunning = false; // 控制接收循环的标志
     int corePoolSize = 10;

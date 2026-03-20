@@ -1,12 +1,12 @@
 package love.linyi.controller.fold;
 import love.linyi.common.context.UserContext;
-import love.linyi.controller.Code;
+import love.linyi.config.Config;
 import love.linyi.domin.UserFolder;
 import love.linyi.exception.BusinessException;
-import love.linyi.service.UserFolderService;
-import love.linyi.service.folderUtilService.Deletefile;
-import love.linyi.service.folderUtilService.ReNameFileOrFolderOnSystem;
-import love.linyi.service.security.FilePath;
+import love.linyi.service.domain.user.UserFolderService;
+import love.linyi.service.infra.file.Deletefile;
+import love.linyi.service.infra.file.ReNameFileOrFolderOnSystem;
+import love.linyi.service.infra.security.FilePath;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -49,7 +49,7 @@ public class FileController {
         String name = (String) (session.getAttribute("user")==null? "":session.getAttribute("user"));
         //获取用户id并检查是否为空
         int id = (int) (session.getAttribute("id")==null? 0:session.getAttribute("id"));
-        File file = new File(Code.root+"/"+name+"/"+filepn);
+        File file = new File(Config.root+"/"+name+"/"+filepn);
 //        System.out.println(idfile);
 //        System.out.println(filepn);
 //        System.out.println(type);
@@ -98,7 +98,7 @@ public class FileController {
         int id = (int) (session.getAttribute("id")==null? 0:session.getAttribute("id"));
         //System.out.println(id+";"+name);
         // 替换为实际的本地文件路径
-        Path path=filePathImpl.formalFilePath(Path.of(Code.root,name),filepn);
+        Path path=filePathImpl.formalFilePath(Path.of(Config.root,name),filepn);
         if(path==null){
             return ResponseEntity.badRequest().build();
         }
@@ -175,14 +175,14 @@ public class FileController {
         }
 
         if (newName.contains("/") || newName.contains("\\")) {
-           throw new BusinessException(Code.BAD_REQUEST,"新名称不能含路径分隔符");
+           throw new BusinessException(Config.BAD_REQUEST,"新名称不能含路径分隔符");
         }
 
         try {
             //check userinfo
             int userId = UserContext.getUserId().orElse(0);
             if (userId == 0) {
-               throw new BusinessException(Code.BAD_REQUEST,"用户登录,dan_shi_mei_xing_xi");
+               throw new BusinessException(Config.BAD_REQUEST,"用户登录,dan_shi_mei_xing_xi");
             }
             String username = UserContext.getUsername().orElse("");
             if (username.isEmpty()) {
@@ -198,7 +198,7 @@ public class FileController {
             String parentPath = folder.getPath();
 
             // 构建系统文件路径
-            Path baseDir = Paths.get(Code.root, username);
+            Path baseDir = Paths.get(Config.root, username);
             Path parentDirPath = filePathImpl.formalFilePath(baseDir, parentPath);
             if (parentDirPath == null) {
                 throw new RuntimeException("非法路径");
@@ -221,7 +221,7 @@ public class FileController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            throw new BusinessException(Code.UPDATE_ERR,"重命名失败: " + e.getMessage());
+            throw new BusinessException(Config.UPDATE_ERR,"重命名失败: " + e.getMessage());
         }
     }
 

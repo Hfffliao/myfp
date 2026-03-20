@@ -1,6 +1,6 @@
 package love.linyi.netapi.udp;
 
-import love.linyi.controller.Code;
+import love.linyi.config.Config;
 import org.springframework.stereotype.Component;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -15,7 +15,7 @@ public class UdpRecvAndSendService {
 
 //这个类用来和esp32，node.js客户端建立udp连接，用来收发视频流，它会把接收的流量都发送到刚连接的客户端
     // 1. 添加 UDP 接收端口（根据 ESP32 发送的目标端口配置，例如 8888）
-    private final int receivePort= Code.udpreceiveAndThenSendport;
+    private final int receivePort= Config.udpreceiveAndThenSendport;
     private DatagramSocket receiveSocket; // 接收用的 UDP 套接字
     private volatile boolean isRunning = true; // 控制接收循环的标志
     int Initcount = 0;

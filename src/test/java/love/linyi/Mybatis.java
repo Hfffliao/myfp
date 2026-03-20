@@ -1,7 +1,7 @@
 //package love.linyi;
 //
-//import love.linyi.config.SpringConfig;
-//import love.linyi.service.ShiJianService;
+//import love.linyi.Config.SpringConfig;
+//import love.linyi.service.util.ShiJianService;
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
 //import org.springframework.beans.factory.annotation.Autowired;

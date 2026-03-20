@@ -1,7 +1,7 @@
 package love.linyi.controller.loginandout;
 
 import love.linyi.domin.User;
-import love.linyi.service.UserService;
+import love.linyi.service.domain.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
