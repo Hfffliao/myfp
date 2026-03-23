@@ -1,11 +1,35 @@
 
     /* CSS变量定义 */
+    /* CSS变量定义 */
 :root {
-    --primary-color: #177bdf;
+    /* 圆角系统 */
+    --radius-sm: 6px;
+    --radius: 8px;
+    --radius-lg: 10px;
+    --radius-xl: 12px;
+    
+    /* 阴影系统 */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+    
+    /* 颜色变量（保持现有蓝色） */
+    --c-primary: #007BFF;
+    --c-primary-hover: #0056b3;
+    --c-danger: #dc3545;
+    --c-danger-hover: #bb2d3b;
+    --c-bg: #f5f6fa;
+    --c-surface: #ffffff;
+    --c-border: #e8ecf4;
+    --c-text: #4c4545;
+    --c-text-sub: #6c757d;
+    
+    /* 兼容旧变量 */
+    --primary-color: var(--c-primary);
     --secondary-color: #34db95;
     --accent-color: #e67e22;
-    --text-color: #4c4545;
-    --box-shadow: 1 4px/*方框下面的阴影长度*/ 6px rgba(245, 12, 12, 0.1);
+    --text-color: var(--c-text);
+    --box-shadow: var(--shadow-md);
 }
 
 /* 重置默认样式 */
