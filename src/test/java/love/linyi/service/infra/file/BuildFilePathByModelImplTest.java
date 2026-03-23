@@ -1,4 +1,4 @@
-package love.linyi.service.folderUtilService.impl;
+package love.linyi.service.infra.file;
 
 import love.linyi.config.Config;
 import love.linyi.domin.UserFolder;

@@ -1,0 +1,1593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>霖依 · 云盘</title>
+    <script>
+        function getContextPath() {
+            const pathName = window.location.pathname;
+            const Index = pathName.indexOf('p');
+            return pathName.substring(0, Index - 1);
+        }
+        const contextPath = getContextPath();
+        function loadScript(src, onLoad, onError) {
+            const script = document.createElement('script');
+            script.src = src; script.onload = onLoad; script.onerror = onError;
+            document.head.appendChild(script);
+        }
+        function loadStylesheet(href, onLoad, onError) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet'; link.href = href; link.onload = onLoad; link.onerror = onError;
+            document.head.appendChild(link);
+        }
+        loadScript(contextPath + '/pages/css/hangbege.js', () => {}, () => console.error('hangbege.js 加载失败'));
+        loadStylesheet(contextPath + '/pages/css/linyistyle.css', () => {}, () => console.error('linyistyle.css 加载失败'));
+    </script>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.2/css/all.min.css">
+    <script src="marked.min.js"></script>
+    <script src="mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════
+           霖依云盘 — 清新现代设计体系
+           ═══════════════════════════════════════════ */
+
+        :root {
+            /* 核心色板：柔和晨光 */
+            --c-bg:         #f8f9fc;
+            --c-surface:    #ffffff;
+            --c-surface-2:  #f1f3f9;
+            --c-border:     #e8ecf4;
+            --c-border-lt:  #f0f2f8;
+
+            /* 文字 */
+            --c-text:       #1a1d26;
+            --c-text-sub:   #5a6075;
+            --c-text-muted: #949bb0;
+
+            /* 品牌色：薰衣草紫 → 靛蓝 */
+            --c-primary:    #6c5ce7;
+            --c-primary-lt: #a29bfe;
+            --c-primary-bg: #f0eefe;
+            --c-accent:     #0984e3;
+            --c-accent-lt:  #74b9ff;
+
+            /* 功能色 */
+            --c-success:    #00b894;
+            --c-success-bg: #e8faf5;
+            --c-warning:    #fdcb6e;
+            --c-danger:     #e17055;
+            --c-danger-bg:  #fef0ec;
+
+            /* 侧栏 */
+            --sb-width:     260px;
+            --sb-collapsed: 72px;
+            --sb-bg:        #ffffff;
+            --sb-text:      #7c8298;
+            --sb-text-hi:   #1a1d26;
+            --sb-hover:     #f5f6fa;
+            --sb-active:    #f0eefe;
+            --sb-active-tx: #6c5ce7;
+
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--c-bg);
+            color: var(--c-text);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ── 整体布局 ── */
+        .app-layout { display: flex; min-height: 100vh; }
+
+        /* ════════════ 侧栏 ════════════ */
+        .sidebar {
+            width: var(--sb-width);
+            height: 100vh;
+            position: fixed;
+            top: 0; left: 0;
+            z-index: 900;
+            background: var(--sb-bg);
+            border-right: 1px solid var(--c-border);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s var(--ease), transform 0.3s var(--ease);
+            overflow: hidden;
+        }
+        .sidebar.collapsed { width: var(--sb-collapsed); }
+
+        /* 品牌 */
+        .sb-brand {
+            padding: 24px 20px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .sb-brand-logo {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--c-primary), var(--c-accent));
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(108,92,231,0.25);
+        }
+        .sb-brand-logo i { color: #fff; font-size: 18px; }
+        .sb-brand-info { display: flex; flex-direction: column; overflow: hidden; white-space: nowrap; }
+        .sb-brand-info .name { font-size: 16px; font-weight: 700; color: var(--c-text); letter-spacing: -0.3px; }
+        .sb-brand-info .sub { font-size: 11.5px; color: var(--c-text-muted); margin-top: 1px; }
+        .sidebar.collapsed .sb-brand-info { display: none; }
+        .sidebar.collapsed .sb-brand { justify-content: center; padding: 24px 0 20px; }
+
+        /* 导航 */
+        .sb-nav {
+            flex: 1;
+            padding: 4px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            overflow-y: auto;
+        }
+        .sb-nav::-webkit-scrollbar { width: 3px; }
+        .sb-nav::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 3px; }
+
+        .sb-section {
+            font-size: 10.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--c-text-muted);
+            padding: 20px 14px 6px;
+        }
+        .sidebar.collapsed .sb-section { font-size: 0; text-align: center; padding: 20px 0 6px; }
+        .sidebar.collapsed .sb-section::after { content: '·'; font-size: 10px; color: var(--c-text-muted); }
+
+        .sb-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            color: var(--sb-text);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s var(--ease);
+            position: relative;
+            user-select: none;
+        }
+        .sb-item:hover { background: var(--sb-hover); color: var(--sb-text-hi); }
+        .sb-item.active {
+            background: var(--sb-active);
+            color: var(--sb-active-tx);
+            font-weight: 600;
+        }
+        .sb-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 50%;
+            transform: translateY(-50%);
+            width: 3px; height: 20px;
+            background: var(--c-primary);
+            border-radius: 0 4px 4px 0;
+        }
+        .sb-item i {
+            width: 20px; text-align: center; font-size: 15px;
+            flex-shrink: 0; opacity: 0.6; transition: opacity 0.2s;
+        }
+        .sb-item:hover i, .sb-item.active i { opacity: 1; }
+        .sb-item .label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sb-item .badge {
+            margin-left: auto;
+            background: var(--c-primary-bg);
+            color: var(--c-primary);
+            font-size: 10.5px;
+            font-weight: 600;
+            padding: 1px 8px;
+            border-radius: 10px;
+            line-height: 1.6;
+        }
+        .sidebar.collapsed .label,
+        .sidebar.collapsed .badge,
+        .sidebar.collapsed .sb-section { display: none; }
+        .sidebar.collapsed .sb-item { justify-content: center; padding: 10px; }
+
+        /* 侧栏底部 */
+        .sb-footer {
+            padding: 16px 16px 20px;
+            border-top: 1px solid var(--c-border-lt);
+        }
+        .sb-storage { padding: 0 14px 14px; }
+        .sidebar.collapsed .sb-storage { display: none; }
+        .sb-storage-head {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11.5px;
+            color: var(--c-text-muted);
+            margin-bottom: 10px;
+        }
+        .sb-storage-bar {
+            height: 5px;
+            background: var(--c-surface-2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .sb-storage-fill {
+            height: 100%;
+            width: 38%;
+            background: linear-gradient(90deg, var(--c-primary), var(--c-accent));
+            border-radius: 5px;
+            transition: width 0.6s var(--ease);
+        }
+        .sb-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            color: var(--c-text-muted);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+        }
+        .sb-toggle:hover { background: var(--sb-hover); color: var(--c-text-sub); }
+
+        /* ════════════ 主内容区 ════════════ */
+        .main-wrap {
+            flex: 1;
+            margin-left: var(--sb-width);
+            transition: margin-left 0.3s var(--ease);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .sidebar.collapsed ~ .main-wrap { margin-left: var(--sb-collapsed); }
+
+        /* ── 顶栏 ── */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 800;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px) saturate(1.8);
+            -webkit-backdrop-filter: blur(20px) saturate(1.8);
+            border-bottom: 1px solid var(--c-border-lt);
+            padding: 0 36px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .topbar-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13.5px;
+            color: var(--c-text-muted);
+        }
+        .topbar-breadcrumb span { color: var(--c-text); font-weight: 600; }
+        .topbar-breadcrumb .sep { color: var(--c-border); font-size: 11px; }
+        .topbar-right { display: flex; align-items: center; gap: 14px; }
+        .topbar-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--c-surface-2);
+            border: 1.5px solid transparent;
+            border-radius: var(--radius);
+            padding: 9px 16px;
+            font-size: 13px;
+            color: var(--c-text-muted);
+            min-width: 240px;
+            transition: all 0.25s var(--ease);
+        }
+        .topbar-search:focus-within {
+            border-color: var(--c-primary-lt);
+            box-shadow: 0 0 0 4px rgba(108,92,231,0.08);
+            background: #fff;
+        }
+        .topbar-search input {
+            border: none; outline: none; background: transparent;
+            font-size: 13px; color: var(--c-text); width: 100%;
+            font-family: inherit;
+        }
+        .topbar-search i { color: var(--c-text-muted); font-size: 14px; }
+        .topbar-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--c-primary), var(--c-accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(108,92,231,0.2);
+        }
+        .topbar-avatar:hover { transform: scale(1.08); box-shadow: 0 4px 16px rgba(108,92,231,0.3); }
+
+        /* ── 统计卡片区 ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 28px 36px 0;
+        }
+        .stat-card {
+            background: var(--c-surface);
+            border: 1px solid var(--c-border-lt);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.25s var(--ease);
+        }
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            border-color: var(--c-border);
+        }
+        .stat-icon {
+            width: 48px; height: 48px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .stat-icon.purple { background: var(--c-primary-bg); color: var(--c-primary); }
+        .stat-icon.blue { background: #e8f4fd; color: var(--c-accent); }
+        .stat-icon.green { background: var(--c-success-bg); color: var(--c-success); }
+        .stat-info { display: flex; flex-direction: column; }
+        .stat-info .val { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; color: var(--c-text); }
+        .stat-info .lbl { font-size: 12.5px; color: var(--c-text-muted); margin-top: 2px; font-weight: 500; }
+
+        /* ── 内容区 ── */
+        .content-area {
+            padding: 24px 36px 48px;
+            flex: 1;
+        }
+
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* 统一按钮系统 */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s var(--ease);
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--c-primary), #7c6cf0);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(108,92,231,0.25);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 16px rgba(108,92,231,0.35);
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: var(--c-surface);
+            color: var(--c-text-sub);
+            border: 1.5px solid var(--c-border);
+        }
+        .btn-secondary:hover {
+            background: var(--c-surface-2);
+            border-color: #cbd5e1;
+            color: var(--c-text);
+        }
+        .btn-ghost {
+            background: transparent;
+            color: var(--c-text-sub);
+            padding: 8px 14px;
+        }
+        .btn-ghost:hover { background: var(--c-surface-2); color: var(--c-text); }
+        .btn-danger {
+            background: var(--c-danger);
+            color: #fff;
+        }
+        .btn-danger:hover { background: #d35400; }
+        .btn-accent {
+            background: linear-gradient(135deg, var(--c-accent), #0a7bd4);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(9,132,227,0.25);
+        }
+        .btn-accent:hover {
+            box-shadow: 0 4px 16px rgba(9,132,227,0.35);
+            transform: translateY(-1px);
+        }
+
+        /* 路径显示 */
+        .path-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--c-text-muted);
+            padding: 12px 18px;
+            background: var(--c-surface);
+            border: 1px solid var(--c-border-lt);
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+        }
+        .path-bar i { color: var(--c-primary-lt); font-size: 14px; }
+        .path-bar .crumb { color: var(--c-text); font-weight: 500; cursor: default; }
+        .path-bar .crumb.clickable { cursor: pointer; }
+        .path-bar .crumb.clickable:hover { color: var(--c-primary); }
+        .path-bar .sep { color: var(--c-border); margin: 0 2px; }
+
+        /* 文件列表容器 */
+        .file-panel {
+            background: var(--c-surface);
+            border: 1px solid var(--c-border-lt);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* 文件列表表头 */
+        .file-header {
+            display: flex;
+            align-items: center;
+            padding: 14px 24px;
+            background: var(--c-surface-2);
+            border-bottom: 1px solid var(--c-border-lt);
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--c-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .file-header .col-name { flex: 1; }
+        .file-header .col-actions { width: 160px; text-align: right; }
+
+        /* 文件列表 */
+        .file-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--c-border-lt);
+            transition: background 0.15s;
+            cursor: default;
+        }
+        .file-item:last-child { border-bottom: none; }
+        .file-item:hover { background: rgba(108,92,231,0.02); }
+
+        .file-item .file-body {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 0;
+            cursor: pointer;
+        }
+        .file-icon {
+            width: 40px; height: 40px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+            transition: transform 0.2s;
+        }
+        .file-item:hover .file-icon { transform: scale(1.05); }
+        .file-icon.folder-icon {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            color: #d68910;
+        }
+        .file-icon.file-icon-default {
+            background: var(--c-primary-bg);
+            color: var(--c-primary);
+        }
+        .file-icon-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .file-icon-text .fname {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--c-text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .file-icon-text .fmeta {
+            font-size: 12px;
+            color: var(--c-text-muted);
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        .file-item .file-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            width: 160px;
+            justify-content: flex-end;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .file-item:hover .file-actions { opacity: 1; }
+
+        .file-action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px; height: 34px;
+            border: none;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--c-text-muted);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .file-action-btn:hover {
+            background: var(--c-surface-2);
+            color: var(--c-text);
+        }
+        .file-action-btn.del:hover {
+            background: var(--c-danger-bg);
+            color: var(--c-danger);
+        }
+        .file-action-btn .btn-text {
+            font-size: 12px;
+            padding: 5px 12px;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            border: 1.5px solid var(--c-border);
+            color: var(--c-text-sub);
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: inherit;
+            font-weight: 500;
+        }
+        .file-action-btn .btn-text:hover {
+            border-color: var(--c-primary-lt);
+            color: var(--c-primary);
+            background: var(--c-primary-bg);
+        }
+
+        /* 新建文件夹输入 */
+        .new-folder-row {
+            display: none;
+            padding: 14px 24px;
+            background: var(--c-primary-bg);
+            border-bottom: 1px solid var(--c-border-lt);
+            gap: 12px;
+            align-items: center;
+        }
+        .new-folder-row input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1.5px solid var(--c-border);
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+        .new-folder-row input:focus {
+            border-color: var(--c-primary-lt);
+            box-shadow: 0 0 0 4px rgba(108,92,231,0.08);
+        }
+
+        /* 重命名输入 */
+        .rename-input {
+            flex: 1;
+            padding: 7px 12px;
+            border: 1.5px solid var(--c-primary-lt);
+            border-radius: var(--radius-sm);
+            font-size: 13.5px;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(108,92,231,0.08);
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        /* ── 弹窗系统 ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(26,29,38,0.4);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: var(--c-surface);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            max-width: 520px;
+            width: 90%;
+            overflow: hidden;
+            animation: modalIn 0.3s var(--ease);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-header {
+            padding: 24px 28px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--c-border-lt);
+        }
+        .modal-header h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--c-text);
+            letter-spacing: -0.3px;
+        }
+        .modal-close {
+            width: 34px; height: 34px;
+            border: none;
+            background: var(--c-surface-2);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--c-text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+        }
+        .modal-close:hover { background: var(--c-border); color: var(--c-text); }
+        .modal-body { padding: 24px 28px; }
+        .modal-footer {
+            padding: 18px 28px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* 文件预览弹窗 */
+        .preview-modal { max-width: 800px; }
+        .preview-modal .modal-body { padding: 0; }
+        .preview-content {
+            width: 100%;
+            min-height: 400px;
+            max-height: 60vh;
+            overflow: auto;
+            padding: 24px;
+        }
+
+        /* 删除确认 */
+        .delete-modal .modal-body p {
+            font-size: 14.5px;
+            color: var(--c-text-sub);
+            line-height: 1.7;
+        }
+        .delete-modal .modal-body .del-name {
+            color: var(--c-text);
+            font-weight: 600;
+        }
+
+        /* 封印弹窗 */
+        .seal-modal .seal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .seal-modal label {
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--c-text-sub);
+        }
+        .seal-modal input[type="datetime-local"] {
+            padding: 12px 16px;
+            border: 1.5px solid var(--c-border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .seal-modal input[type="datetime-local"]:focus {
+            border-color: var(--c-primary-lt);
+            box-shadow: 0 0 0 4px rgba(108,92,231,0.08);
+        }
+
+        /* ── 页脚 ── */
+        .site-footer {
+            background: var(--c-surface);
+            border-top: 1px solid var(--c-border-lt);
+            color: var(--c-text-sub);
+            padding: 40px 36px;
+            margin-top: auto;
+        }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .footer-inner h4 {
+            color: var(--c-text);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 14px;
+            letter-spacing: -0.2px;
+        }
+        .footer-inner p, .footer-inner a {
+            font-size: 13px;
+            color: var(--c-text-muted);
+            text-decoration: none;
+            line-height: 2;
+        }
+        .footer-inner a:hover { color: var(--c-primary); }
+        .footer-social {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .footer-social a {
+            width: 38px; height: 38px;
+            border-radius: var(--radius);
+            background: var(--c-surface-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            color: var(--c-text-muted);
+            transition: all 0.2s;
+        }
+        .footer-social a:hover {
+            background: var(--c-primary-bg);
+            color: var(--c-primary);
+            transform: translateY(-2px);
+        }
+
+        /* ── 移动端 ── */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 899;
+            backdrop-filter: blur(4px);
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.mobile-open { transform: translateX(0); }
+            .main-wrap { margin-left: 0 !important; }
+            .sidebar-overlay.active { display: block; }
+            .topbar-search { min-width: 140px; }
+            .stats-row { grid-template-columns: 1fr; margin: 20px 16px 0; gap: 12px; }
+            .content-area { padding: 16px; }
+            .file-header .col-actions { display: none; }
+            .file-item .file-actions { display: none; }
+            .topbar { padding: 0 16px; }
+        }
+
+        /* md渲染 */
+        .markdown-body { width: 100%; height: 100%; overflow: auto; padding: 20px; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.7; }
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 { margin-top: 24px; margin-bottom: 16px; font-weight: 600; line-height: 1.25; }
+        .markdown-body h1 { font-size: 2em; border-bottom: 1px solid var(--c-border-lt); padding-bottom: .3em; }
+        .markdown-body h2 { font-size: 1.5em; border-bottom: 1px solid var(--c-border-lt); padding-bottom: .3em; }
+        .markdown-body h3 { font-size: 1.25em; }
+        .markdown-body code { padding: .2em .4em; margin: 0; font-size: 85%; background-color: var(--c-surface-2); border-radius: 4px; }
+        .markdown-body pre { padding: 16px; overflow: auto; font-size: 85%; line-height: 1.45; background-color: var(--c-surface-2); border-radius: var(--radius-sm); }
+        .markdown-body pre code { background-color: transparent; padding: 0; }
+        .markdown-body blockquote { padding: 0 1em; color: var(--c-text-sub); border-left: .25em solid var(--c-border); }
+        .markdown-body ul, .markdown-body ol { padding-left: 2em; }
+        .markdown-body table { border-collapse: collapse; width: 100%; }
+        .markdown-body table th, .markdown-body table td { padding: 8px 14px; border: 1px solid var(--c-border-lt); }
+        .markdown-body table tr:nth-child(2n) { background-color: var(--c-surface-2); }
+
+        /* 拖拽上传区域 */
+        .drop-zone-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 950;
+            background: rgba(108,92,231,0.06);
+            border: 3px dashed var(--c-primary-lt);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+        .drop-zone-overlay.active { display: flex; }
+        .drop-zone-inner {
+            text-align: center;
+            color: var(--c-primary);
+        }
+        .drop-zone-inner i { font-size: 48px; margin-bottom: 16px; }
+        .drop-zone-inner p { font-size: 16px; font-weight: 600; }
+    </style>
+</head>
+
+<body>
+
+<!-- 遮罩 -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleMobileSidebar()"></div>
+
+<!-- 拖拽上传 -->
+<div class="drop-zone-overlay" id="dropZone">
+    <div class="drop-zone-inner">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>松开鼠标上传文件</p>
+    </div>
+</div>
+
+<!-- ════════════ 侧栏 ════════════ -->
+<aside class="sidebar" id="sidebar">
+    <div class="sb-brand">
+        <div class="sb-brand-logo"><i class="fas fa-cloud"></i></div>
+        <div class="sb-brand-info">
+            <span class="name">霖依云盘</span>
+            <span class="sub">智能文件管理</span>
+        </div>
+    </div>
+    <nav class="sb-nav">
+        <div class="sb-section">概览</div>
+        <a class="sb-item active" onclick="switchSidebarView('all', this)">
+            <i class="fas fa-th-large"></i><span class="label">全部文件</span>
+        </a>
+        <a class="sb-item" onclick="switchSidebarView('recent', this)">
+            <i class="fas fa-clock"></i><span class="label">最近访问</span>
+        </a>
+        <a class="sb-item" onclick="switchSidebarView('starred', this)">
+            <i class="fas fa-star"></i><span class="label">收藏夹</span>
+        </a>
+        <div class="sb-section">分类</div>
+        <a class="sb-item" onclick="switchSidebarView('docs', this)">
+            <i class="fas fa-file-alt"></i><span class="label">文档</span><span class="badge">12</span>
+        </a>
+        <a class="sb-item" onclick="switchSidebarView('images', this)">
+            <i class="fas fa-image"></i><span class="label">图片</span><span class="badge">8</span>
+        </a>
+        <a class="sb-item" onclick="switchSidebarView('videos', this)">
+            <i class="fas fa-video"></i><span class="label">视频</span>
+        </a>
+        <a class="sb-item" onclick="switchSidebarView('others', this)">
+            <i class="fas fa-box-open"></i><span class="label">其他</span>
+        </a>
+        <div class="sb-section">工具</div>
+        <a class="sb-item" onclick="switchSidebarView('recycle', this)">
+            <i class="fas fa-trash-alt"></i><span class="label">回收站</span>
+        </a>
+        <a class="sb-item" onclick="switchSidebarView('shared', this)">
+            <i class="fas fa-share-alt"></i><span class="label">共享空间</span>
+        </a>
+    </nav>
+    <div class="sb-footer">
+        <div class="sb-storage">
+            <div class="sb-storage-head">
+                <span>存储空间</span>
+                <span>3.8 / 10 GB</span>
+            </div>
+            <div class="sb-storage-bar"><div class="sb-storage-fill"></div></div>
+        </div>
+        <div class="sb-toggle" onclick="toggleSidebar()" title="收起侧栏">
+            <i class="fas fa-angles-left" id="sidebarToggleIcon"></i>
+        </div>
+    </div>
+</aside>
+
+<!-- ════════════ 主内容 ════════════ -->
+<div class="app-layout">
+    <div class="main-wrap">
+
+        <!-- 顶栏 -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-breadcrumb">
+                    <i class="fas fa-home" style="font-size:13px; color:var(--c-primary-lt)"></i>
+                    <span class="sep">/</span>
+                    <span>文件系统</span>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <div class="topbar-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="搜索文件和文件夹…" />
+                </div>
+                <div class="topbar-avatar">霖</div>
+            </div>
+        </header>
+
+        <main>
+            <!-- 统计卡片 -->
+            <section class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon purple"><i class="fas fa-file-lines"></i></div>
+                    <div class="stat-info">
+                        <span class="val">24</span>
+                        <span class="lbl">文件总数</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-database"></i></div>
+                    <div class="stat-info">
+                        <span class="val">3.8 GB</span>
+                        <span class="lbl">已用空间</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-folder"></i></div>
+                    <div class="stat-info">
+                        <span class="val">2</span>
+                        <span class="lbl">文件夹</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 内容区 -->
+            <div class="content-area">
+                <!-- 工具栏 -->
+                <div class="toolbar" id="toolbar">
+                    <button class="btn btn-primary" onclick="createNewFolder()">
+                        <i class="fas fa-folder-plus"></i> 新建文件夹
+                    </button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('folder-input').click()">
+                        <i class="fas fa-cloud-upload-alt"></i> 上传文件夹
+                    </button>
+                    <button class="btn btn-accent" onclick="document.getElementById('file-input').click()">
+                        <i class="fas fa-upload"></i> 上传文件
+                    </button>
+                    <input type="file" id="file-input" style="display:none;" onchange="handleFolderUpload(this)" multiple>
+                    <input type="file" id="folder-input" style="display:none;" onchange="handleFolderUpload(this)" webkitdirectory directory>
+                </div>
+
+                <!-- 新建文件夹表单 -->
+                <div class="new-folder-row" id="new-folder-form">
+                    <i class="fas fa-folder" style="color:#fdcb6e; font-size:18px;"></i>
+                    <input type="text" id="new-folder-name" placeholder="输入文件夹名称…" />
+                    <button class="btn btn-primary" onclick="saveNewFolder()">保存</button>
+                    <button class="btn btn-ghost" onclick="cancelNewFolder()">取消</button>
+                </div>
+
+                <!-- 路径 -->
+                <div class="path-bar" id="path-display">
+                    <i class="fas fa-folder-open"></i>
+                    <span class="crumb">根目录</span>
+                </div>
+
+                <!-- 文件面板 -->
+                <div class="file-panel">
+                    <div class="file-header">
+                        <div class="col-name">名称</div>
+                        <div class="col-actions">操作</div>
+                    </div>
+                    <ul class="file-list" id="file-list"></ul>
+                </div>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="site-footer">
+            <div class="footer-inner">
+                <div>
+                    <h4>联系我们</h4>
+                    <p>电话: (+86) 19807393661</p>
+                    <p>邮箱: <a href="https://mail.qq.com/" id="copyContent" onclick="copyToClipboard()">3390351358@qq.com</a></p>
+                    <p><a href="https://beian.miit.gov.cn">湘公网安备30174248163393967号</a></p>
+                </div>
+                <div>
+                    <h4>关注我们</h4>
+                    <div class="footer-social">
+                        <a href="#"><i class="fab fa-weibo"></i></a>
+                        <a href="#"><i class="fab fa-weixin"></i></a>
+                        <a href="#"><i class="fab fa-github"></i></a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+</div>
+
+<!-- ════════════ 弹窗系统 ════════════ -->
+
+<!-- 文件预览弹窗 -->
+<div class="modal-overlay" id="previewModal">
+    <div class="modal preview-modal">
+        <div class="modal-header">
+            <h3 id="previewTitle">文件预览</h3>
+            <button class="modal-close" onclick="closePreviewModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="preview-content" id="fileshowcontent"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closePreviewModal()">关闭</button>
+            <button class="btn btn-primary" id="downloadlink"><i class="fas fa-download"></i> 下载</button>
+        </div>
+    </div>
+</div>
+
+<!-- 更多操作弹窗 -->
+<div class="modal-overlay" id="moreOpModal">
+    <div class="modal seal-modal">
+        <div class="modal-header">
+            <h3>更多操作</h3>
+            <button class="modal-close" onclick="closeMoreOperation()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <div class="seal-form">
+                <label>封印文件 — 选择解封时间</label>
+                <input type="datetime-local" id="sealTime" name="sealTime" required>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeMoreOperation()">取消</button>
+            <button class="btn btn-accent" onclick="sealfile()"><i class="fas fa-lock"></i> 确定封印</button>
+        </div>
+    </div>
+</div>
+
+<!-- 删除确认弹窗 -->
+<div class="modal-overlay" id="deleteModal">
+    <div class="modal delete-modal">
+        <div class="modal-header">
+            <h3>确认删除</h3>
+            <button class="modal-close" onclick="closeDeleteModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body">
+            <p>确定要删除 <span class="del-name" id="deleteItemName"></span> 吗？此操作不可撤销。</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeDeleteModal()">取消</button>
+            <button class="btn btn-danger" id="deleteConfirmBtn"><i class="fas fa-trash-alt"></i> 删除</button>
+        </div>
+    </div>
+</div>
+
+<!-- ════════════ 脚本 ════════════ -->
+
+<script>
+    /* ── 侧栏 ── */
+    function toggleSidebar() {
+        const sb = document.getElementById('sidebar');
+        const icon = document.getElementById('sidebarToggleIcon');
+        sb.classList.toggle('collapsed');
+        icon.className = sb.classList.contains('collapsed') ? 'fas fa-angles-right' : 'fas fa-angles-left';
+    }
+    function toggleMobileSidebar() {
+        document.getElementById('sidebar').classList.toggle('mobile-open');
+        document.getElementById('sidebarOverlay').classList.toggle('active');
+    }
+    function switchSidebarView(view, el) {
+        document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        if (window.innerWidth <= 768) toggleMobileSidebar();
+    }
+
+    /* ── 弹窗 ── */
+    function openModal(id) { document.getElementById(id).classList.add('show'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    function closePreviewModal() { closeModal('previewModal'); }
+    function closeMoreOperation() { closeModal('moreOpModal'); }
+    function closeDeleteModal() { closeModal('deleteModal'); }
+    function closefileshow() { closePreviewModal(); }
+
+    /* ── 拖拽上传 ── */
+    let dragCounter = 0;
+    document.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        dragCounter++;
+        document.getElementById('dropZone').classList.add('active');
+    });
+    document.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        dragCounter--;
+        if (dragCounter === 0) document.getElementById('dropZone').classList.remove('active');
+    });
+    document.addEventListener('dragover', (e) => e.preventDefault());
+    document.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dragCounter = 0;
+        document.getElementById('dropZone').classList.remove('active');
+        if (e.dataTransfer.files.length > 0) {
+            const dt = new DataTransfer();
+            Array.from(e.dataTransfer.files).forEach(f => dt.items.add(f));
+            const input = document.getElementById('file-input');
+            input.files = dt.files;
+            handleFolderUpload(input);
+        }
+    });
+
+    /* 键盘快捷键 */
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closePreviewModal();
+            closeMoreOperation();
+            closeDeleteModal();
+        }
+    });
+</script>
+
+<script>
+    /* ═══════ 文件系统核心逻辑 ═══════ */
+
+    function createNewFolder() {
+        document.getElementById('toolbar').style.display = 'none';
+        document.getElementById('new-folder-form').style.display = 'flex';
+    }
+
+    async function saveNewFolder() {
+        const folderName = document.getElementById('new-folder-name').value.trim();
+        if (folderName) {
+            try {
+                const pathParam = currentPath.join('/');
+                const response = await fetch('/create-folder', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: pathParam, name: folderName })
+                });
+                if (!response.ok) throw new Error('创建文件夹失败');
+                await initFileList();
+            } catch (error) {
+                console.error('创建文件夹出错:', error);
+            }
+        }
+        cancelNewFolder();
+    }
+
+    function cancelNewFolder() {
+        document.getElementById('new-folder-form').style.display = 'none';
+        document.getElementById('toolbar').style.display = 'flex';
+    }
+
+    /* 删除 */
+    let pendingDeleteFn = null;
+    function isDeletef(name, type, id) {
+        document.getElementById('deleteItemName').textContent = name;
+        pendingDeleteFn = () => deleteItem(name, type, id);
+        openModal('deleteModal');
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('deleteConfirmBtn').onclick = () => {
+            if (pendingDeleteFn) pendingDeleteFn();
+            closeDeleteModal();
+        };
+    });
+
+    async function deleteItem(name, type, id) {
+        try {
+            let joincurrentPath = currentPath.join('/');
+            if (joincurrentPath.length > 0) joincurrentPath += '/';
+            const encodedPath = encodeURIComponent(joincurrentPath);
+            const encodedName = encodeURIComponent(name);
+            const encodedid = encodeURIComponent(id);
+            let url = `${endpointPath}/file?filepn=${encodedPath}${encodedName}&fileid=${encodedid}&type=${type}`;
+            const response = await fetch(url, { method: 'DELETE', credentials: 'include' });
+            if (!response.ok) throw new Error('删除失败');
+            await getFilePathSystemAndInit();
+        } catch (error) {
+            await getFilePathSystemAndInit();
+            console.error('删除出错:', error);
+        }
+    }
+
+    /* 上传文件 */
+    async function handleFileUpload(input) {
+        const files = Array.from(input.files);
+        const formData = new FormData();
+        let tatolsize = 0;
+        files.forEach(file => { tatolsize += file.size; });
+        formData.append('tatolsize', tatolsize);
+        files.forEach(file => { formData.append('files', file, file.name); });
+        formData.append('relativePath', currentPath.join('/'));
+        try {
+            const sessionId = localStorage.getItem('sessionId');
+            let requestUrl = endpointPath + '/folder;jsessionid=' + sessionId;
+            const response = await fetch(requestUrl, { method: 'POST', body: formData, credentials: 'include' });
+            if (!response.ok) throw new Error('上传失败');
+            await initFileList();
+        } catch (error) {
+            console.error('上传错误', error);
+        } finally {
+            input.value = '';
+        }
+    }
+
+    /* 上传文件夹 */
+    function handleFolderUpload(input) {
+        const files = Array.from(input.files);
+        const formData = new FormData();
+        let tatolsize = 0;
+        let filestructure = [];
+        function findOrCreateFolder(folderArray, pathParts) {
+            let current = folderArray;
+            for (let i = 0; i < pathParts.length; i++) {
+                const part = pathParts[i];
+                let folder = current.find(item => item.name === part && item.type === 'folder');
+                if (!folder) { folder = { name: part, type: 'folder', children: [] }; current.push(folder); }
+                current = folder.children;
+            }
+            return current;
+        }
+        files.forEach(file => {
+            const relativePath = file.webkitRelativePath;
+            if (relativePath) {
+                const pathParts = relativePath.split('/');
+                const filename = pathParts.pop();
+                const parentFolder = findOrCreateFolder(filestructure, pathParts);
+                parentFolder.push({ name: filename, type: 'file' });
+            } else {
+                filestructure.push({ name: file.name, type: 'file' });
+            }
+            tatolsize += file.size;
+            formData.append('files', file, file.name);
+        });
+        formData.append('tatolsize', tatolsize);
+        formData.append('relativePath', currentPath.join('/'));
+        formData.append('filestructure', JSON.stringify(filestructure));
+        const sessionId = localStorage.getItem('sessionId');
+        let requestUrl = endpointPath + '/folder;jsessionid=' + sessionId;
+        fetch(requestUrl, { method: 'POST', body: formData, credentials: 'include' })
+            .then(response => {
+                if (response.status == 401) alert('please login');
+                if (!response.ok) throw new Error('上传失败');
+                return response.json();
+            })
+            .then(data => { alert('upload success'); getFilePathSystemAndInit(); })
+            .catch(error => console.error('上传错误', error))
+            .finally(() => { input.value = ''; });
+    }
+
+    async function checkSpace(tatolsize) {
+        const sessionId = localStorage.getItem('sessionId');
+        let requestUrl = endpointPath + '/folder_check;jsessionid=' + sessionId;
+        try {
+            const response = await fetch(requestUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tatolsize })
+            });
+            if (!response.ok) throw new Error('上传失败');
+            return response.json();
+        } catch (error) { console.error('上传错误', error); }
+    }
+
+    /* 重命名 */
+    function startRename(id) {
+        let currentFileSystem = fileSystem;
+        currentPath.forEach(pathPart => {
+            const folder = currentFileSystem.find(item => item.name === pathPart && item.type === 'folder');
+            if (folder) currentFileSystem = folder.children;
+        });
+        let index = currentFileSystem.findIndex(item => item.id == id);
+        if (index === -1) return;
+        const item = currentFileSystem[index];
+        const offset = currentPath.length > 0 ? 1 : 0;
+        const listItem = document.querySelectorAll('.file-item')[index + offset];
+        if (!listItem) return;
+        const nameEl = listItem.querySelector('.fname');
+        const oldName = item.name;
+
+        const input = document.createElement('input');
+        input.className = 'rename-input';
+        input.value = oldName;
+        nameEl.replaceWith(input);
+        input.focus();
+        input.select();
+
+        const actionsEl = listItem.querySelector('.file-actions');
+        actionsEl.style.opacity = '1';
+        actionsEl.innerHTML = `
+        <button class="btn btn-primary" style="padding:5px 14px; font-size:12px;" onclick="saveRename('${id}', this.closest('.file-item'), '${oldName.replace(/'/g, "\\'")}')">保存</button>
+        <button class="btn btn-ghost" style="padding:5px 14px; font-size:12px;" onclick="cancelRename('${id}', this.closest('.file-item'), '${oldName.replace(/'/g, "\\'")}')">取消</button>
+    `;
+    }
+
+    async function saveRename(id, listItem, oldName) {
+        const inputEl = listItem.querySelector('.rename-input');
+        const newName = inputEl.value.trim();
+        if (newName) {
+            let currentFileSystem = fileSystem;
+            currentPath.forEach(p => {
+                const f = currentFileSystem.find(i => i.name === p && i.type === 'folder');
+                if (f) currentFileSystem = f.children;
+            });
+            const item = currentFileSystem.find(i => i.id == id);
+            if (!item) return;
+            try {
+                const response = await fetch(`${endpointPath}/file`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ id, newName })
+                });
+                if (!response.ok) throw new Error('重命名失败');
+                item.name = newName;
+                initFileList();
+            } catch (error) {
+                console.error('重命名出错:', error);
+                cancelRename(id, listItem, oldName);
+            }
+        } else {
+            cancelRename(id, listItem, oldName);
+        }
+    }
+
+    function cancelRename(id, listItem, oldName) {
+        initFileList();
+    }
+
+    /* 点击文件 */
+    async function clickFileItem(name) {
+        try {
+            let joincurrentPath = currentPath.join('/');
+            if (joincurrentPath.length > 0) joincurrentPath += '/';
+            const encodedPath = encodeURIComponent(joincurrentPath);
+            const encodedName = encodeURIComponent(name);
+            let url = `${endpointPath}/file?filepn=${encodedPath}${encodedName}`;
+            const response = await fetch(url, { method: 'GET', credentials: 'include' });
+            if (!response.ok) {
+                const e = new Error(`HTTP error! status: ${response.status}`);
+                e.response = response;
+                throw e;
+            }
+            const blob = await response.blob();
+            const urlObject = window.URL.createObjectURL(blob);
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let filenameMatch;
+            if (contentDisposition) filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+
+            let link = document.getElementById('downloadlink');
+            link.onclick = () => {
+                const a = document.createElement('a');
+                a.href = urlObject;
+                if (filenameMatch) a.download = decodeURIComponent(filenameMatch[1]);
+                a.click();
+                window.URL.revokeObjectURL(urlObject);
+            };
+
+            let filetype = decodeURIComponent(filenameMatch[1]).substring(decodeURIComponent(filenameMatch[1]).lastIndexOf('.') + 1);
+
+            if (filetype == 'txt' || filetype == 'md' || filetype == 'jpg' || filetype == 'png' || filetype == 'mermaid' || filetype == 'mmd') {
+                let showcontent = document.getElementById('fileshowcontent');
+                showcontent.innerHTML = '';
+                document.getElementById('previewTitle').textContent = name;
+
+                if (filetype === 'txt') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const ta = document.createElement('textarea');
+                        ta.value = e.target.result;
+                        ta.style.cssText = 'width:100%;height:100%;min-height:350px;resize:none;border:1.5px solid #e8ecf4;border-radius:10px;padding:14px;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;line-height:1.6;color:#1a1d26;background:#f8f9fc;';
+                        showcontent.appendChild(ta);
+                    };
+                    reader.readAsText(blob);
+                }
+                if (filetype === 'md') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'markdown-body';
+                        div.innerHTML = marked.parse(e.target.result);
+                        showcontent.appendChild(div);
+                    };
+                    reader.readAsText(blob);
+                }
+                if (filetype === 'mermaid' || filetype === 'mmd') {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const container = document.createElement('div');
+                        container.style.cssText = 'display:flex;justify-content:center;padding:8px 0;';
+                        const pre = document.createElement('pre');
+                        pre.className = 'mermaid';
+                        pre.textContent = e.target.result;
+                        container.appendChild(pre);
+                        showcontent.appendChild(container);
+                        try {
+                            await mermaid.run({ nodes: [pre] });
+                        } catch (err) {
+                            container.innerHTML = `<div style="color:var(--c-danger);padding:20px;text-align:center;">
+                                <i class="fas fa-exclamation-triangle" style="font-size:24px;margin-bottom:8px;display:block;"></i>
+                                <p style="font-weight:600;">Mermaid 渲染失败</p>
+                                <p style="font-size:13px;color:var(--c-text-muted);margin-top:4px;">${err.message || '语法有误'}</p>
+                            </div>`;
+                        }
+                    };
+                    reader.readAsText(blob);
+                }
+                if (filetype == 'jpg' || filetype == 'png') {
+                    const img = document.createElement('img');
+                    img.src = urlObject;
+                    img.style.cssText = 'max-width:100%;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.08);';
+                    showcontent.appendChild(img);
+                }
+                openModal('previewModal');
+            } else {
+                link.click();
+            }
+        } catch (error) {
+            console.error('下载错误', error);
+        }
+    }
+
+    /* 更多操作 */
+    let currentFile;
+    function moreOperation(name, type) {
+        if (type == 'file') {
+            currentFile = name;
+            openModal('moreOpModal');
+        }
+    }
+
+    /* 封印 */
+    function sealfile() {
+        const sealTime = document.getElementById('sealTime').value;
+        if (!sealTime) { alert('请选择封印时间'); return; }
+        fetch(`${endpointPath}/sealFile`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ filepath: currentPath.join('/'), filename: currentFile, sealTime })
+        }).then(r => { if (r.ok) console.log('封印成功'); })
+            .catch(e => console.error('封印失败', e));
+        alert(`文件已封印，时间: ${sealTime}`);
+        closeMoreOperation();
+    }
+
+    /* ── 文件系统数据 ── */
+    let fileSystem = [
+        { id: '1', name: '文档', type: 'folder', whose: '3390351358@qq.com', path: '/文档', children: [{ name: '报告.docx', type: 'file' }] },
+        { name: '图片', type: 'folder', children: [] }
+    ];
+    let currentPath = [];
+
+    /* 初始化文件列表 */
+    async function initFileList() {
+        const fileList = document.getElementById('file-list');
+        fileList.innerHTML = '';
+        try {
+            let currentFileSystem = fileSystem;
+            for (const pathPart of currentPath) {
+                const folder = currentFileSystem.find(item => item.name === pathPart && item.type === 'folder');
+                if (folder) currentFileSystem = folder.children;
+                else break;
+            }
+
+            /* 返回上级 */
+            if (currentPath.length > 0) {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                li.innerHTML = `
+                <div class="file-body" onclick="goBack()">
+                    <div class="file-icon folder-icon"><i class="fas fa-level-up-alt"></i></div>
+                    <div class="file-icon-text">
+                        <div class="fname">..</div>
+                        <div class="fmeta">返回上一级</div>
+                    </div>
+                </div>
+                <div class="file-actions"></div>
+            `;
+                fileList.appendChild(li);
+            }
+
+            currentFileSystem.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'file-item';
+                const iconClass = item.type === 'folder' ? 'folder-icon' : 'file-icon-default';
+                const iconFA = item.type === 'folder' ? 'fa-folder' : 'fa-file';
+                const meta = item.type === 'folder' ? '文件夹' : '文件';
+
+                li.innerHTML = `
+                <div class="file-body" onclick="${item.type === 'folder' ? `enterFolder('${item.name}')` : `clickFileItem('${item.name}')`}">
+                    <div class="file-icon ${iconClass}"><i class="fas ${iconFA}"></i></div>
+                    <div class="file-icon-text">
+                        <div class="fname">${item.name}</div>
+                        <div class="fmeta">${meta}</div>
+                    </div>
+                </div>
+                <div class="file-actions">
+                    <button class="file-action-btn" title="重命名" onclick="event.stopPropagation(); startRename('${item.id}')">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                    <button class="file-action-btn del" title="删除" onclick="event.stopPropagation(); isDeletef('${item.name}','${item.type}','${item.id}')">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button class="file-action-btn" title="更多" onclick="event.stopPropagation(); moreOperation('${item.name}','${item.type}')">
+                        <i class="fas fa-ellipsis-h"></i>
+                    </button>
+                </div>
+            `;
+                fileList.appendChild(li);
+            });
+
+            /* 更新路径 */
+            const pathDisplay = document.getElementById('path-display');
+            if (currentPath.length === 0) {
+                pathDisplay.innerHTML = '<i class="fas fa-folder-open"></i><span class="crumb">根目录</span>';
+            } else {
+                let html = '<i class="fas fa-folder-open"></i><span class="crumb clickable" onclick="currentPath=[];initFileList()">根目录</span>';
+                currentPath.forEach((p, i) => {
+                    html += `<span class="sep">/</span>`;
+                    if (i === currentPath.length - 1) {
+                        html += `<span class="crumb">${p}</span>`;
+                    } else {
+                        const pathUpTo = currentPath.slice(0, i + 1);
+                        html += `<span class="crumb clickable" onclick="currentPath=${JSON.stringify(pathUpTo)};initFileList()">${p}</span>`;
+                    }
+                });
+                pathDisplay.innerHTML = html;
+            }
+        } catch (error) {
+            console.error('初始化文件列表出错:', error);
+        }
+    }
+
+    async function enterFolder(folderName) {
+        currentPath.push(folderName);
+        await initFileList();
+    }
+    async function goBack() {
+        currentPath.pop();
+        await initFileList();
+    }
+
+    async function getFilePathSystem() {
+        const sessionId = localStorage.getItem('sessionId');
+        let requestUrl = endpointPath + '/folder;jsessionid=' + sessionId;
+        fileSystem = await fetch(requestUrl, {
+            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' }
+        }).then(res => res.json());
+    }
+
+    function getFilePathSystemAndInit() {
+        getFilePathSystem().then(() => initFileList()).catch(e => console.error('获取文件路径出错:', e));
+    }
+
+    window.onload = function() { getFilePathSystemAndInit(); };
+</script>
+
+</body>
+</html>

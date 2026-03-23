@@ -1,5 +1,5 @@
 
-package love.linyi.service.folderUtilService.impl;
+package love.linyi.service.infra.file;
 
 import love.linyi.domin.UserFolder;
 import love.linyi.service.infra.file.impl.FolderStructureBuilder;

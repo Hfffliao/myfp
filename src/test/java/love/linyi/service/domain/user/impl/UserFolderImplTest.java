@@ -1,8 +1,7 @@
-package love.linyi.service.impl;
+package love.linyi.service.domain.user.impl;
 
 import love.linyi.dao.UserFolderDao;
 import love.linyi.domin.UserFolder;
-import love.linyi.service.domain.user.impl.UserFolderImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

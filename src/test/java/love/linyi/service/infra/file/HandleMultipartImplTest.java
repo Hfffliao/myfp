@@ -1,4 +1,4 @@
-package love.linyi.service.folderUtilService.impl;
+package love.linyi.service.infra.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import love.linyi.service.domain.user.impl.UserFolderImpl;

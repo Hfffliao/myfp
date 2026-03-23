@@ -1,4 +1,4 @@
-package love.linyi.service.security.impl;
+package love.linyi.service.infra.security;
 
 import love.linyi.config.Config;
 import love.linyi.service.infra.security.impl.FilePathImpl;

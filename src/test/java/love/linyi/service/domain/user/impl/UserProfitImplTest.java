@@ -1,8 +1,7 @@
-package love.linyi.service.Impl;
+package love.linyi.service.domain.user.impl;
 
 import love.linyi.dao.UserProfitDao;
 import love.linyi.domin.UserProfit;
-import love.linyi.service.domain.user.impl.UserProfitImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

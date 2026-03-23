@@ -1,3 +1,4 @@
+<!--2026.3.23-->
 <!DOCTYPE html>
 <html lang="zh-CN">
 
@@ -54,19 +55,13 @@
         );
     </script>
     <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.2/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="marked.min.js"></script>
+    <script src="mermaid.min.js"></script>
+
     <style>
         /* CSS变量定义 */
 
         /* md文件渲染（开始） */
-        .markdown-body {
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            padding: 20px;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-        }
         .markdown-body h1, .markdown-body h2, .markdown-body h3 {
             margin-top: 24px;
             margin-bottom: 16px;
@@ -152,34 +147,7 @@
             margin: 0;
         }
 
-        .file-item {
-            display: flex;
-            align-items: center;
-            padding: 0px;
-            border-bottom: 1px solid #eee;
-            transition: background-color 0.3s;
-        }
 
-        .file-item:hover {
-            background-color: #f9f9f9;
-        }
-
-        .file-icon {
-            margin-right: 10px;
-            font-size: 20px;
-        }
-
-        .folder {
-            color: #ffd700;
-        }
-
-        .file {
-            color: #6c757d;
-        }
-
-        .file-name {
-            flex-grow: 1;
-        }
 
         .delete-btn {
             background-color: #dc3545;
@@ -196,33 +164,59 @@
             flex-grow: 1;
         }
 
-        .rename-btn {
-            background-color: #1259dd;
+
+        /* 文件展示相关 */
+        /* 遮罩层 */
+        .fileshow-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            display: none;
+        }
+
+        /* 文件展示窗口 - 全屏 */
+        .fileshow {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: none;
+            background-color: #fff;
+            flex-direction: column;
+        }
+
+        /* 顶部工具栏 */
+        .fileshow-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            background: #f5f5f5;
+            border-bottom: 1px solid #ddd;
+            flex-shrink: 0;
+        }
+
+        .fileshow-header button {
             margin-left: 10px;
         }
 
-        .rename-btn:hover {
-            background-color: #218838;
-        }
-
-        .rename-input {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            flex-grow: 1;
-            margin-right: 10px;
-        }
-
-        .fileshow {
-            background-color: #fff;
+        /* 内容区域 - 占满剩余空间 */
+        #fileshowcontent {
+            flex: 1;
             width: 100%;
-            height: 800px;
-            z-index: 1000;
-            position: fixed;
-            /* 固定定位 */
-            top: 100px;
-            display: none;
-            padding: 10px 20px 10px 20px;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        /* 文件展示相关 */
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;  /* 左右两端分布 */
+            padding: 0px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
         }
         .moreoperation{
             position: fixed;
@@ -285,12 +279,19 @@
     <div id="header"></div>
     <main>
         <!-- 文件展示窗口 -->
+        <!-- 遮罩层 -->
+        <div id="fileshow-overlay" class="fileshow-overlay" onclick="closefileshow()"></div>
+
+        <!-- 文件展示窗口 -->
         <div id="fileshow" class="fileshow">
-            <button id="closefileshow" onclick="closefileshow()">关闭</button>
-            <button id="downloadlink">下载</button>
-            <!-- //文件展示项目 -->
-            <div id="fileshowcontent" style="width: 100%;height: 500px;">
+            <div class="fileshow-header">
+                <span id="fileshow-title" style="font-weight:600;font-size:16px;">文件预览</span>
+                <div>
+                    <button id="downloadlink">下载</button>
+                    <button onclick="closefileshow()" style="background:#dc3545;margin-left:10px;">关闭</button>
+                </div>
             </div>
+            <div id="fileshowcontent"></div>
         </div>
         <!-- 更多操作按钮的选项 -->
         <div id="moreoperation" class="moreoperation">
@@ -345,6 +346,7 @@
 <script>
     function closefileshow() {
         document.getElementById('fileshow').style.display = 'none';
+        document.getElementById('fileshow-overlay').style.display = 'none';
     }
 
     // 新增：关闭 moreoperation 面板的函数
@@ -391,7 +393,7 @@
         }
         cancelNewFolder();
     }
-    //关闭新建文件夹  
+    //关闭新建文件夹
     function cancelNewFolder() {
         document.getElementById('new-folder-form').style.display = 'none';
         document.getElementById('toolbar').style.display = 'block';
@@ -605,25 +607,36 @@
 
         const item = currentFileSystem[index];
         const listItem = document.querySelectorAll('.file-item')[index + (currentPath.length > 0 ? 1 : 0)];
-        const nameElement = listItem.querySelector('.file-name');
+        const nameElement = listItem.querySelector('.file-body');
         const oldName = item.name;
-
         const input = document.createElement('input');
         input.className = 'rename-input';
         input.value = oldName;
-        nameElement.parentNode.replaceChild(input, nameElement);
 
+        //隐藏文件file-body
+        nameElement.style.display = 'none';
+        //隐藏文件操作按钮容器
+        const actionsDiv = listItem.querySelector('.file-actions');
+        actionsDiv.style.display = 'none';
+        //添加重命名文本输入框
+        listItem.appendChild(input);
+
+        //创建重命名按钮容器，显示保存、取消按钮
+        const actionsRename = document.createElement('div');
+        actionsRename.style = "display:flex; gap:6px; flex-shrink:0;";
+        actionsRename.className = 'file-actions-rename';//文件重命名按钮容器:保存、取消
+        //添加保存、取消按钮
         const saveBtn = document.createElement('button');
-        saveBtn.className = 'rename-btn';
+        saveBtn.className = 'save-btn';
         saveBtn.textContent = '保存';
         saveBtn.onclick = () => saveRename(id, input, listItem, oldName);
-        listItem.querySelector('.rename-btn').replaceWith(saveBtn);
-
+        actionsRename.appendChild(saveBtn);
         const cancelBtn = document.createElement('button');
         cancelBtn.className = 'cancel-btn';
         cancelBtn.textContent = '取消';
         cancelBtn.onclick = () => cancelRename(id, listItem, oldName);
-        listItem.appendChild(cancelBtn);
+        actionsRename.appendChild(cancelBtn);
+        listItem.appendChild(actionsRename);
     }
     // 保存重命名
     async function saveRename(id, inputElement, listItem, oldName) {
@@ -670,18 +683,14 @@
     // 取消重命名
     function cancelRename(id, listItem, oldName) {
         const inputElement = listItem.querySelector('.rename-input');
-        const nameElement = document.createElement('span');
-        nameElement.className = 'file-name';
-        nameElement.textContent = oldName;
-        inputElement.parentNode.replaceChild(nameElement, inputElement);
 
-        const renameBtn = document.createElement('button');
-        renameBtn.className = 'rename-btn';
-        renameBtn.textContent = '重命名';
-        renameBtn.onclick = () => startRename(id);
-        listItem.querySelector('.rename-btn').replaceWith(renameBtn);
-
-        listItem.querySelector('.cancel-btn')?.remove();
+        const  nameElement = listItem.querySelector('.file-body');
+        nameElement.style.display = 'inline-flex';
+        inputElement.remove();
+        //恢复文件操作按钮容器，删除重命名按钮容器
+        const actionsDiv = listItem.querySelector('.file-actions');
+        actionsDiv.style.display = 'flex';
+        listItem.querySelector('.file-actions-rename')?.remove();
     }
     ////////// 单击文件项
     async function clickFileItem(name) {
@@ -744,7 +753,7 @@
             if (
             //    filetype == 'doc'  || filetype == 'docx' || filetype == 'xls' || filetype == 'xlsx' ||
             // filetype == 'ppt' || filetype == 'pptx' || filetype == 'pdf'||
-            filetype == 'txt'||filetype=='md'||filetype=='jpg'||filetype=='png') {
+            filetype == 'txt'||filetype=='md'||filetype=='jpg'||filetype=='png'|| filetype=='mmd'||filetype=='mermaid') {
 
                 let show = document.getElementById('fileshow');
                 let showcontent = document.getElementById('fileshowcontent');
@@ -760,7 +769,11 @@
                         showcontent.appendChild(textarea);
                     };
                     reader.readAsText(blob);
-                    show.style.display = 'block';
+                    show.style.display = 'flex';  // 改为 flex 才能撑满
+                    document.getElementById('fileshow-overlay').style.display = 'block';
+
+// 同时设置标题
+                    document.getElementById('fileshow-title').textContent = name;
                 }
                 if (filetype === 'md') {
                     const reader = new FileReader();
@@ -771,52 +784,57 @@
                         showcontent.appendChild(div);
                     };
                     reader.readAsText(blob);
-                    show.style.display = 'block';
+                    show.style.display = 'flex';  // 改为 flex 才能撑满
+                    document.getElementById('fileshow-overlay').style.display = 'block';
+
+// 同时设置标题
+                    document.getElementById('fileshow-title').textContent = name;
                 }
                 if(filetype=='jpg'||filetype=='png'){
                     const img = document.createElement('img');
                     img.src = urlObject;
                     img.style.width = '70%';
                     showcontent.appendChild(img);
-                    show.style.display = 'block';
-                }
-                //可能有用的表示方法
-                // const iframe = document.createElement('iframe');
-                // iframe.style.width = '100%';
-                // iframe.style.height = '100%';
-                // iframe.style.border = 'none';
+                    show.style.display = 'flex';  // 改为 flex 才能撑满
+                    document.getElementById('fileshow-overlay').style.display = 'block';
 
-                // if (['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(filetype)) {
-                //     // 使用 Microsoft Office Online 预览 Office 文件
-                //     const officeUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(urlObject)}`;
-                //     iframe.src = officeUrl;
-                // } else if (filetype === 'pdf') {
-                //     // 直接预览 PDF 文件
-                //     iframe.src = urlObject;
-                // } else if (['jpg', 'png'].includes(filetype)) {
-                //     // 显示图片
-                //     iframe.src = `data:image/${filetype};base64,${await blobToBase64(blob)}`;
-                // } else if (filetype === 'txt') {
-                //     // 显示文本文件
-                //     const reader = new FileReader();
-                //     reader.onload = function(e) {
-                //         const textContent = e.target.result;
-                //         iframe.srcdoc = `
-                //             <!DOCTYPE html>
-                //             <html>
-                //             <head>
-                //                 <meta charset="UTF-8">
-                //             </head>
-                //             <body>
-                //                 <pre style="white-space: pre-wrap; padding: 10px;">${textContent}</pre>
-                //             </body>
-                //             </html>
-                //         `;
-                //     };
-                //     reader.readAsText(blob);
-                // }
-                // showcontent.appendChild(iframe);
-                // show.style.display = 'block';
+// 同时设置标题
+                    document.getElementById('fileshow-title').textContent = name;
+                }
+                if (filetype === 'mermaid' || filetype === 'mmd') {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const container = document.createElement('div');
+                        container.style.cssText = 'display:flex;justify-content:center;padding:8px 0;';
+                        const pre = document.createElement('pre');
+                        pre.className = 'mermaid';
+                        pre.textContent = e.target.result;
+                        container.appendChild(pre);
+                        showcontent.appendChild(container);
+
+                        // ★ 关键：必须先让容器可见，mermaid 才能获取到尺寸
+                        show.style.display = 'flex';  // 改为 flex 才能撑满
+                        document.getElementById('fileshow-overlay').style.display = 'block';
+
+// 同时设置标题
+                        document.getElementById('fileshow-title').textContent = name;
+
+                        // 等浏览器完成布局渲染
+                        await new Promise(r => setTimeout(r, 100));
+
+                        try {
+                            mermaid.initialize({ startOnLoad: false, theme: 'default' });
+                            await mermaid.run({ nodes: [pre] });
+                        } catch (err) {
+                            container.innerHTML = `<div style="color:#dc3545;padding:20px;text-align:center;">
+                <p style="font-weight:600;">Mermaid 渲染失败</p>
+                <p style="font-size:13px;color:#6a737d;margin-top:4px;">${err.message}</p>
+            </div>`;
+                        }
+                    };
+                    reader.readAsText(blob);
+                    // 注意：这里不再提前设 display = 'block'，由 reader.onload 内部控制
+                }
 
             } else {
                 // 触发点击事件进行下载
@@ -859,12 +877,12 @@
                 filename: currentFile,
                 sealTime: sealTime
             })
-           
+
         }).then(response=>{
             if(response.ok){
                 console.log('封印文件成功');
             }
-        }) 
+        })
         .catch(error=>{
                 console.error('封印文件失败', error);
         })
@@ -945,15 +963,16 @@ let currentFile;
                 const listItem = document.createElement('li');
                 listItem.className = 'file-item';
                 //文件栏位主体包括icon&name
+                // 文件栏位主体（左侧）
                 const filebody = document.createElement('div');
-                filebody.style = "display:inline-block;width: 80% ; white-space: normal;overflow-wrap: break-word;word-break: break-all;"
+                filebody.className = 'file-body';
+                filebody.style = "display:inline-flex; align-items:center; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;";
                 listItem.appendChild(filebody);
 
                 const icon = document.createElement('span');
                 icon.className = `file-icon ${item.type}`;
                 icon.innerHTML = item.type === 'folder' ? '📁' : '📄';
                 filebody.appendChild(icon);
-
 
                 const name = document.createElement('span');
                 name.className = 'file-name';
@@ -965,24 +984,30 @@ let currentFile;
                     filebody.onclick = () => clickFileItem(item.name);
                 }
                 filebody.appendChild(name);
-                //文件操作按钮
+
+// ★ 按钮容器（右侧）
+                const actions = document.createElement('div');
+                actions.style = "display:flex; gap:6px; flex-shrink:0;";
+                actions.className = 'file-actions';//文件操作按钮容器:重命名、删除、更多
                 const renameBtn = document.createElement('button');
                 renameBtn.className = 'rename-btn';
                 renameBtn.textContent = '重命名';
                 renameBtn.onclick = () => startRename(item.id);
-                listItem.appendChild(renameBtn);
+                actions.appendChild(renameBtn);
 
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'delete-btn';
                 deleteBtn.textContent = '删除';
-                deleteBtn.onclick = () => isDeletef(item.name,item.type,item.id);
-                listItem.appendChild(deleteBtn);
+                deleteBtn.onclick = () => isDeletef(item.name, item.type, item.id);
+                actions.appendChild(deleteBtn);
 
                 const moreBtn = document.createElement('button');
                 moreBtn.className = 'more-btn';
                 moreBtn.textContent = '更多';
-                moreBtn.onclick = () => moreOperation(item.name,item.type);
-                listItem.appendChild(moreBtn);
+                moreBtn.onclick = () => moreOperation(item.name, item.type);
+                actions.appendChild(moreBtn);
+
+                listItem.appendChild(actions);
                 fileList.appendChild(listItem);
             });
 
