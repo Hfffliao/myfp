@@ -80,7 +80,7 @@ async function initPage() {//初始化导航栏和页脚
 }
 
 function loadHeaderFooter() {
-    const headFetch = fetch(contextPath+'/pages/css/head.html')
+    const headFetch = fetch(contextPath+'/pages/components/head.html')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -96,7 +96,7 @@ function loadHeaderFooter() {
             console.error('加载头部文件时出错:', error);
             throw error;
         });
-    const footFetch = fetch(contextPath+'/pages/css/foot.html')
+    const footFetch = fetch(contextPath+'/pages/components/foot.html')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
