@@ -22,12 +22,12 @@
             link.rel = 'stylesheet'; link.href = href; link.onload = onLoad; link.onerror = onError;
             document.head.appendChild(link);
         }
-        loadScript(contextPath + '/pages/css/hangbege.js', () => {}, () => console.error('hangbege.js 加载失败'));
+        loadScript(contextPath + '/pages/js/hangbege.js', () => {}, () => console.error('hangbege.js 加载失败'));
         loadStylesheet(contextPath + '/pages/css/linyistyle.css', () => {}, () => console.error('linyistyle.css 加载失败'));
     </script>
     <link rel="stylesheet" href="css/font-awesome/css/all.min.css">
-    <script src="marked.min.js"></script>
-    <script src="mermaid.min.js"></script>
+    <script src="js/marked.min.js"></script>
+    <script src="js/mermaid.min.js"></script>
     <script>mermaid.initialize({ startOnLoad: false, theme: 'default', securityLevel: 'loose' });</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
