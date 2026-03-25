@@ -91,6 +91,13 @@ body {
     flex-direction: column;
     cursor: pointer;
 }
+.menu-toggle {
+    display: block;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+}
 .nav-links {
     width: 80%;
     display: flex;
@@ -201,31 +208,22 @@ footer {
 .social-link:hover {
     opacity: 0.8;
 }
-    /*@media (max-width: 768px) {*/
-    /*    !* 导航栏改为汉堡菜单 *!*/
-    /*    -links {*/
-    /*        display: none; !* 默认隐藏导航链接 *!*/
-    /*        width: 100%;*/
-    /*        flex-direction: column;*/
-    /*        position: absolute;*/
-    /*        top: 100%;*/
-    /*        left: 0;*/
-    /*        background: var(--primary-color);*/
-    /*        padding: 1rem;*/
-    /*    }*/
+    @media (max-width: 768px) {
+    /* 导航栏保持和电脑端一致，显示汉堡按钮但不隐藏导航链接 */
+    .menu-toggle {
+        display: block !important;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
 
-    /*    .nav-link {*/
-    /*        width: 100%;*/
-    /*        text-align: center;*/
-    /*        padding: 1rem;*/
-    /*    }*/
+    .nav-links {
+        display: flex !important;
+        width: 80%;
+    }
 
-    /*    !* 显示汉堡菜单图标 *!*/
-    /*    .menu-toggle {*/
-    /*        display: block !important;*/
-    /*        color: white;*/
-    /*        font-size: 1.5rem;*/
-    /*        cursor: pointer;*/
-    /*    }*/
-    /*    !* 卡片容器减少内边距 *!*/
-    /*}*/
+    .nav-link {
+        width: auto;
+        padding: 0.5rem;
+    }
+}*/
