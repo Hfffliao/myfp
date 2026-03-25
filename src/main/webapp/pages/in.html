@@ -70,6 +70,24 @@
             background-color: #e8d4da;
             font-size: large;
         }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 280px;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        .checkbox-group label {
+            cursor: pointer;
+            color: #2d2d2d;
+        }
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
 
 
         /* 页脚样式 */
@@ -93,6 +111,12 @@
             用户名（邮箱地址）：<input type ="text" name="username" class="card-in"><br>
 
             密码：<input  type ="password" name="password" class="card-in"><br>
+            <!-- 在密码输入框和登录按钮之间插入 -->
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="rememberMeCheckbox"> 自动登录（下次免密）
+                </label>
+            </div>
             <input type="button"  value="登录" id="area" onclick="bt()">
 
 
@@ -108,53 +132,97 @@
   document.getElementById("forgetpassword").href = contextPath + "/pages/getpassword.html";
   window.addEventListener('load',init)
   function init() {
-    
+      // 先填充“记住密码”保存的账号密码（如果存在）
+      const savedUsername = localStorage.getItem('savedUsername');
+      const savedPassword = localStorage.getItem('savedPassword');
+      if (savedUsername) {
+          document.querySelector("input[name='username']").value = savedUsername;
+      }
+      if (savedPassword) {
+          document.querySelector("input[name='password']").value = savedPassword;
+      }
+      autoLogin();   // 添加这一行
   }
-  function bt(){
-    fetch(endpointPath+"/login",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        // 修复点：把 JSON.stringify 放在 body 内
-        body:JSON.stringify({
-            username:document.querySelector("input[name='username']").value,
-            password:document.querySelector("input[name='password']").value
-        }),
-        credentials: "include" // 携带会话信息
-    }) // fetch 选项结束
-    .then(function(response){
-        const sessionId = response.headers.get('TK');
-        console.log("sessionId:"+sessionId);
-        if (sessionId) {
-            localStorage.setItem('sessionId', sessionId);
-        }
-        if(response.ok){
-            return response.json(); 
-        }  else {
-            alert('登录失败');
-            throw new Error(`登录失败，状态码: ${response.status}` );
-        } 
-    }).then(function(data){
-        
-        if(data.user){
-            const currentDate = new Date();
-            const expirationDate = new Date(currentDate.getTime() + 30* 60 * 1000);
-            localStorage.setItem('username',data.user);
-            localStorage.setItem('expirationDate', expirationDate.toISOString());
-            console.log('登录成功');
+  function bt() {
+      fetch(endpointPath + "/login", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+              username: document.querySelector("input[name='username']").value,
+              password: document.querySelector("input[name='password']").value
+          }),
+          credentials: "include"
+      })
+          .then(function(response) {
+              const sessionId = response.headers.get('TK');  // 在这里获取 sessionId
+              if (sessionId) {
+                  localStorage.setItem('sessionId', sessionId);
+              }
+              if (response.ok) {
+                  return response.json().then(data => ({ data, sessionId })); // 将 sessionId 传递给下一个 then
+              } else {
+                  alert('登录失败');
+                  throw new Error(`登录失败，状态码: ${response.status}`);
+              }
+          })
+          .then(function({ data, sessionId }) {  // 接收 sessionId 和 data
+              if (data.user) {
+                  const currentDate = new Date();
+                  const expirationDate = new Date(currentDate.getTime() + 30 * 60 * 1000);
+                  localStorage.setItem('username', data.user);
+                  localStorage.setItem('expirationDate', expirationDate.toISOString());
+                  console.log('登录成功');
 
+                  // ========== 自动登录凭证处理（存储用户名/密码） ==========
+                  const rememberMe = document.getElementById('rememberMeCheckbox').checked;
+                  if (rememberMe) {
+                      // 保存用户名和密码（明文，用于下次自动填充）
+                      const username = document.querySelector("input[name='username']").value;
+                      const password = document.querySelector("input[name='password']").value;
+                      localStorage.setItem('autoUsername', username);
+                      localStorage.setItem('autoPassword', password);
+                  } else {
+                      // 未勾选则清除旧凭证
+                      localStorage.removeItem('autoUsername');
+                      localStorage.removeItem('autoPassword');
+                  }
+                  // ====================================================
+                  // 保存用户名和密码（明文）
+                  localStorage.setItem('savedUsername', document.querySelector("input[name='username']").value);
+                  localStorage.setItem('savedPassword', document.querySelector("input[name='password']").value);
+                  alert('登录成功');
+                  window.location.href = contextPath + "/pages/main.html";
+              } else {
+                  throw new Error('验证成功但是无用户信息');
+              }
+          })
+          .catch(function(error) {
+              console.error('登录失败:', error);
+          });
+  }
+  // 自动登录：填充表单并模拟点击登录按钮
+  let autoLoginAttempted = false;  // 防止重复执行自动登录
 
-            alert('登录成功');
-             window.location.href = contextPath + "/pages/main.html";
-        }else{
-            throw new Error('验证成功但是无用户信息');
-        }
-       
-    }).catch(function(error){
-        console.error('登录失败:', error);
-    })
-}
+  function autoLogin() {
+      if (autoLoginAttempted) return;
+      autoLoginAttempted = true;
+
+      const savedUsername = localStorage.getItem('autoUsername');
+      const savedPassword = localStorage.getItem('autoPassword');
+      if (!savedUsername || !savedPassword) return;
+
+      // 填充表单
+      document.querySelector("input[name='username']").value = savedUsername;
+      document.querySelector("input[name='password']").value = savedPassword;
+
+      // 模拟点击登录按钮（触发 bt）
+      const loginBtn = document.getElementById("area");
+      if (loginBtn) {
+          loginBtn.click();
+      }
+  }
 </script>
 <div id="footer"></div>
 </body>
